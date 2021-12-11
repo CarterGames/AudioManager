@@ -16,8 +16,8 @@ using System.Linq;
  *      E: jonathan@carter.games
  *      W: https://jonathan.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 27/08/2021 (d/m/y)							
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)									
  * 
  */
 
@@ -114,7 +114,12 @@ namespace CarterGames.Assets.AudioManager
             }
         }
 
-        
+        /// <summary>
+        /// Returns if the music player is currently playing a track.
+        /// </summary>
+        public bool IsTrackPlaying => GetAudioSource.isPlaying;
+
+
         private void OnEnable()
         {
             // Instancing Setup...
@@ -214,6 +219,15 @@ namespace CarterGames.Assets.AudioManager
         public void PlayTrack()
         {
             GetAudioSource.Play();
+        }
+
+
+        /// <summary>
+        /// Stops the active track when called...
+        /// </summary>
+        public void StopTrack()
+        {
+            GetAudioSource.Stop();
         }
         
 
@@ -447,38 +461,47 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="multiplier">How fast or slow should it go.</param>
         private IEnumerator FadeInOut(bool fadeIn, AudioSource s, float multiplier = 1f)
         {
+            var _currentTime = 0f;
+            var _start = s.volume;
+            var _targetValue = 0f;
+            var _duration = 1f;
+
+            // Fade to 1...
             if (fadeIn)
             {
-                s.volume = 0f;
-                
-                while (s.volume < volume)
+                _targetValue = 1f;
+
+                while (_currentTime < _duration)
                 {
-                    s.volume += multiplier * Time.unscaledDeltaTime;
+                    _currentTime += multiplier * Time.unscaledDeltaTime;
+                    s.volume = Mathf.Lerp(_start, _targetValue, _currentTime / _duration);
                     yield return null;
                 }
-                
-                s.volume = volume;
+
+                s.volume = 1f;
+                OnTrackTransitionComplete?.Invoke();
+                yield break;
             }
-            else
+
+            // Fade to 0...
+            // Only runs if it is not fading to 1...
+            _targetValue = 0f;
+
+            while (_currentTime < _duration)
             {
-                s.volume = volume;
-                
-                while (s.volume > 0f)
-                {
-                    s.volume -= multiplier * Time.unscaledDeltaTime;
-                    yield return null;
-                }
-                
-                s.volume = 0f;
+                _currentTime += multiplier * Time.unscaledDeltaTime;
+                s.volume = Mathf.Lerp(_start, _targetValue, _currentTime / _duration);
+                yield return null;
             }
-            
+
+            s.volume = 0f;
             OnTrackTransitionComplete?.Invoke();
         }
         
 
 
         /// <summary>
-        /// Coroutine | Cross-fades the track into the game.
+        /// Coroutine | Fades out & then in the track into the game.
         /// </summary>
         /// <param name="clip">The clip to change</param>
         /// <param name="s">The source to play from</param>
@@ -488,22 +511,35 @@ namespace CarterGames.Assets.AudioManager
         /// <returns></returns>
         private IEnumerator FadeTrackInOut(AudioClip clip, AudioSource s, float multiplier, float startTime = 0f, float endTime = 0f)
         {
-            while (s.volume > 0f)
+            var _currentTime = 0f;
+            var _start = s.volume;
+            var _targetValue = 0f;
+            var _duration = 1f;
+            
+            _targetValue = 0f;
+
+            while (_currentTime < _duration)
             {
-                s.volume -= (multiplier * 2f) * Time.unscaledDeltaTime;
+                _currentTime += multiplier * 2 * Time.unscaledDeltaTime;
+                s.volume = Mathf.Lerp(_start, _targetValue, _currentTime / _duration);
                 yield return null;
             }
             
             s.volume = 0f;
             SetTrack(clip, s, startTime, endTime);
 
-            while (s.volume < volume)
+            _targetValue = 1f;
+            _start = s.volume;
+            _currentTime = 0f;
+            
+            while (_currentTime < _duration)
             {
-                s.volume += (multiplier * 2f) * Time.unscaledDeltaTime;
+                _currentTime += multiplier * 2 * Time.unscaledDeltaTime;
+                s.volume = Mathf.Lerp(_start, _targetValue, _currentTime / _duration);
                 yield return null;
             }
             
-            s.volume = volume;
+            s.volume = 1f;
             OnTrackTransitionComplete?.Invoke();
         }
         

@@ -4,7 +4,6 @@ using UnityEngine.Audio;
 using UnityEditor;
 using System.IO;
 using System.Linq;
-using NUnit.Framework.Internal.Commands;
 
 /*
  * 
@@ -24,8 +23,8 @@ using NUnit.Framework.Internal.Commands;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 02/09/2021 (d/m/y)							
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)							
  * 
  */
 
@@ -46,6 +45,10 @@ namespace CarterGames.Assets.AudioManager.Editor
         private readonly Color32 greenCol = new Color32(41, 176, 97, 255);
         private readonly Color32 redCol = new Color32(190, 42, 42, 255);
         private readonly Color32 amRedCol = new Color32(255, 150, 157, 255);
+
+        private Color normalColour;
+        private Color normalBackgroundColour;
+        private Color normalContentColour;
 
         private const string PlayIconLocation = "Play";
         private const string StopIconLocation = "Stop";
@@ -69,7 +72,6 @@ namespace CarterGames.Assets.AudioManager.Editor
         private SerializedObject fileObj;
         private SerializedProperty soundPrefab;
         private SerializedProperty audioMixerList;
-        private SerializedProperty fileHasDir;
         private SerializedProperty fileDirs;
         private SerializedProperty fileLib;
         private SerializedProperty fileIsPopulated;
@@ -87,6 +89,10 @@ namespace CarterGames.Assets.AudioManager.Editor
             // Sets the boolean values up to what they were set to last.
             showDirectories = serializedObject.FindProperty("shouldShowDir").boolValue;
             showClips = serializedObject.FindProperty("shouldShowClips").boolValue;
+
+            normalColour = GUI.color;
+            normalBackgroundColour = GUI.backgroundColor;
+            normalContentColour = GUI.contentColor;
         }
 
         
@@ -119,7 +125,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             #endregion
 
             // Logo, Title & docs/discord links
-            HeaderDisplay();
+            AudioManagerEditorHelper.Header("Audio Manager", true, normalBackgroundColour);
 
             
             EditorGUILayout.BeginVertical("Box");
@@ -130,7 +136,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Manager Settings", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
             EditorGUILayout.EndHorizontal();
-            GUI.contentColor = Color.white;
+            GUI.contentColor = normalContentColour;
             
             GUILayout.Space(5f);
             
@@ -147,7 +153,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     && !IsScriptingDefinePresent(ScriptingDefines[1], EditorUserBuildSettings.activeBuildTarget))
                     AddScriptingDefine("USE_CG_AM_STATIC", EditorUserBuildSettings.activeBuildTarget);
             }
-            GUI.backgroundColor = Color.white;
+            GUI.backgroundColor = normalBackgroundColour;
 #else
             GUI.backgroundColor = redCol;
             if (GUILayout.Button("Disable Static Instance"))
@@ -159,7 +165,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 if (IsScriptingDefinePresent(ScriptingDefines[1], EditorUserBuildSettings.activeBuildTarget))
                     RemoveScriptingDefine("USE_CG_AM_STATIC", EditorUserBuildSettings.activeBuildTarget);
             }
-            GUI.backgroundColor = Color.white;
+            GUI.backgroundColor = normalBackgroundColour;
 #endif
             EditorGUILayout.EndHorizontal();
             
@@ -223,7 +229,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     }
                     else
                     {
-                        GUI.color = Color.white;
+                        GUI.color = normalColour;
                         if (GUILayout.Button("Hide Directories", GUILayout.Width(120)))
                         {
                             serializedObject.FindProperty("shouldShowDir").boolValue = !serializedObject.FindProperty("shouldShowDir").boolValue;
@@ -242,7 +248,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     }
                     else
                     {
-                        GUI.color = Color.white;
+                        GUI.color = normalColour;
                         if (GUILayout.Button("Hide Clips", GUILayout.Width(95)))
                         {
                             serializedObject.FindProperty("shouldShowClips").boolValue = !serializedObject.FindProperty("shouldShowClips").boolValue;
@@ -250,7 +256,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         }
                     }
 
-                    GUI.color = Color.white;
+                    GUI.color = normalColour;
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.EndHorizontal();
 
@@ -268,12 +274,12 @@ namespace CarterGames.Assets.AudioManager.Editor
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("Directories", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
                         EditorGUILayout.EndHorizontal();
-                        GUI.contentColor = Color.white;
+                        GUI.contentColor = normalContentColour;
             
                         GUILayout.Space(5f);
 
                         // controls the directories 
-                        if (fileHasDir.boolValue || fileDirs.arraySize > 0)
+                        if (fileDirs.arraySize > 0)
                         {
                             DirectoriesDisplay();
                         }
@@ -291,15 +297,14 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                             if (GUILayout.Button("Continue", GUILayout.Width(80)))
                             {
-                                if (fileHasDir.boolValue) goto SkipCont;
+                                if (fileDirs.arraySize > 0) goto SkipCont;
                                 fileDirs.InsertArrayElementAtIndex(0);
                                 AddToDirectories(newPath);
-                                fileHasDir.boolValue = true;
                             }
                             
                             SkipCont: ;
 
-                            GUI.color = Color.white;
+                            GUI.color = normalColour;
                             GUILayout.FlexibleSpace();
                             EditorGUILayout.EndHorizontal();
                         }
@@ -322,13 +327,13 @@ namespace CarterGames.Assets.AudioManager.Editor
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField("Clips", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
                     EditorGUILayout.EndHorizontal();
-                    GUI.contentColor = Color.white;
+                    GUI.contentColor = normalContentColour;
             
                     GUILayout.Space(5f);
 
                     if (CheckAmount() > 0)
                     {
-                        if (fileHasDir.boolValue && (CheckAmount() > GetNumberOfClips()) || (CheckAmount() < GetNumberOfClips()))
+                        if (fileDirs.arraySize > 0 && (CheckAmount() > GetNumberOfClips()) || (CheckAmount() < GetNumberOfClips()))
                         {               
                             // Init Lists
                             audioList = new List<AudioClip>();
@@ -349,7 +354,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         }
                         
                         
-                        if (fileHasDir.boolValue && CheckAmount().Equals(GetNumberOfClips()))
+                        if (fileDirs.arraySize > 0 && CheckAmount().Equals(GetNumberOfClips()))
                             DisplayNames();
                         else
                             HelpLabels();
@@ -444,73 +449,9 @@ namespace CarterGames.Assets.AudioManager.Editor
             }
         }
 
-        
+
         /// <summary>
-        /// Shows the header info including logo, asset name and documentation/discord buttons.
-        /// </summary>
-        private void HeaderDisplay()
-        {
-            GUILayout.Space(10f);
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-
-            // Shows either the Carter Games Logo or an alternative for if the icon is deleted/not included when you import the package
-            // Note: if you are using an older version of the asset, the directory/name of the logo may not match this and therefore will display the text title only
-            if (Resources.Load<Texture2D>("LogoAM"))
-            {
-                if (GUILayout.Button(Resources.Load<Texture2D>("LogoAM"), GUIStyle.none, GUILayout.Width(50), GUILayout.Height(50)))
-                {
-                    GUI.FocusControl(null);
-                }
-            }
-
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.Space(5f);
-
-            // Label that shows the name of the script / tool & the Version number for user reference sake.
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Audio Manager", EditorStyles.boldLabel, GUILayout.Width(TextWidth("Audio Manager   ")));
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Version: 2.5.2", GUILayout.Width(TextWidth("Version 2.5.2  ")));
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.Space(2.5f);
-
-            // Links to the docs and discord server for the user to access quickly if needed.
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Docs", GUILayout.Width(45f)))
-            {
-                Application.OpenURL("https://carter.games/audiomanager");
-            }
-            GUI.backgroundColor = Color.cyan;
-            if (GUILayout.Button("Discord", GUILayout.Width(65f)))
-            {
-                Application.OpenURL("https://carter.games/discord");
-            }
-            GUI.backgroundColor = redCol;
-            if (GUILayout.Button("Report Issue", GUILayout.Width(100f)))
-            {
-                Application.OpenURL("https://carter.games/report");
-            }
-
-            GUI.backgroundColor = Color.white;
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-            GUILayout.Space(10f);
-        }
-
-        
-        /// <summary>
-        /// Checks to see how many files are found from the sacn so it can be displayed.
+        /// Checks to see how many files are found from the scan so it can be displayed.
         /// </summary>
         /// <returns>Int | The amount of clips that have been found.</returns>
         private int CheckAmount()
@@ -518,14 +459,15 @@ namespace CarterGames.Assets.AudioManager.Editor
             int _amount = default;
             var _allFiles = new List<string>();
 
+            if (fileDirs == null) return 0;
             if (fileDirs.arraySize > 0)
             {
                 for (int i = 0; i < fileDirs.arraySize; i++)
                 {
-                    if (Directory.Exists(Application.dataPath + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i).stringValue))
+                    if (Directory.Exists(Application.dataPath + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue))
                     {
                         // 2.3.1 - adds a range so it adds each directory to the asset 1 by 1
-                        _allFiles.AddRange(new List<string>(Directory.GetFiles(Application.dataPath + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i).stringValue)));
+                        _allFiles.AddRange(new List<string>(Directory.GetFiles(Application.dataPath + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue)));
                     }
                     else
                     {
@@ -597,19 +539,19 @@ namespace CarterGames.Assets.AudioManager.Editor
                 if (fileDirs.GetArrayElementAtIndex(i).stringValue.Equals(""))
                     // 2.4.1 - fixed an issue where the directory order would break the asset finding files.
                     _allFiles.AddRange(new List<string>(Directory.GetFiles(Application.dataPath + BaseAudioFolderLocation)));
-                else if (Directory.Exists(Application.dataPath + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i).stringValue))
+                else if (Directory.Exists(Application.dataPath + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue))
                     // 2.3.1 - adds a range so it adds each directory to the asset 1 by 1.
-                    _allFiles.AddRange(new List<string>(Directory.GetFiles(Application.dataPath + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i).stringValue)));
+                    _allFiles.AddRange(new List<string>(Directory.GetFiles(Application.dataPath + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue)));
                 else
                 {
                     // !Warning Message - shown in the console should there not be a directory named what the user entered
 #if (!CarterGames_Assets_AudioManager_NoDebug)
-                    Debug.LogWarning("(*Audio Manager*): Path does not exist! please make sure you spelt your path correctly: " + Application.dataPath + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i).stringValue);
+                    Debug.LogWarning("(*Audio Manager*): Path does not exist! please make sure you spelt your path correctly: " + Application.dataPath + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue);
 #endif
                     shouldShowMessage = true;
                 }
             }
-           
+
 
             // Checks to see if there is anything in the path, if its empty it will not run the rest of the code and instead put a message in the console
             if (_allFiles.Any())
@@ -620,7 +562,10 @@ namespace CarterGames.Assets.AudioManager.Editor
                 {
                     var _path = "Assets" + _thingy.Replace(Application.dataPath, "").Replace('\\', '/');
 
-                    if (!AssetDatabase.LoadAssetAtPath(_path, typeof(AudioClip))) continue;
+                    if (!AssetDatabase.LoadAssetAtPath(_path, typeof(AudioClip)))
+                    {
+                        continue;
+                    }
                     
                     _source = (AudioClip)AssetDatabase.LoadAssetAtPath(_path, typeof(AudioClip));
                     audioList.Add(_source);
@@ -722,7 +667,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 }
 
                 // Resets the GUI colour
-                GUI.color = Color.white;
+                GUI.color = normalColour;
 
                 // Adds the text for the clip
                 EditorGUILayout.TextArea(_elementString, GUILayout.ExpandWidth(true));
@@ -751,7 +696,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField("Mixers", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
                     EditorGUILayout.EndHorizontal();
-                    GUI.contentColor = Color.white;
+                    GUI.contentColor = normalContentColour;
 
                     GUILayout.Space(5f);
 
@@ -774,9 +719,10 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                             if (GUILayout.Button("+", GUILayout.Width(25)))
                                 audioMixerList.InsertArrayElementAtIndex(audioMixerList.arraySize);
+                            
+                            GUI.color = normalColour;
                         }
-
-                        GUI.color = Color.white;
+                        
 
                         if (!i.Equals(0))
                         {
@@ -784,9 +730,9 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                             if (GUILayout.Button("-", GUILayout.Width(25)))
                                 audioMixerList.DeleteArrayElementAtIndex(i);
+                            
+                            GUI.color = normalColour;
                         }
-
-                        GUI.color = Color.white;
 
                         // Ends the GUI ordering
                         EditorGUILayout.EndHorizontal();
@@ -831,6 +777,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             var _check = 0;
 
+            if (fileDirs == null) return false;
             if (fileDirs.arraySize > 0)
             {
                 if (fileDirs.arraySize < 2) return false;
@@ -884,6 +831,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         private void DirectoriesDisplay()
         {
+            if (fileDirs.arraySize <= 0) return;
             for (var i = 0; i < fileDirs.arraySize; i++)
             {
                 EditorGUILayout.BeginHorizontal();
@@ -897,7 +845,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         fileDirs.InsertArrayElementAtIndex(i);
                 }
 
-                GUI.color = Color.white;
+                GUI.color = normalColour;
 
                 if (!i.Equals(0))
                 {
@@ -907,7 +855,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         fileDirs.DeleteArrayElementAtIndex(fileDirs.arraySize - 1);
                 }
 
-                GUI.color = Color.white;
+                GUI.color = normalColour;
                 EditorGUILayout.EndHorizontal();
             }
         }
@@ -940,7 +888,6 @@ namespace CarterGames.Assets.AudioManager.Editor
                 fileObj = new SerializedObject(file.objectReferenceValue);
                 soundPrefab = fileObj.FindProperty("soundPrefab");
                 audioMixerList = fileObj.FindProperty("audioMixer");
-                fileHasDir = fileObj.FindProperty("hasDirectories");
                 fileDirs = fileObj.FindProperty("directory");
                 fileLib = fileObj.FindProperty("library");
                 fileIsPopulated = fileObj.FindProperty("isPopulated");
@@ -994,11 +941,11 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                         for (var i = 0; i < fileDirs.arraySize; i++)
                         {
-                            _errorString = _errorString + "assets/" + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i).stringValue + "\n";
+                            _errorString = _errorString + "assets" + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue + "\n";
                         }
                     }
                     else
-                        _errorString = "No clips found in: " + "assets/" + BaseAudioFolderLocation;
+                        _errorString = "No clips found in: " + "assets" + BaseAudioFolderLocation;
 
                     EditorGUILayout.HelpBox(_errorString, MessageType.Info, true);
                     EditorGUILayout.EndHorizontal();
@@ -1016,7 +963,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                         for (int i = 0; i < fileDirs.arraySize; i++)
                         {
-                            _errorString = _errorString + "assets/" + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i).stringValue + "\n";
+                            _errorString = _errorString + "assets/" + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue + "\n";
                         }
                     }
                     else
@@ -1038,7 +985,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                         for (int i = 0; i < fileDirs.arraySize; i++)
                         {
-                            _errorString = _errorString + "assets/" + BaseAudioFolderLocation + fileDirs.GetArrayElementAtIndex(i) + "\n";
+                            _errorString = _errorString + "assets/" + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i) + "\n";
                         }
                     }
                     else
@@ -1061,11 +1008,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         
         
         
-        // JTools Bit
-        internal static float TextWidth(string text)
-        {
-            return GUI.skin.label.CalcSize(new GUIContent(text)).x;
-        }
+
         
         
         

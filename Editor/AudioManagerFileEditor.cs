@@ -19,8 +19,8 @@ using UnityEngine;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 27/08/2021 (d/m/y)							
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)							
  * 
  */
 
@@ -33,7 +33,6 @@ namespace CarterGames.Assets.AudioManager.Editor
         private readonly string[] TabTitles = new string[2] {"Settings", "Library"};
         
         private SerializedProperty audioPrefab;
-        private SerializedProperty hasDir;
         private SerializedProperty isPopulated;
         private SerializedProperty audioMixers;
         private SerializedProperty directories;
@@ -41,61 +40,31 @@ namespace CarterGames.Assets.AudioManager.Editor
         private SerializedProperty tabPos;
         
         private Color defaultContentCol;
+        private Color normalBackgroundCol;
         
         
         private void Awake()
         {
             audioPrefab = serializedObject.FindProperty("soundPrefab");
             isPopulated = serializedObject.FindProperty("isPopulated");
-            hasDir = serializedObject.FindProperty("hasDirectories");
             audioMixers = serializedObject.FindProperty("audioMixer");
             directories = serializedObject.FindProperty("directory");
             library = serializedObject.FindProperty("library");
             tabPos = serializedObject.FindProperty("tabPos");
-
             defaultContentCol = GUI.contentColor;
+            normalBackgroundCol = GUI.backgroundColor;
         }
 
 
         public override void OnInspectorGUI()
         {
-            RenderHeaderSection();
+            AudioManagerEditorHelper.Header("Audio Manager File", false, normalBackgroundCol);
             RenderTabBar();
             RenderSettings(tabPos.intValue);
             RenderLibrary(tabPos.intValue);
 
             serializedObject.ApplyModifiedProperties();
             serializedObject.Update();
-        }
-
-
-        private void RenderHeaderSection()
-        {
-            GUILayout.Space(5f);
-            
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-
-            // Shows either the Carter Games Logo or an alternative for if the icon is deleted/not included when you import the package
-            // Note: if you are using an older version of the asset, the directory/name of the logo may not match this and therefore will display the text title only
-            if (Resources.Load<Texture2D>("LogoAM"))
-            {
-                if (GUILayout.Button(Resources.Load<Texture2D>("LogoAM"), GUIStyle.none, GUILayout.Width(50), GUILayout.Height(50)))
-                {
-                    GUI.FocusControl(null);
-                }
-            }
-
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.Space(5f);
-            
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Audio Manager File", EditorStyles.boldLabel, GUILayout.Width(AudioManagerEditor.TextWidth("Audio Manager File   ")));
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
         }
 
 
@@ -129,8 +98,41 @@ namespace CarterGames.Assets.AudioManager.Editor
             GUI.contentColor = defaultContentCol;
 
             EditorGUILayout.HelpBox("Tells the Audio Manager that this file has run the directory setup & if it has audio from the directories scanned.", MessageType.None);
-            EditorGUILayout.PropertyField(hasDir);
             EditorGUILayout.PropertyField(isPopulated);
+            
+            
+            GUILayout.Space(10);
+            
+            
+            GUI.contentColor = amRedCol;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Mixers", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
+            EditorGUILayout.EndHorizontal();
+            GUI.contentColor = defaultContentCol;
+
+            if (audioMixers.arraySize.Equals(0))
+            {
+                audioMixers.InsertArrayElementAtIndex(0);
+                return;
+            }
+            
+            for (var i = 0; i < audioMixers.arraySize; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"#{(i+1).ToString()}", GUILayout.Width(TextWidth($"#{(i+1).ToString()} ")));
+                EditorGUILayout.PropertyField(audioMixers.GetArrayElementAtIndex(i), GUIContent.none);
+                
+                if (GUILayout.Button("+", GUILayout.Width(25f)))
+                    audioMixers.InsertArrayElementAtIndex(i + 1);
+
+                if (GUILayout.Button("-", GUILayout.Width(25f)))
+                    audioMixers.DeleteArrayElementAtIndex(i);
+
+                EditorGUILayout.EndHorizontal();
+            }    
+            
+            
+            GUILayout.Space(10);
             
             GUI.contentColor = amRedCol;
             EditorGUILayout.BeginHorizontal();
@@ -138,10 +140,12 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.EndHorizontal();
             GUI.contentColor = defaultContentCol;
             
-            if (!hasDir.boolValue || directories.arraySize.Equals(0))
+            if (directories.arraySize.Equals(0))
             {
                 if (GUILayout.Button("Add First Element"))
+                {
                     directories.InsertArrayElementAtIndex(0);
+                }
                 
                 return;
             }
@@ -153,14 +157,11 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.PropertyField(directories.GetArrayElementAtIndex(i), GUIContent.none);
                 
                 if (GUILayout.Button("+", GUILayout.Width(25f)))
-                {
                     directories.InsertArrayElementAtIndex(i + 1);
-                }
-                
+
                 if (GUILayout.Button("-", GUILayout.Width(25f)))
-                {
                     directories.DeleteArrayElementAtIndex(i);
-                }
+
                 EditorGUILayout.EndHorizontal();
             }
         }
@@ -190,7 +191,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.EndHorizontal();
             GUI.contentColor = defaultContentCol;
             
-            EditorGUILayout.HelpBox("Shows all the clips that are present in the library of this file. Use the controls below to perform actions to this library or edit individual entries manually.", MessageType.None);
+            EditorGUILayout.HelpBox("Shows all the clips that are present in the library of this file.", MessageType.None);
 
             GUILayout.Space(5f);
 

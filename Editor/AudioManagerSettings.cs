@@ -20,8 +20,8 @@ using UnityEngine;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 07/08/2021 (d/m/y)							
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)						
  * 
  */
 
@@ -33,12 +33,6 @@ namespace CarterGames.Assets.AudioManager.Editor
         public Rect deselectWindow;
         private readonly Color32 amRedCol = new Color32(255, 150, 157, 255);
 
-        public enum ScanOptions
-        {
-            AutomaticScanning,
-            ManualScanning
-        };
-        
 
 
         [MenuItem("Tools/Audio Manager | CG/Global Settings", priority = 2)]
@@ -146,7 +140,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Version: 2.5.2", GUILayout.Width(TextWidth("Version 2.5.2  ")));
+            EditorGUILayout.LabelField("Version: 2.5.4", GUILayout.Width(TextWidth("Version 2.5.4  ")));
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
         }

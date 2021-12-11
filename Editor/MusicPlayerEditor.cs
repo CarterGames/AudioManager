@@ -20,8 +20,8 @@ using UnityEditor;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 06/09/2021 (d/m/y)								
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)							
  * 
  */
 
@@ -35,6 +35,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         private readonly Color32 amRedCol = new Color32(255, 150, 157, 255);
         private MusicPlayer player;
 
+        private Color normalBgCol;
         
         private SerializedProperty musicTrack;
         private SerializedProperty mixer;
@@ -67,6 +68,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             playOnAwake = serializedObject.FindProperty("playOnAwake");
             musicIntroTransition = serializedObject.FindProperty("introTransition");
             transitionLength = serializedObject.FindProperty("transitionLength");
+
+            normalBgCol = GUI.backgroundColor;
         }
         
         
@@ -80,7 +83,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             if (!player)
                 player = (MusicPlayer)target;
 
-            HeaderDisplay();
+            AudioManagerEditorHelper.Header("Music Player", true, normalBgCol);
             AudioSourceSetup();
 
 
@@ -114,7 +117,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             GUI.contentColor = amRedCol;
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel, GUILayout.MaxWidth(55f));
+            EditorGUILayout.LabelField("First Play Setup", EditorStyles.boldLabel, GUILayout.MaxWidth(125f));
             EditorGUILayout.EndHorizontal();
             GUI.contentColor = Color.white;
             
@@ -144,19 +147,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.LabelField("Track Pitch:", GUILayout.MaxWidth(140f));
             EditorGUILayout.PropertyField(pitch, GUIContent.none);
             EditorGUILayout.EndHorizontal();
-            
-            
-            GUILayout.Space(5f);
 
-            GUI.contentColor = amRedCol;
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Track Looping", EditorStyles.boldLabel, GUILayout.MaxWidth(105f));
-            EditorGUILayout.EndHorizontal();
-            GUI.contentColor = Color.white;
-            
-            GUILayout.Space(5f);
-            
-            
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Should Loop Track:", GUILayout.MaxWidth(140f));
             EditorGUILayout.PropertyField(shouldLoop, GUIContent.none);
@@ -242,7 +233,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Version: 2.5.2", GUILayout.Width(TextWidth("Version 2.5.2  ")));
+            EditorGUILayout.LabelField("Version: 2.5.4", GUILayout.Width(TextWidth("Version 2.5.4  ")));
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 

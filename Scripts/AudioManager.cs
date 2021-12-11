@@ -20,8 +20,8 @@ using UnityEngine.SceneManagement;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 27/08/2021 (d/m/y)								
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)								
  * 
  */
 
@@ -329,7 +329,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]],0, volume, pitch);
             _source.Play();
             
             AddToAudioRemoval(_audioRemoval, _clip, _source);
@@ -355,7 +355,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]],0, volume, pitch);
             _source.Play();
             
             AddToAudioRemoval(_audioRemoval, _clip, _source);
@@ -382,7 +382,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]],0, volume, pitch);
             _source.outputAudioMixerGroup = mixer;
             _source.Play();
             
@@ -410,7 +410,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]],0, volume, pitch);
             _source.outputAudioMixerGroup = mixer;
             _source.Play();
             
@@ -438,7 +438,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]],0, volume, pitch);
             _source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             _source.Play();
             
@@ -466,7 +466,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]],0, volume, pitch);
             _source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             _source.Play();
             
@@ -545,7 +545,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]],0, volume, pitch);
             _source.Play();
             
             AddToAudioRemoval(_audioRemoval, _clip, _source);
@@ -572,7 +572,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]],0, volume, pitch);
             _source.Play();
             
             AddToAudioRemoval(_audioRemoval, _clip, _source);
@@ -600,7 +600,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]],0, volume, pitch);
             _source.outputAudioMixerGroup = mixer;
             _source.Play();
             
@@ -629,7 +629,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]],0, volume, pitch);
             _source.outputAudioMixerGroup = mixer;
             _source.Play();
             
@@ -658,7 +658,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Length)]],0, volume, pitch);
             _source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             _source.Play();
             
@@ -687,7 +687,7 @@ namespace CarterGames.Assets.AudioManager
             var _source = _clip.GetComponent<AudioSource>();
             var _audioRemoval = _source.GetComponent<AudioRemoval>();
             
-            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]], volume, pitch);
+            _source = SourceSetup(_source, lib[request[Random.Range(0, request.Count)]],0, volume, pitch);
             _source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             _source.Play();
             

@@ -20,8 +20,8 @@ using UnityEditor;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 07/08/2021 (d/m/y)							
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)							
  * 
  */
 
@@ -35,6 +35,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         private readonly Color32 amRedCol = new Color32(255, 150, 157, 255);
         
         private AudioPlayer player;
+        private Color normalBgCol;
 
         private SerializedProperty file;
         private SerializedProperty mixer;
@@ -61,13 +62,15 @@ namespace CarterGames.Assets.AudioManager.Editor
             clipDelays = serializedObject.FindProperty("clipsWithDelay");
             dropDownBools = serializedObject.FindProperty("dropDowns");
             dropDownOptionals = serializedObject.FindProperty("dropDownsOptional");
+
+            normalBgCol = GUI.backgroundColor;
         }
 
    
         
         public override void OnInspectorGUI()
         {
-            HeaderDisplay();
+            AudioManagerEditorHelper.Header("Audio Player", true, normalBgCol);
             
             AudioSourceSetup();
 
@@ -217,74 +220,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             serializedObject.Update();
         }
 
-        
-        /// <summary>
-        /// Shows the header info including logo, asset name and documentation/discord buttons.
-        /// </summary>
-        private void HeaderDisplay()
-        {
-            GUILayout.Space(10f);
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
 
-            // Shows either the Carter Games Logo or an alternative for if the icon is deleted/not included when you import the package
-            // Note: if you are using an older version of the asset, the directory/name of the logo may not match this and therefore will display the text title only
-            if (Resources.Load<Texture2D>("LogoAM"))
-            {
-                if (GUILayout.Button(Resources.Load<Texture2D>("LogoAM"), GUIStyle.none, GUILayout.Width(50), GUILayout.Height(50)))
-                {
-                    GUI.FocusControl(null);
-                }
-            }
-
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.Space(5f);
-
-            // Label that shows the name of the script / tool & the Version number for user reference sake.
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Audio Player", EditorStyles.boldLabel, GUILayout.Width(TextWidth("Audio Player   ")));
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Version: 2.5.2", GUILayout.Width(TextWidth("Version 2.5.2  ")));
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-            GUILayout.Space(2.5f);
-
-            // Links to the docs and discord server for the user to access quickly if needed.
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Docs", GUILayout.Width(45f)))
-            {
-                Application.OpenURL("https://carter.games/audiomanager");
-            }
-            GUI.backgroundColor = Color.cyan;
-            if (GUILayout.Button("Discord", GUILayout.Width(65f)))
-            {
-                Application.OpenURL("https://carter.games/discord");
-            }
-            GUI.backgroundColor = redCol;
-            if (GUILayout.Button("Report Issue", GUILayout.Width(100f)))
-            {
-                Application.OpenURL("https://carter.games/report");
-            }
-            GUI.backgroundColor = Color.white;
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-
-
-            GUILayout.Space(10f);
-        }
-
-        
-        
-        
         /// <summary>
         /// Runs the setup for the audio source....
         /// </summary>

@@ -21,8 +21,8 @@ using UnityEngine.Audio;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.2
- *	Last Updated: 27/08/2021 (d/m/y)							
+ *  Version: 2.5.5
+ *	Last Updated: 30/11/2021 (d/m/y)									
  * 
  */
 
@@ -37,7 +37,6 @@ namespace CarterGames.Assets.AudioManager
         public List<AudioMixerGroup> audioMixer;  // Holds a list of the audio clips stored in the AMF.
         public GameObject soundPrefab;     // Holds the prefab spawned in to play sound from this AMF.
         public bool isPopulated;           // Holds the boolean value for whether or not this AMF has been used to store audio.
-        public bool hasDirectories;        // Holds the boolean value for whether or not this AMF has directories stored on it.
         public List<string> directory;     // Holds a list of directory strings for use in the AM.
         public List<AudioLibrary> library;     // Moved in 2.3.5 to be here instead of in the AM reference as it caused some issues with the automation.
         

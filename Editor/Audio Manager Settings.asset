@@ -13,4 +13,3 @@ MonoBehaviour:
   m_Name: Audio Manager Settings
   m_EditorClassIdentifier: 
   baseAudioScanPath: /audio
-  scanOption: 1
