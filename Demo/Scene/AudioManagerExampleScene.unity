@@ -1408,7 +1408,7 @@ GameObject:
   m_IsActive: 1
 --- !u!82 &619241936
 AudioSource:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1504,7 +1504,7 @@ AudioSource:
     m_RotationOrder: 4
 --- !u!82 &619241937
 AudioSource:
-  m_ObjectHideFlags: 2
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1620,7 +1620,7 @@ MonoBehaviour:
   pitch: 1
   transitionLength: 1
   introTransition: 0
-  showSource: 0
+  showSource: 1
 --- !u!4 &619241939
 Transform:
   m_ObjectHideFlags: 0

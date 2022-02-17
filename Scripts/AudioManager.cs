@@ -20,8 +20,8 @@ using UnityEngine.SceneManagement;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.5
- *	Last Updated: 30/11/2021 (d/m/y)								
+ *  Version: 2.5.6
+*	Last Updated: 09/02/2022 (d/m/y)								
  * 
  */
 
@@ -69,7 +69,7 @@ namespace CarterGames.Assets.AudioManager
         {
             // Normal AM setup stuff xD
             if (audioManagerFile.soundPrefab == null)
-                Debug.LogWarning("* Audio Manager * | Warning Code 1 | Prefab has not been assigned! Please assign a prefab in the inspector before using the manager.");
+                Debug.LogWarning("<color=#E77A7A><b>Audio Manager</b></color> | <color=#D6BA64>Warning Code 1</color> | Prefab has not been assigned! Please assign a prefab in the inspector before using the manager.");
             
 
             // For the audio source on the script, only used for previewing clips xD
@@ -102,13 +102,11 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="mode">LoadSceneMode | The method of scene loading to use.</param>
         private void ResetOnSceneChange(Scene scene, LoadSceneMode mode)
         {
-#if !Use_CGAudioManager_Static && !USE_CG_AM_STATIC
             if (pool != null)
                 pool.Clear();
 
             if (active != null)
                 active.Clear();
-#endif
         }
         
         
@@ -1403,7 +1401,7 @@ namespace CarterGames.Assets.AudioManager
                 if (!_go.GetComponent<AudioSource>())
                 {
                     Debug.LogWarning(
-                        "* Audio Manager * | Warning Code 4 | No AudioSource Component found on the Sound Prefab. Please ensure a AudioSource Component is attached to your prefab.");
+                        "<color=#E77A7A><b>Audio Manager</b></color> | <color=#D6BA64>Warning Code 4</color> | No AudioSource Component found on the Sound Prefab. Please ensure a AudioSource Component is attached to your prefab.");
                     return null;
                 }
 
@@ -1465,7 +1463,7 @@ namespace CarterGames.Assets.AudioManager
             if (lib.ContainsKey(request))
                 return true;
             
-            Debug.LogWarning("* Audio Manager * | Warning Code 2 | Could not find clip. Please ensure the clip is scanned and the string you entered is correct (Note the input is CaSe SeNsItIvE).");
+            Debug.LogWarning($"<color=#E77A7A><b>Audio Manager</b></color> | <color=#D6BA64>Warning Code 2</color> | Could not find clip: <b><i>{request}</i></b>. Please ensure the clip is scanned and the string you entered is correct (Note the input is CaSe SeNsItIvE).");
             return false;
         }
         

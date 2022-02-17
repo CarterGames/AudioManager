@@ -16,8 +16,8 @@ using System.Linq;
  *      E: jonathan@carter.games
  *      W: https://jonathan.carter.games
  *		
- *  Version: 2.5.5
- *	Last Updated: 30/11/2021 (d/m/y)									
+ *  Version: 2.5.6
+*	Last Updated: 09/02/2022 (d/m/y)									
  * 
  */
 
@@ -29,7 +29,7 @@ namespace CarterGames.Assets.AudioManager
     public class MusicPlayer : MonoBehaviour
     {
         private const string NotAValidTransitionString =
-            "Audio Manager | CG: Music Player - Transition chosen was not valid, please select a valid transition to use.";
+            "<color=#E77A7A><b>Audio Manager</b></color> | Music PLayer | <color=#D6BA64>Warning Code 5</color> Transition chosen was not valid, please select a valid transition to use.";
         
         // Start & End times for the track in use...
         [SerializeField] private float timeToStartFrom;
@@ -209,7 +209,8 @@ namespace CarterGames.Assets.AudioManager
         public void SetVolume(float value)
         {
             AssignSource();
-            GetAudioSource.volume = value;
+            volume = Mathf.Clamp01(value);
+            GetAudioSource.volume = Mathf.Clamp01(value);
         }
         
         
@@ -469,16 +470,16 @@ namespace CarterGames.Assets.AudioManager
             // Fade to 1...
             if (fadeIn)
             {
-                _targetValue = 1f;
+                _targetValue = volume;
 
                 while (_currentTime < _duration)
                 {
                     _currentTime += multiplier * Time.unscaledDeltaTime;
-                    s.volume = Mathf.Lerp(_start, _targetValue, _currentTime / _duration);
+                    s.volume = Mathf.Lerp(0, _targetValue, _currentTime / _duration);
                     yield return null;
                 }
 
-                s.volume = 1f;
+                s.volume = volume;
                 OnTrackTransitionComplete?.Invoke();
                 yield break;
             }
@@ -521,25 +522,24 @@ namespace CarterGames.Assets.AudioManager
             while (_currentTime < _duration)
             {
                 _currentTime += multiplier * 2 * Time.unscaledDeltaTime;
-                s.volume = Mathf.Lerp(_start, _targetValue, _currentTime / _duration);
+                s.volume = Mathf.Lerp(volume, _targetValue, _currentTime / _duration);
                 yield return null;
             }
             
             s.volume = 0f;
             SetTrack(clip, s, startTime, endTime);
-
-            _targetValue = 1f;
+            
             _start = s.volume;
             _currentTime = 0f;
             
             while (_currentTime < _duration)
             {
                 _currentTime += multiplier * 2 * Time.unscaledDeltaTime;
-                s.volume = Mathf.Lerp(_start, _targetValue, _currentTime / _duration);
+                s.volume = Mathf.Lerp(_start, volume, _currentTime / _duration);
                 yield return null;
             }
             
-            s.volume = 1f;
+            s.volume = volume;
             OnTrackTransitionComplete?.Invoke();
         }
         

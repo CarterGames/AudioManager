@@ -16,8 +16,8 @@
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.5
- *	Last Updated: 30/11/2021 (d/m/y)							
+ *  Version: 2.5.6
+*	Last Updated: 09/02/2022 (d/m/y)							
  * 
  */
 
@@ -28,7 +28,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 {
     public static class AudioManagerEditorHelper
     {
-        private static readonly string AssetVersionNumber = "2.5.5";
+        private static readonly string AssetVersionNumber = "2.5.6";
         
         private static readonly Color32 amRedCol = new Color32(255, 150, 157, 255);
         private static readonly Color32 greenCol = new Color32(41, 176, 97, 255);

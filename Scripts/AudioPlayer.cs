@@ -17,8 +17,8 @@ using UnityEngine.Audio;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.5
- *	Last Updated: 30/11/2021 (d/m/y)									
+ *  Version: 2.5.6
+*	Last Updated: 09/02/2022 (d/m/y)									
  * 
  */
 
@@ -127,7 +127,7 @@ namespace CarterGames.Assets.AudioManager
                     }
                     else
                         Debug.LogWarning(
-                            "* AM: Audio Player * | Warning Code 1 | Could not find clip. Please ensure the clip is scanned and the string you entered is correct (Note the input is CaSe SeNsItIvE).");
+                            "<color=#E77A7A><b>Audio Manager</b></color> | Audio Player | <color=#D6BA64>Warning Code 1</color> | Could not find clip. Please ensure the clip is scanned and the string you entered is correct (Note the input is CaSe SeNsItIvE).");
                 }
             }
         }
