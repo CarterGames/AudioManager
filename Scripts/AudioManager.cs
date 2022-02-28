@@ -1438,6 +1438,7 @@ namespace CarterGames.Assets.AudioManager
         private void AddToAudioRemoval(AudioRemoval removal, GameObject clip, AudioSource source)
         {
             active.Add(source);
+            if (source.loop) return;
             removal.Cleanup(clip, source.clip.length);
         }
         
