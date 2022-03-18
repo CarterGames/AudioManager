@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.Audio;
-
-/*
+﻿/*
  * 
  *  Audio Manager
  *							  
@@ -17,10 +13,14 @@ using UnityEngine.Audio;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.6
-*	Last Updated: 09/02/2022 (d/m/y)									
+ *  Version: 2.5.7
+ *	Last Updated: 18/03/2022 (d/m/y)									
  * 
  */
+
+using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.Audio;
 
 namespace CarterGames.Assets.AudioManager
 {
@@ -61,9 +61,7 @@ namespace CarterGames.Assets.AudioManager
             lib = new Dictionary<string, AudioClip>();
 
             foreach (var _t in audioManagerFile.library)
-            {
                 lib.Add(_t.key, _t.value);
-            }
         }
 
 
@@ -107,7 +105,7 @@ namespace CarterGames.Assets.AudioManager
                         if (!_clip.GetComponent<AudioSource>()) return;
 
                         var _source = _clip.GetComponent<AudioSource>();
-                        var _audioRemoval = _source.GetComponent<AudioRemoval>();
+                        var _audioRemoval = _source.GetComponent<AudioClipPlayer>();
 
                         _source.clip = lib[clipsToPlay[i]];
                         _source.volume = clipsVolume[i];
@@ -123,7 +121,7 @@ namespace CarterGames.Assets.AudioManager
                         else
                             _source.Play();
                         
-                        _audioRemoval.Cleanup(_clip, _source.clip.length);
+                        _audioRemoval.Cleanup(_source.clip.length);
                     }
                     else
                         Debug.LogWarning(

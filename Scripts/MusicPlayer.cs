@@ -1,10 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Audio;
-using System.Collections;
-using System.Linq;
-
-/*
+﻿/*
  * 
  *  Audio Manager
  *							  
@@ -16,10 +10,16 @@ using System.Linq;
  *      E: jonathan@carter.games
  *      W: https://jonathan.carter.games
  *		
- *  Version: 2.5.6
-*	Last Updated: 09/02/2022 (d/m/y)									
+ *  Version: 2.5.7
+ *	Last Updated: 15/03/2022 (d/m/y)									
  * 
  */
+
+using System;
+using UnityEngine;
+using UnityEngine.Audio;
+using System.Collections;
+using System.Linq;
 
 namespace CarterGames.Assets.AudioManager
 {

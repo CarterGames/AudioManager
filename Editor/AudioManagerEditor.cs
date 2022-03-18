@@ -1,11 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Audio;
-using UnityEditor;
-using System.IO;
-using System.Linq;
-
-/*
+﻿/*
  * 
  *  Audio Manager
  *							  
@@ -23,10 +16,17 @@ using System.Linq;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.6
-*	Last Updated: 09/02/2022 (d/m/y)							
+ *  Version: 2.5.7
+*	Last Updated: 18/02/2022 (d/m/y)							
  * 
  */
+
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEditor;
+using System.IO;
+using System.Linq;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
@@ -39,6 +39,9 @@ namespace CarterGames.Assets.AudioManager.Editor
         private const string DefaultBaseAudioScanPath = "/audio";
         private string BaseAudioFolderLocation = DefaultBaseAudioScanPath;
 
+        private static AudioSource Source;
+        private static string[] Names;
+        
         private readonly string[] ScriptingDefines = new string[2] { "Use_CGAudioManager_Static", "USE_CG_AM_STATIC" };
         
         // Colours for the Editor Buttons
@@ -67,6 +70,13 @@ namespace CarterGames.Assets.AudioManager.Editor
         private bool showClips = true;                  // Should the clips section be open?
         private bool isSetup = false;                   // Has the initial setup been completed?
 
+        private bool shouldRefresh = false;
+        private int lastTotal = 0;
+        private int totalClipsInFile = 0;
+        private Texture2D cachedPlayButtonTexture;
+        private Texture2D cachedStopButtonTexture;
+        private AudioSource cachedSource;
+        
         private SerializedProperty file;
         private SerializedProperty lastFile;
         private SerializedObject fileObj;
@@ -85,14 +95,14 @@ namespace CarterGames.Assets.AudioManager.Editor
             audioManagerScript = (AudioManager)target;            // References the Audio Manager Script
 
             ReferenceSetup();
+            UpdateNormalEditorColours();
             
             // Sets the boolean values up to what they were set to last.
             showDirectories = serializedObject.FindProperty("shouldShowDir").boolValue;
             showClips = serializedObject.FindProperty("shouldShowClips").boolValue;
 
-            normalColour = GUI.color;
-            normalBackgroundColour = GUI.backgroundColor;
-            normalContentColour = GUI.contentColor;
+            cachedPlayButtonTexture = Resources.Load<Texture2D>(PlayIconLocation);
+            cachedStopButtonTexture = Resources.Load<Texture2D>(StopIconLocation);
         }
 
         
@@ -101,19 +111,10 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public override void OnInspectorGUI()
         {
-            if (fileObj != null)
-                fileObj.Update();
-            
+            UpdateNormalEditorColours();
+            fileObj?.Update();
             serializedObject.Update();
             
-            if (lastFile != file)
-            {
-                ReferenceSetup();
-                serializedObject.Update();
-                serializedObject.ApplyModifiedProperties();
-            }
-            
-
             #region First Setup
             // If the audio source is not attached
             if (!isSetup)
@@ -126,7 +127,6 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             // Logo, Title & docs/discord links
             AudioManagerEditorHelper.Header("Audio Manager", true, normalBackgroundColour);
-
             
             EditorGUILayout.BeginVertical("Box");
             
@@ -143,7 +143,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.BeginHorizontal();
 
-            
+            #region Static Instancing Logic
+
             // Enable / Disable Static Instance Use...
 #if !Use_CGAudioManager_Static && !USE_CG_AM_STATIC
             GUI.backgroundColor = greenCol;
@@ -167,36 +168,50 @@ namespace CarterGames.Assets.AudioManager.Editor
             }
             GUI.backgroundColor = normalBackgroundColour;
 #endif
+
+            #endregion
+            
             EditorGUILayout.EndHorizontal();
             
-
-            #region Audio Manager File Assignment
+            #region Audio Manager File
             // Audio Manager File (AMF) field
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PropertyField(file, new GUIContent("Audio Manager File: "));
             EditorGUILayout.EndHorizontal();
+
+            if (EditorGUI.EndChangeCheck() && lastFile != file)
+            {
+                ReferenceSetup();
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+
             #endregion
 
-            #region Sound Prefab Area
+            #region Sound Prefab
             
             // if file exists
             if (file.objectReferenceValue && fileObj != null)
             {
+                EditorGUI.BeginChangeCheck();
                 EditorGUILayout.BeginHorizontal();
-                soundPrefab.objectReferenceValue = (GameObject) EditorGUILayout.ObjectField("Audio Prefab: ", soundPrefab.objectReferenceValue, typeof(GameObject), false);
+                EditorGUILayout.PropertyField(soundPrefab, new GUIContent("Sound Prefab"));
                 EditorGUILayout.EndHorizontal();
+                
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    serializedObject.Update();
+                }
             }
+            
             #endregion
             
             EditorGUILayout.EndVertical();
-            
-            
-            
+
             GUILayout.Space(5f);
             
-            
-
-            EditorGUI.BeginChangeCheck();
 
             if (file.objectReferenceValue && fileObj != null)
             {
@@ -218,6 +233,8 @@ namespace CarterGames.Assets.AudioManager.Editor
                     EditorGUILayout.BeginHorizontal();
                     GUILayout.FlexibleSpace();
 
+                    #region Directories Button Logic
+
                     if (!showDirectories)
                     {
                         GUI.color = Color.cyan;
@@ -236,6 +253,10 @@ namespace CarterGames.Assets.AudioManager.Editor
                             showDirectories = serializedObject.FindProperty("shouldShowDir").boolValue;
                         }
                     }
+
+                    #endregion
+
+                    #region Clips Button logic
 
                     if (!showClips)
                     {
@@ -256,12 +277,16 @@ namespace CarterGames.Assets.AudioManager.Editor
                         }
                     }
 
+                    #endregion
+
                     GUI.color = normalColour;
                     GUILayout.FlexibleSpace();
                     EditorGUILayout.EndHorizontal();
-
+                    
 
                     // Directories Display
+                    #region Directories Display
+
                     if (showDirectories)
                     {
                         EditorGUILayout.Space();
@@ -311,30 +336,39 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                         EditorGUILayout.EndVertical();
                     }
+
+                    #endregion
                 }
+                
+                GUI.color = normalColour;
 
                 GUILayout.Space(10f);
 
-
                 // Clips Display
+                #region Clips Display
+
                 if (showClips && !AreAllDirectoryStringsBlank() && !AreDupDirectories())
                 {
                     EditorGUILayout.BeginVertical("Box");
 
                     GUILayout.Space(5f);
-            
+
                     GUI.contentColor = amRedCol;
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField("Clips", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
                     EditorGUILayout.EndHorizontal();
                     GUI.contentColor = normalContentColour;
-            
+
                     GUILayout.Space(5f);
 
-                    if (CheckAmount() > 0)
+                    lastTotal = CheckAmount();
+                    totalClipsInFile = GetNumberOfClips();
+
+                    if (lastTotal > 0)
                     {
-                        if (fileDirs.arraySize > 0 && (CheckAmount() > GetNumberOfClips()) || (CheckAmount() < GetNumberOfClips()))
-                        {               
+                        if (fileDirs.arraySize > 0 && (lastTotal > totalClipsInFile) ||
+                            (lastTotal < totalClipsInFile))
+                        {
                             // Init Lists
                             audioList = new List<AudioClip>();
                             audioStrings = new List<string>();
@@ -345,25 +379,32 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                             fileLib.ClearArray();
 
-                            for (int i = 0; i < audioList.Count; i++)
+                            Debug.Log("Update Ran");
+
+                            for (var i = 0; i < audioList.Count; i++)
                             {
                                 fileLib.InsertArrayElementAtIndex(i);
-                                fileLib.GetArrayElementAtIndex(i).FindPropertyRelative("key").stringValue = audioStrings[i];
-                                fileLib.GetArrayElementAtIndex(i).FindPropertyRelative("value").objectReferenceValue = audioList[i];
+                                fileLib.GetArrayElementAtIndex(i).FindPropertyRelative("key").stringValue =
+                                    audioStrings[i];
+                                fileLib.GetArrayElementAtIndex(i).FindPropertyRelative("value")
+                                        .objectReferenceValue =
+                                    audioList[i];
                             }
                         }
-                        
-                        
-                        if (fileDirs.arraySize > 0 && CheckAmount().Equals(GetNumberOfClips()))
+
+
+                        if (fileDirs.arraySize > 0 && lastTotal.Equals(totalClipsInFile))
                             DisplayNames();
                         else
                             HelpLabels();
                     }
                     else
-                        EditorGUILayout.HelpBox("No audio clips found in your project.", MessageType.Warning);
+                        EditorGUILayout.HelpBox("Cannot scan project. Either a directory you have entered has a typo or doesn't exist. Or you could have clips in your project from the base directory entered.", MessageType.Warning);
 
                     EditorGUILayout.EndVertical();
                 }
+
+                #endregion
             }
             else
             {
@@ -374,31 +415,33 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.Space();
             }
             #endregion
-
-            if (fileObj != null)
-                fileObj.ApplyModifiedProperties();
             
+            fileObj?.ApplyModifiedProperties();
             serializedObject.ApplyModifiedProperties();
         }
 
-        
+        #region Referencing Setup
+
         /// <summary>
         /// Runs the Init setup for the manager if needed....
         /// </summary>
         private void FirstSetup()
         {
+            cachedSource = audioManagerScript.gameObject.GetComponent<AudioSource>();
+            
             // Adds an Audio Source to the gameObject this script is on if its not already there (used for previewing audio only) 
             // * Hide flags hides it from the inspector so you don't notice it there *
-            if (audioManagerScript.gameObject.GetComponent<AudioSource>())
+            if (cachedSource)
             {
-                audioManagerScript.gameObject.GetComponent<AudioSource>().hideFlags = HideFlags.HideInInspector;
-                audioManagerScript.GetComponent<AudioSource>().playOnAwake = false;
+                cachedSource.hideFlags = HideFlags.HideInInspector;
+                cachedSource.playOnAwake = false;
             }
             else
             {
                 audioManagerScript.gameObject.AddComponent<AudioSource>();
-                audioManagerScript.gameObject.GetComponent<AudioSource>().hideFlags = HideFlags.HideInInspector;
-                audioManagerScript.GetComponent<AudioSource>().playOnAwake = false;
+                cachedSource = audioManagerScript.gameObject.GetComponent<AudioSource>();
+                cachedSource.hideFlags = HideFlags.HideInInspector;
+                cachedSource.playOnAwake = false;
             }
             
             
@@ -432,7 +475,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                 AssetDatabase.CreateFolder("Assets" + BaseAudioFolderLocation, "Files");
 
-                var _newAmf = ScriptableObject.CreateInstance<AudioManagerFile>();
+                var _newAmf = CreateInstance<AudioManagerFile>();
                 AssetDatabase.CreateAsset(_newAmf, "Assets" + BaseAudioFolderLocation + "/Files/Audio Manager File.asset");
                 file.objectReferenceValue = (AudioManagerFile)AssetDatabase.LoadAssetAtPath("Assets" + BaseAudioFolderLocation + "/Files/Audio Manager File.asset", typeof(AudioManagerFile));
                 _newAmf.directory = new List<string>();
@@ -441,14 +484,65 @@ namespace CarterGames.Assets.AudioManager.Editor
             else if (((Directory.Exists(Application.dataPath + BaseAudioFolderLocation)) && (!Directory.Exists(Application.dataPath + BaseAudioFolderLocation + "/Files"))))
             {
                 AssetDatabase.CreateFolder("Assets" + BaseAudioFolderLocation, "Files");
-                var _newAmf = ScriptableObject.CreateInstance<AudioManagerFile>();
+                var _newAmf = CreateInstance<AudioManagerFile>();
                 AssetDatabase.CreateAsset(_newAmf, "Assets" + BaseAudioFolderLocation + "/Files/Audio Manager File.asset");
                 file.objectReferenceValue = (AudioManagerFile)AssetDatabase.LoadAssetAtPath("Assets" + BaseAudioFolderLocation + "/Files/Audio Manager File.asset", typeof(AudioManagerFile));
                 _newAmf.directory = new List<string>();
                 _newAmf.directory.Add("");
             }
         }
+        
+        private void ReferenceSetup()
+        {
+            file = serializedObject.FindProperty("audioManagerFile");
+            lastFile = serializedObject.FindProperty("audioManagerFile");
 
+            if (file.objectReferenceValue)
+            {
+                fileObj = new SerializedObject(file.objectReferenceValue);
+                soundPrefab = fileObj.FindProperty("soundPrefab");
+                audioMixerList = fileObj.FindProperty("audioMixer");
+                fileDirs = fileObj.FindProperty("directory");
+                fileLib = fileObj.FindProperty("library");
+                fileIsPopulated = fileObj.FindProperty("isPopulated");
+            }
+            
+            
+            if (file.objectReferenceValue && audioMixerList.arraySize == 0)
+                audioMixerList.InsertArrayElementAtIndex(0);
+            
+            if (fileObj != null)
+                fileObj.Update();
+            
+            // Setup data asset is needed...
+            var _asset = AssetDatabase.FindAssets("t:audiomanagersettingsdata", null);
+
+            if (_asset.Length > 0) return;
+            
+            var _editorScript = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(this)).Split('/');
+            var _editorPath = string.Empty;
+
+            for (int i = 0; i < _editorScript.Length; i++)
+            {
+                if (i.Equals(_editorScript.Length - 1)) continue;
+                _editorPath += $"{_editorScript[i]}/";
+            }
+                
+            AssetDatabase.CreateAsset(CreateInstance(typeof(AudioManagerSettingsData)), $"{_editorPath}Audio Manager Settings.asset");
+            AssetDatabase.Refresh();
+        }
+
+        private void UpdateNormalEditorColours()
+        {
+            normalColour = GUI.color;
+            normalBackgroundColour = GUI.backgroundColor;
+            normalContentColour = GUI.contentColor;
+        }
+
+        #endregion
+
+
+        #region Editor Helpers
 
         /// <summary>
         /// Checks to see how many files are found from the scan so it can be displayed.
@@ -456,13 +550,14 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <returns>Int | The amount of clips that have been found.</returns>
         private int CheckAmount()
         {
-            int _amount = default;
+            var _amount = 0;
             var _allFiles = new List<string>();
 
             if (fileDirs == null) return 0;
+            
             if (fileDirs.arraySize > 0)
             {
-                for (int i = 0; i < fileDirs.arraySize; i++)
+                for (var i = 0; i < fileDirs.arraySize; i++)
                 {
                     if (Directory.Exists(Application.dataPath + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue))
                     {
@@ -480,7 +575,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             // Checks to see if there is anything in the path, if its empty it will not run the rest of the code and instead put a message in the console
             if (_allFiles.Count <= 0) return _amount;
-
+            
             foreach (var _thingy in _allFiles)
             {
                 var _path = "Assets" + _thingy.Replace(Application.dataPath, "").Replace('\\', '/');
@@ -488,11 +583,219 @@ namespace CarterGames.Assets.AudioManager.Editor
                 if (AssetDatabase.LoadAssetAtPath(_path, typeof(AudioClip)))
                     ++_amount;
             }
-
+            
             return _amount;
+        }
+        
+                        
+        /// <summary>
+        /// Audio Manager Editor Method | gets the number of clips currently in this instance of the Audio Manager.
+        /// </summary>
+        /// <returns>Int | number of clips in the AMF on this Audio Manager.</returns>
+        private int GetNumberOfClips()
+        {
+            // 2.4.1 - fixed an issue where this if statement didn't fire where there was only 1 file, simple mistake xD, previous ">" now ">=".
+            if (fileLib != null && fileLib.arraySize >= 1)
+                return fileLib.arraySize;
+
+            return 0;
+        }
+
+        #endregion
+        
+        
+        #region Mixers Logic
+
+        /// <summary>
+        /// Creates the display that is used to show all the mixers
+        /// </summary>
+        private void DisplayMixers()
+        {
+            EditorGUILayout.BeginVertical("Box");
+
+            // Going through all the audio clips and making an element in the Inspector for them
+            if (fileObj != null)
+            {
+                if (file.objectReferenceValue && audioMixerList.arraySize > 0)
+                {
+                    GUILayout.Space(5f);
+
+                    GUI.contentColor = amRedCol;
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("Mixers", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
+                    EditorGUILayout.EndHorizontal();
+                    GUI.contentColor = normalContentColour;
+
+                    GUILayout.Space(5f);
+
+                    for (var i = 0; i < audioMixerList.arraySize; i++)
+                    {
+                        // Starts the ordering
+                        EditorGUILayout.BeginHorizontal();
+
+                        EditorGUILayout.PrefixLabel("Mixer ID: '" + i + "'");
+
+                        audioMixerList.GetArrayElementAtIndex(i).objectReferenceValue =
+                            (AudioMixerGroup) EditorGUILayout.ObjectField(
+                                audioMixerList.GetArrayElementAtIndex(i).objectReferenceValue, typeof(AudioMixerGroup),
+                                false);
+
+
+                        if (i != audioMixerList.arraySize)
+                        {
+                            GUI.color = greenCol;
+
+                            if (GUILayout.Button("+", GUILayout.Width(25)))
+                                audioMixerList.InsertArrayElementAtIndex(audioMixerList.arraySize);
+                        }
+                        
+
+                        if (!i.Equals(0))
+                        {
+                            GUI.color = Color.red;
+
+                            if (GUILayout.Button("-", GUILayout.Width(25)))
+                                audioMixerList.DeleteArrayElementAtIndex(i);
+                        }
+
+                        // Ends the GUI ordering
+                        EditorGUILayout.EndHorizontal();
+                        
+                        GUI.color = normalColour;              
+                        GUI.contentColor = normalContentColour;
+                    }
+                }
+                else if (file.objectReferenceValue && audioMixerList.arraySize <= 0)
+                {
+                    audioMixerList.InsertArrayElementAtIndex(0);
+                }
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
+        #endregion
+
+        
+        #region Directory Logic
+
+        /// <summary>
+        /// Checks to see if there are no directories...
+        /// </summary>
+        /// <returns>Bool | Whether or not there is a directory in the list.</returns>
+        private bool AreAllDirectoryStringsBlank()
+        {
+            var _check = 0;
+
+            if (fileDirs == null || fileDirs.arraySize <= 1) return false;
+            
+            for (var i = 0; i < fileDirs.arraySize; i++)
+            {
+                if (fileDirs.GetArrayElementAtIndex(i).stringValue == "")
+                    ++_check;
+            }
+
+            return _check.Equals(fileDirs.arraySize);
+
         }
 
         
+        /// <summary>
+        /// Checks to see if there are directories with the same name (avoid scanning when there is).
+        /// </summary>
+        /// <returns>Bool | Whether or not there is a duplicate directory in the list.</returns>
+        private bool AreDupDirectories()
+        {
+            var _check = 0;
+
+            if (fileDirs == null) return false;
+            if (fileDirs.arraySize > 0)
+            {
+                if (fileDirs.arraySize < 2) return false;
+
+                for (var i = 0; i < fileDirs.arraySize; i++)
+                {
+                    for (var j = 0; j < fileDirs.arraySize; j++)
+                    {
+                        // avoids checking the same position... as that would be true....
+                        if (i.Equals(j)) continue;
+
+                        string dir1, dir2;
+
+                        dir1 = fileDirs.GetArrayElementAtIndex(i).stringValue.ToLower();
+                        dir2 = fileDirs.GetArrayElementAtIndex(j).stringValue.ToLower();
+
+                        dir1 = dir1.Replace("/", "");
+                        dir2 = dir2.Replace("/", "");
+
+                        if (dir1.Equals(dir2))
+                        {
+                            ++_check;
+                        }
+                    }
+                }
+
+                return _check > 0;
+            }
+
+            return false;
+        }
+
+        
+        /// <summary>
+        /// Adds the value inputted to both directories.
+        /// </summary>
+        /// <param name="value">String | The value to add.</param>
+        private void AddToDirectories(string value)
+        {
+            if (!fileDirs.arraySize.Equals(1))
+            {
+                fileDirs.InsertArrayElementAtIndex(fileDirs.arraySize);
+            }
+            
+            fileDirs.GetArrayElementAtIndex(fileDirs.arraySize - 1).stringValue = value;
+        }
+
+        
+        /// <summary>
+        /// Displays the directories if there are more than one in the AMF.
+        /// </summary>
+        private void DirectoriesDisplay()
+        {
+            if (fileDirs.arraySize <= 0) return;
+            for (var i = 0; i < fileDirs.arraySize; i++)
+            {
+                EditorGUILayout.BeginHorizontal();
+                fileDirs.GetArrayElementAtIndex(i).stringValue = EditorGUILayout.TextField(new GUIContent("Path #" + (i + 1) + ": "), fileDirs.GetArrayElementAtIndex(i).stringValue);
+
+                if (i != fileDirs.arraySize)
+                {
+                    GUI.color = greenCol;
+
+                    if (GUILayout.Button("+", GUILayout.Width(25)))
+                        fileDirs.InsertArrayElementAtIndex(i);
+                }
+
+                GUI.color = normalColour;
+
+                if (!i.Equals(0))
+                {
+                    GUI.color = Color.red;
+
+                    if (GUILayout.Button("-", GUILayout.Width(25)))
+                        fileDirs.DeleteArrayElementAtIndex(i);
+                }
+
+                GUI.color = normalColour;
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+
+        #endregion
+        
+        
+        #region Clip logic
+
         /// <summary>
         /// Adds all strings for the found clips to the AMF.
         /// </summary>
@@ -600,7 +903,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 _elementString = fileLib.GetArrayElementAtIndex(i).FindPropertyRelative("key").stringValue;
                 _elementAudio = (AudioClip) fileLib.GetArrayElementAtIndex(i).FindPropertyRelative("value").objectReferenceValue;
-
+                
+                
                 // Starts the ordering
                 EditorGUILayout.BeginHorizontal();
 
@@ -608,60 +912,60 @@ namespace CarterGames.Assets.AudioManager.Editor
                 GUI.color = greenCol;
 
                 // If there are no clips playing it will show "preview clip" buttons for all elements
-                if (!audioManagerScript.GetComponent<AudioSource>().isPlaying)
+                if (!cachedSource.isPlaying)
                 {
-                    if (Resources.Load<Texture2D>(PlayIconLocation))
+                    if (cachedPlayButtonTexture != null)
                     {
-                        if (GUILayout.Button(Resources.Load<Texture2D>(PlayIconLocation), GUIStyle.none, GUILayout.Width(20), GUILayout.Height(20)))
+                        if (GUILayout.Button(cachedPlayButtonTexture, GUIStyle.none, GUILayout.Width(20), GUILayout.Height(20)))
                         {
-                            audioManagerScript.GetComponent<AudioSource>().clip = _elementAudio;
-                            audioManagerScript.GetComponent<AudioSource>().time = 0f;
-                            audioManagerScript.GetComponent<AudioSource>().Play();
+                            cachedSource.clip = _elementAudio;
+                            cachedSource.time = 0f;
+                            cachedSource.Play();
                         }
                     }
                     else
                     {
                         if (GUILayout.Button("P", GUILayout.Width(20), GUILayout.Height(20)))
                         {
-                            audioManagerScript.GetComponent<AudioSource>().clip = _elementAudio;
-                            audioManagerScript.GetComponent<AudioSource>().time = 0f;
-                            audioManagerScript.GetComponent<AudioSource>().Play();
+                            cachedSource.clip = _elementAudio;
+                            cachedSource.time = 0f;
+                            cachedSource.Play();
                         }
                     }
                 }
                 // if a clip is playing, the clip that is playing will have a "stop clip" button instead of "preview clip" 
-                else if (audioManagerScript.GetComponent<AudioSource>().clip.Equals(_elementAudio))
+                else if (cachedSource.clip.Equals(_elementAudio))
                 {
                     GUI.color = redCol;
 
-                    if (Resources.Load<Texture2D>(StopIconLocation))
+                    if (cachedStopButtonTexture != null)
                     {
-                        if (GUILayout.Button(Resources.Load<Texture2D>(StopIconLocation), GUIStyle.none, GUILayout.Width(20), GUILayout.Height(20)))
-                            audioManagerScript.GetComponent<AudioSource>().Stop();
+                        if (GUILayout.Button(cachedStopButtonTexture, GUIStyle.none, GUILayout.Width(20), GUILayout.Height(20)))
+                            cachedSource.Stop();
                     }
                     else
                     {
                         if (GUILayout.Button("S", GUILayout.Width(20), GUILayout.Height(20)))
-                            audioManagerScript.GetComponent<AudioSource>().Stop();
+                            cachedSource.Stop();
                     }
                 }
                 // This just ensures the rest of the elements keep a button next to them
                 else
                 {
-                    if (Resources.Load<Texture2D>(PlayIconLocation))
+                    if (cachedPlayButtonTexture != null)
                     {
-                        if (GUILayout.Button(Resources.Load<Texture2D>(PlayIconLocation), GUIStyle.none, GUILayout.Width(20), GUILayout.Height(20)))
+                        if (GUILayout.Button(cachedPlayButtonTexture, GUIStyle.none, GUILayout.Width(20), GUILayout.Height(20)))
                         {
-                            audioManagerScript.GetComponent<AudioSource>().clip = _elementAudio;
-                            audioManagerScript.GetComponent<AudioSource>().PlayOneShot(_elementAudio);
+                            cachedSource.clip = _elementAudio;
+                            cachedSource.PlayOneShot(_elementAudio);
                         }
                     }
                     else
                     {
                         if (GUILayout.Button("P", GUILayout.Width(20), GUILayout.Height(20)))
                         {
-                            audioManagerScript.GetComponent<AudioSource>().clip = _elementAudio;
-                            audioManagerScript.GetComponent<AudioSource>().PlayOneShot(_elementAudio);
+                            cachedSource.clip = _elementAudio;
+                            cachedSource.PlayOneShot(_elementAudio);
                         }
                     }
                 }
@@ -677,248 +981,11 @@ namespace CarterGames.Assets.AudioManager.Editor
             }
         }
 
-        
-        /// <summary>
-        /// Creates the display that is used to show all the mixers
-        /// </summary>
-        private void DisplayMixers()
-        {
-            EditorGUILayout.BeginVertical("Box");
-
-            // Going through all the audio clips and making an element in the Inspector for them
-            if (fileObj != null)
-            {
-                if (file.objectReferenceValue && audioMixerList.arraySize > 0)
-                {
-                    GUILayout.Space(5f);
-
-                    GUI.contentColor = amRedCol;
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Mixers", EditorStyles.boldLabel, GUILayout.MaxWidth(120f));
-                    EditorGUILayout.EndHorizontal();
-                    GUI.contentColor = normalContentColour;
-
-                    GUILayout.Space(5f);
-
-                    for (var i = 0; i < audioMixerList.arraySize; i++)
-                    {
-                        // Starts the ordering
-                        EditorGUILayout.BeginHorizontal();
-
-                        EditorGUILayout.PrefixLabel("Mixer ID: '" + i + "'");
-
-                        audioMixerList.GetArrayElementAtIndex(i).objectReferenceValue =
-                            (AudioMixerGroup) EditorGUILayout.ObjectField(
-                                audioMixerList.GetArrayElementAtIndex(i).objectReferenceValue, typeof(AudioMixerGroup),
-                                false);
+        #endregion
 
 
-                        if (i != audioMixerList.arraySize)
-                        {
-                            GUI.color = greenCol;
+        #region Editor Warning Messages Controller
 
-                            if (GUILayout.Button("+", GUILayout.Width(25)))
-                                audioMixerList.InsertArrayElementAtIndex(audioMixerList.arraySize);
-                            
-                            GUI.color = normalColour;
-                        }
-                        
-
-                        if (!i.Equals(0))
-                        {
-                            GUI.color = Color.red;
-
-                            if (GUILayout.Button("-", GUILayout.Width(25)))
-                                audioMixerList.DeleteArrayElementAtIndex(i);
-                            
-                            GUI.color = normalColour;
-                        }
-
-                        // Ends the GUI ordering
-                        EditorGUILayout.EndHorizontal();
-                    }
-                }
-                else if (file.objectReferenceValue && audioMixerList.arraySize <= 0)
-                {
-                    audioMixerList.InsertArrayElementAtIndex(0);
-                }
-            }
-
-            EditorGUILayout.EndVertical();
-        }
-
-        
-        /// <summary>
-        /// Checks to see if there are no directories...
-        /// </summary>
-        /// <returns>Bool | Whether or not there is a directory in the list.</returns>
-        private bool AreAllDirectoryStringsBlank()
-        {
-            var _check = 0;
-
-            if (fileDirs == null || fileDirs.arraySize <= 1) return false;
-            
-            for (var i = 0; i < fileDirs.arraySize; i++)
-            {
-                if (fileDirs.GetArrayElementAtIndex(i).stringValue == "")
-                    ++_check;
-            }
-
-            return _check.Equals(fileDirs.arraySize);
-
-        }
-
-        
-        /// <summary>
-        /// Checks to see if there are directories with the same name (avoid scanning when there is).
-        /// </summary>
-        /// <returns>Bool | Whether or not there is a duplicate directory in the list.</returns>
-        private bool AreDupDirectories()
-        {
-            var _check = 0;
-
-            if (fileDirs == null) return false;
-            if (fileDirs.arraySize > 0)
-            {
-                if (fileDirs.arraySize < 2) return false;
-
-                for (var i = 0; i < fileDirs.arraySize; i++)
-                {
-                    for (var j = 0; j < fileDirs.arraySize; j++)
-                    {
-                        // avoids checking the same position... as that would be true....
-                        if (i.Equals(j)) continue;
-
-                        string dir1, dir2;
-
-                        dir1 = fileDirs.GetArrayElementAtIndex(i).stringValue.ToLower();
-                        dir2 = fileDirs.GetArrayElementAtIndex(j).stringValue.ToLower();
-
-                        dir1 = dir1.Replace("/", "");
-                        dir2 = dir2.Replace("/", "");
-
-                        if (dir1.Equals(dir2))
-                        {
-                            ++_check;
-                        }
-                    }
-                }
-
-                return _check > 0;
-            }
-
-            return false;
-        }
-
-        
-        /// <summary>
-        /// Adds the value inputted to both directories.
-        /// </summary>
-        /// <param name="value">String | The value to add.</param>
-        private void AddToDirectories(string value)
-        {
-            if (!fileDirs.arraySize.Equals(1))
-            {
-                fileDirs.InsertArrayElementAtIndex(fileDirs.arraySize);
-            }
-            
-            fileDirs.GetArrayElementAtIndex(fileDirs.arraySize - 1).stringValue = value;
-        }
-
-        
-        /// <summary>
-        /// Displays the directories if there are more than one in the AMF.
-        /// </summary>
-        private void DirectoriesDisplay()
-        {
-            if (fileDirs.arraySize <= 0) return;
-            for (var i = 0; i < fileDirs.arraySize; i++)
-            {
-                EditorGUILayout.BeginHorizontal();
-                fileDirs.GetArrayElementAtIndex(i).stringValue = EditorGUILayout.TextField(new GUIContent("Path #" + (i + 1).ToString() + ": "), fileDirs.GetArrayElementAtIndex(i).stringValue);
-
-                if (i != fileDirs.arraySize)
-                {
-                    GUI.color = greenCol;
-
-                    if (GUILayout.Button("+", GUILayout.Width(25)))
-                        fileDirs.InsertArrayElementAtIndex(i);
-                }
-
-                GUI.color = normalColour;
-
-                if (!i.Equals(0))
-                {
-                    GUI.color = Color.red;
-
-                    if (GUILayout.Button("-", GUILayout.Width(25)))
-                        fileDirs.DeleteArrayElementAtIndex(fileDirs.arraySize - 1);
-                }
-
-                GUI.color = normalColour;
-                EditorGUILayout.EndHorizontal();
-            }
-        }
-
-        
-        /// <summary>
-        /// Audio Manager Editor Method | gets the number of clips currently in this instance of the Audio Manager.
-        /// </summary>
-        /// <returns>Int | number of clips in the AMF on this Audio Manager.</returns>
-        private int GetNumberOfClips()
-        {
-            // 2.4.1 - fixed an issue where this if statement didn't fire where there was only 1 file, simple mistake xD, previous ">" now ">=".
-            if (fileLib != null && fileLib.arraySize >= 1)
-            {
-                return fileLib.arraySize;
-            }
-            
-            return 0;
-        }
-
-
-
-        private void ReferenceSetup()
-        {
-            file = serializedObject.FindProperty("audioManagerFile");
-            lastFile = serializedObject.FindProperty("audioManagerFile");
-
-            if (file.objectReferenceValue)
-            {
-                fileObj = new SerializedObject(file.objectReferenceValue);
-                soundPrefab = fileObj.FindProperty("soundPrefab");
-                audioMixerList = fileObj.FindProperty("audioMixer");
-                fileDirs = fileObj.FindProperty("directory");
-                fileLib = fileObj.FindProperty("library");
-                fileIsPopulated = fileObj.FindProperty("isPopulated");
-            }
-            
-            
-            if (file.objectReferenceValue && audioMixerList.arraySize == 0)
-                audioMixerList.InsertArrayElementAtIndex(0);
-            
-            if (fileObj != null)
-                fileObj.Update();
-            
-            // Setup data asset is needed...
-            var _asset = AssetDatabase.FindAssets("t:audiomanagersettingsdata", null);
-
-            if (_asset.Length > 0) return;
-            
-            var _editorScript = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(this)).Split('/');
-            var _editorPath = string.Empty;
-
-            for (int i = 0; i < _editorScript.Length; i++)
-            {
-                if (i.Equals(_editorScript.Length - 1)) continue;
-                _editorPath += $"{_editorScript[i]}/";
-            }
-                
-            AssetDatabase.CreateAsset(CreateInstance(typeof(AudioManagerSettingsData)), $"{_editorPath}Audio Manager Settings.asset");
-            AssetDatabase.Refresh();
-        }
-
-        
         /// <summary>
         /// Shows a variety of help labels when stuff goes wrong, these just explain to the user what has happened and how they should go about fixing it.
         /// </summary>
@@ -928,21 +995,19 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             if (fileIsPopulated.boolValue)
             {
-                if (fileLib.arraySize > 0 && fileLib.arraySize != CheckAmount())
+                if (fileLib.arraySize > 0 && fileLib.arraySize != lastTotal)
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.BeginHorizontal();
 
-                    string _errorString = null;
+                    string _errorString;
 
                     if (fileDirs.arraySize != 0)
                     {
                         _errorString = NoClipsInDirMessage;
 
                         for (var i = 0; i < fileDirs.arraySize; i++)
-                        {
                             _errorString = _errorString + "assets" + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue + "\n";
-                        }
                     }
                     else
                         _errorString = "No clips found in: " + "assets" + BaseAudioFolderLocation;
@@ -950,21 +1015,19 @@ namespace CarterGames.Assets.AudioManager.Editor
                     EditorGUILayout.HelpBox(_errorString, MessageType.Info, true);
                     EditorGUILayout.EndHorizontal();
                 }
-                else if (fileLib.arraySize != CheckAmount())
+                else if (fileLib.arraySize != lastTotal)
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.BeginHorizontal();
 
-                    string _errorString = null;
+                    string _errorString;
 
                     if (fileDirs.arraySize != 0)
                     {
                         _errorString = NoClipsInDirMessage;
 
-                        for (int i = 0; i < fileDirs.arraySize; i++)
-                        {
+                        for (var i = 0; i < fileDirs.arraySize; i++)
                             _errorString = _errorString + "assets/" + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i).stringValue + "\n";
-                        }
                     }
                     else
                         _errorString = "No clips found in: " + "assets/" + BaseAudioFolderLocation;
@@ -972,21 +1035,19 @@ namespace CarterGames.Assets.AudioManager.Editor
                     EditorGUILayout.HelpBox(_errorString, MessageType.Info, true);
                     EditorGUILayout.EndHorizontal();
                 }
-                else if (CheckAmount() == 0)
+                else if (lastTotal.Equals(0))
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.BeginHorizontal();
 
-                    string _errorString = null;
+                    string _errorString;
 
                     if (fileDirs.arraySize != 0)
                     {
                         _errorString = NoClipsInDirMessage;
 
-                        for (int i = 0; i < fileDirs.arraySize; i++)
-                        {
+                        for (var i = 0; i < fileDirs.arraySize; i++)
                             _errorString = _errorString + "assets/" + BaseAudioFolderLocation + "/" + fileDirs.GetArrayElementAtIndex(i) + "\n";
-                        }
                     }
                     else
                         _errorString = "No clips found in: " + "assets/" + BaseAudioFolderLocation;
@@ -1005,14 +1066,12 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.Space();
             }
         }
-        
-        
+
+        #endregion
         
 
-        
-        
-        
-        
+        #region Scripting Define Setup Logic
+
         // Helper stuff for scripting defines... (Makes it so the code can add a define and remove it without effecting the others in the project)
         // Patch in 2.5.1: Fixed an issue where this code would remove all other defines on addition or removal..
         private string GetScriptingDefines(BuildTarget buildTarget) 
@@ -1068,5 +1127,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 SetScriptingDefines(updatedScriptingDefines, buildTarget);
             }
         }
+
+        #endregion
     }
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-/*
+﻿/*
  * 
  *  Audio Manager
  *							  
@@ -16,10 +13,13 @@ using UnityEngine;
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.6
-*	Last Updated: 09/02/2022 (d/m/y)							
+ *  Version: 2.5.7
+ *	Last Updated: 18/03/2022 (d/m/y)							
  * 
  */
+
+using System;
+using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
 {

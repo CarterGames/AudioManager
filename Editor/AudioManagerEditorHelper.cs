@@ -16,8 +16,8 @@
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.6
-*	Last Updated: 09/02/2022 (d/m/y)							
+ *  Version: 2.5.7
+ *	Last Updated: 18/03/2022 (d/m/y)						
  * 
  */
 
@@ -28,12 +28,13 @@ namespace CarterGames.Assets.AudioManager.Editor
 {
     public static class AudioManagerEditorHelper
     {
-        private static readonly string AssetVersionNumber = "2.5.6";
+        private static readonly Texture2D AssetLogo = Resources.Load<Texture2D>("LogoAM");
+        private static readonly string AssetVersionNumber = "2.5.7";
         
         private static readonly Color32 amRedCol = new Color32(255, 150, 157, 255);
         private static readonly Color32 greenCol = new Color32(41, 176, 97, 255);
         private static readonly Color32 redCol = new Color32(190, 42, 42, 255);
-
+        
 
         public static void Header(string scriptName, bool showButtons, Color normalBackgroundColour)
         {
@@ -43,9 +44,9 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             // Shows either the Carter Games Logo or an alternative for if the icon is deleted/not included when you import the package
             // Note: if you are using an older version of the asset, the directory/name of the logo may not match this and therefore will display the text title only
-            if (Resources.Load<Texture2D>("LogoAM"))
+            if (AssetLogo)
             {
-                if (GUILayout.Button(Resources.Load<Texture2D>("LogoAM"), GUIStyle.none, GUILayout.Width(50), GUILayout.Height(50)))
+                if (GUILayout.Button(AssetLogo, GUIStyle.none, GUILayout.Width(50), GUILayout.Height(50)))
                 {
                     GUI.FocusControl(null);
                 }
@@ -100,9 +101,9 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             GUILayout.Space(10f);
         }
-        
-        
-        public static float TextWidth(string text)
+
+
+        private static float TextWidth(string text)
         {
             return GUI.skin.label.CalcSize(new GUIContent(text)).x;
         }
