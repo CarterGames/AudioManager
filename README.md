@@ -1,4 +1,5 @@
-![Audio Manager Banner 1200 x 630](https://user-images.githubusercontent.com/33253710/154432524-5a0e4e61-22d3-4c2f-b103-829d03947574.jpg)
+![Audio Manager Banner 2022-1 1200x630](https://user-images.githubusercontent.com/33253710/166158015-c4a17270-2456-456d-90bf-31d362bc7a0d.jpg)
+
 
 <b>Audio Manager</b> is a <b>FREE</b> audio/sound management library for Unity with options to play clips & background music for any game. 
 
