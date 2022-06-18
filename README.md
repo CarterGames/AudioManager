@@ -3,7 +3,7 @@
 
 <b>Audio Manager</b> is a <b>FREE</b> audio/sound management library for Unity with options to play clips & background music for any game. 
 
-> Version 2.5.7
+> Version 2.5.8
 
 ## Key Features
 - Automatic clip adding so you don't have to.
