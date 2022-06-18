@@ -13,8 +13,8 @@
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.7
- *	Last Updated: 18/03/2022 (d/m/y)										
+ *  Version: 2.5.8
+ *	Last Updated: 18/06/2022 (d/m/y)										
  * 
  */
 
@@ -84,10 +84,10 @@ namespace CarterGames.Assets.AudioManager
             RemovalLogic();
         }
         
+        
         private void RemovalLogic()
         {
-            am.pool.Push(gameObject);
-            am.active.Remove(source);
+            AudioPool.Return(source);
             gameObject.SetActive(false);
         }
     }

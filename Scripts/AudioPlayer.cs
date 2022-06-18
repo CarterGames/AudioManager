@@ -13,8 +13,8 @@
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.7
- *	Last Updated: 18/03/2022 (d/m/y)									
+ *  Version: 2.5.8
+ *	Last Updated: 18/06/2022 (d/m/y)									
  * 
  */
 
@@ -82,7 +82,7 @@ namespace CarterGames.Assets.AudioManager
                 {
                     if (lib.ContainsKey(clipsToPlay[i]))
                     {
-                        GameObject _clip;
+                        AudioSource _clip;
 
                         if (!am)
                         {
@@ -93,16 +93,10 @@ namespace CarterGames.Assets.AudioManager
 #endif
                         }
 
-                        if (am.pool.Count > 0)
-                        {
-                            _clip = am.pool.Pop();
-                            _clip.SetActive(true);
-                        }
-                        else
-                            _clip = Instantiate(audioManagerFile.soundPrefab);
-
-
-                        if (!_clip.GetComponent<AudioSource>()) return;
+                        _clip = AudioPool.Assign();
+                        _clip.gameObject.SetActive(true);
+                        
+                        if (!_clip) return;
 
                         var _source = _clip.GetComponent<AudioSource>();
                         var _audioRemoval = _source.GetComponent<AudioClipPlayer>();

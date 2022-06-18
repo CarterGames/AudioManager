@@ -16,8 +16,8 @@
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.7
- *	Last Updated: 18/03/2022 (d/m/y)						
+ *  Version: 2.5.8
+ *	Last Updated: 18/06/2022 (d/m/y)						
  * 
  */
 
@@ -29,7 +29,7 @@ namespace CarterGames.Assets.AudioManager.Editor
     public static class AudioManagerEditorHelper
     {
         private static readonly Texture2D AssetLogo = Resources.Load<Texture2D>("LogoAM");
-        private static readonly string AssetVersionNumber = "2.5.7";
+        private static readonly string AssetVersionNumber = "2.5.8";
         
         private static readonly Color32 amRedCol = new Color32(255, 150, 157, 255);
         private static readonly Color32 greenCol = new Color32(41, 176, 97, 255);

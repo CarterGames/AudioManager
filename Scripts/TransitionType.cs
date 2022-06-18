@@ -10,8 +10,8 @@
  *      E: jonathan@carter.games
  *      W: https://jonathan.carter.games
  *		
- *  Version: 2.5.7
- *	Last Updated: 18/03/2022 (d/m/y)										
+ *  Version: 2.5.8
+ *	Last Updated: 18/06/2022 (d/m/y)										
  * 
  */
 

@@ -13,8 +13,8 @@
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.7
- *	Last Updated: 18/03/2022 (d/m/y)								
+ *  Version: 2.5.8
+ *	Last Updated: 18/06/2022 (d/m/y)								
  * 
  */
 
@@ -44,9 +44,6 @@ namespace CarterGames.Assets.AudioManager
         [SerializeField] private AudioManagerFile audioManagerFile; // The AMF currently in use by this instance of the Audio Manager.
 
         private Dictionary<string, AudioClip> lib;
-        internal Stack<GameObject> pool;
-        internal List<AudioSource> active;
-
         private bool canPlayAudio = true;
 
 
@@ -73,7 +70,6 @@ namespace CarterGames.Assets.AudioManager
             if (audioManagerFile.soundPrefab == null)
                 Debug.LogWarning("<color=#E77A7A><b>Audio Manager</b></color> | <color=#D6BA64>Warning Code 1</color> | Prefab has not been assigned! Please assign a prefab in the inspector before using the manager.");
             
-
             // For the audio source on the script, only used for previewing clips xD
             GetComponent<AudioSource>().hideFlags = HideFlags.HideInInspector;
 
@@ -84,35 +80,15 @@ namespace CarterGames.Assets.AudioManager
             {
                 lib.Add(_t.key, _t.value);
             }
-            
-            // Sets up the object pool & active list for use...
-            pool = new Stack<GameObject>();
-            active = new List<AudioSource>();
 
             canPlayAudio = true;
-            
-            // Runs the method to clear the active list and object pool on a scene change...
-            SceneManager.sceneLoaded += ResetOnSceneChange;
-        }
 
-
-
-        /// <summary>
-        /// Resets the manager on a scene change, as some references wil be lost on the scene change....
-        /// </summary>
-        /// <param name="scene">Scene | The scene to change to.</param>
-        /// <param name="mode">LoadSceneMode | The method of scene loading to use.</param>
-        private void ResetOnSceneChange(Scene scene, LoadSceneMode mode)
-        {
-            if (pool != null)
-                pool.Clear();
-
-            if (active != null)
-                active.Clear();
+            if (AudioPool.ExistsInScene) return;
+            var obj = new GameObject("Audio Pool");
+            obj.AddComponent<AudioPool>();
         }
         
-        
-        
+
         /// <summary>
         /// Play a sound that is scanned into the audio manager.
         /// </summary>
@@ -969,7 +945,7 @@ namespace CarterGames.Assets.AudioManager
             
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
         
         
@@ -995,7 +971,7 @@ namespace CarterGames.Assets.AudioManager
             _source.outputAudioMixerGroup = mixer;
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
         
         
@@ -1021,7 +997,7 @@ namespace CarterGames.Assets.AudioManager
             _source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
         
         
@@ -1045,7 +1021,7 @@ namespace CarterGames.Assets.AudioManager
             _source.time = 0;
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
         
         
@@ -1069,7 +1045,7 @@ namespace CarterGames.Assets.AudioManager
             _source = SourceSetup(_source, lib[request], 0, volume, pitch);
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
             
             return _source;
         }
@@ -1097,7 +1073,7 @@ namespace CarterGames.Assets.AudioManager
             _source.outputAudioMixerGroup = mixer;
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
             
             return _source;
         }
@@ -1125,7 +1101,7 @@ namespace CarterGames.Assets.AudioManager
             _source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
             
             return _source;
         }
@@ -1152,7 +1128,7 @@ namespace CarterGames.Assets.AudioManager
             _source.time = 0;
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
             
             return _source;
         }
@@ -1309,7 +1285,7 @@ namespace CarterGames.Assets.AudioManager
             
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
         
         
@@ -1333,7 +1309,7 @@ namespace CarterGames.Assets.AudioManager
             _source.outputAudioMixerGroup = mixer;
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
         
         
@@ -1357,7 +1333,7 @@ namespace CarterGames.Assets.AudioManager
             _source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             _source.PlayDelayed(delay);
             
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
 
         
@@ -1379,7 +1355,7 @@ namespace CarterGames.Assets.AudioManager
             _source.time = 0;
             _source.PlayDelayed(delay);
 
-            AddToAudioRemoval(_audioRemoval, _source);
+            AddToAudioRemoval(_audioRemoval, _source, delay);
         }
         
         
@@ -1390,16 +1366,14 @@ namespace CarterGames.Assets.AudioManager
         {
             get
             {
-                GameObject _go;
+                AudioSource _go;
 
-                if (pool.Count > 0)
-                {
-                    _go = pool.Pop();
-                    _go.SetActive(true);
-                }
-                else
-                    _go = Instantiate(audioManagerFile.soundPrefab);
+                if (!AudioPool.IsInitialised)
+                    AudioPool.Initialise(audioManagerFile.soundPrefab, 10);
 
+                _go = AudioPool.Assign();
+                _go.gameObject.SetActive(true);
+                
                 if (!_go.GetComponent<AudioSource>())
                 {
                     Debug.LogWarning(
@@ -1407,7 +1381,7 @@ namespace CarterGames.Assets.AudioManager
                     return null;
                 }
 
-                return _go;
+                return _go.gameObject;
             }
         }
 
@@ -1431,18 +1405,18 @@ namespace CarterGames.Assets.AudioManager
             source.time = time;
             return source;
         }
-        
-        
+
+
         /// <summary>
         /// Adds the clip to audio removal for clean up once the clip has finished playing...
         /// </summary>
         /// <param name="clipPlayer">AudioRemoval | The removal script...</param>
         /// <param name="source">AudioSource | The source to check...</param>
-        private void AddToAudioRemoval(AudioClipPlayer clipPlayer, AudioSource source)
+        /// <param name="extraTime">Float | Any extra time to wait for before removing...</param>
+        private void AddToAudioRemoval(AudioClipPlayer clipPlayer, AudioSource source, float extraTime = 0f)
         {
-            active.Add(source);
             if (source.loop) return;
-            clipPlayer.Cleanup(source.clip.length);
+            clipPlayer.Cleanup(source.clip.length + extraTime);
         }
         
 
@@ -1517,16 +1491,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>Bool</returns>
         public bool IsClipPlaying(string clip)
         {
-            if (active == null) return false;
-            if (active.Count == 0) return false;
-            
-            for (int i = 0; i < active.Count; i++)
-            {
-                if (active[i].clip.name.Equals(clip))
-                    return true;
-            }
-
-            return false;
+            return AudioPool.AnyActiveWithClip(clip);
         }
         
         

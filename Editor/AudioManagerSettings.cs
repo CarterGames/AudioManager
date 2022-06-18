@@ -16,8 +16,8 @@
  *      E: hello@carter.games
  *      W: https://www.carter.games
  *		
- *  Version: 2.5.7
- *	Last Updated: 18/03/2022 (d/m/y)						
+ *  Version: 2.5.8
+ *	Last Updated: 18/06/2022 (d/m/y)						
  * 
  */
 
@@ -139,7 +139,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            EditorGUILayout.LabelField("Version: 2.5.7", GUILayout.Width(TextWidth("Version 2.5.7  ")));
+            EditorGUILayout.LabelField("Version: 2.5.8", GUILayout.Width(TextWidth("Version 2.5.8  ")));
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
         }
