@@ -3,7 +3,11 @@
 
 <b>Audio Manager</b> is a <b>FREE</b> audio/sound management library for Unity with options to play clips & background music for any game. 
 
-> Version 2.5.8
+## Badges
+![CodeFactor](https://www.codefactor.io/repository/github/cartergames/audiomanager/badge?style=for-the-badge)
+![GitHub all releases](https://img.shields.io/github/downloads/CarterGames/AudioManager/total?style=for-the-badge)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/CarterGames/AudioManager?style=for-the-badge)
+![GitHub repo size](https://img.shields.io/github/repo-size/CarterGames/AudioManager?style=for-the-badge)
 
 ## Key Features
 - Automatic clip adding so you don't have to.
