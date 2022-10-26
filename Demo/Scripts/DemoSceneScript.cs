@@ -5,64 +5,116 @@ using UnityEngine.UI;
 
 namespace CarterGames.Assets.AudioManager.Demo
 {
+    /// <summary>
+    /// The demo script for the asset.
+    /// </summary>
     public class DemoSceneScript : MonoBehaviour
     {
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Fields
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */   
+        
+        [SerializeField] private List<AudioClip> tracks;
+        
         private float startTime;
         private float endTime;
         private float transitionLength = 1;
-        public List<AudioClip> tracks;
-        public TransitionType TransType { get; set; }
+
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Properties
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        private TransitionType Transition { get; set; }
         
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Methods
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */   
+        
+        /// <summary>
+        /// Opens the documentation for the asset (Online)
+        /// </summary>
         public void OpenDocs()
         {
             Application.OpenURL("https://carter.games/audiomanager");
         }
+        
 
-        public void PlayStopTrack(Button b)
+        /// <summary>
+        /// Players or stops a track based on if a track is playing.
+        /// </summary>
+        /// <param name="text">The button to read the text for.</param>
+        public void PlayStopTrack(Text text)
         {
             if (!MusicPlayer.instance.GetAudioSource.isPlaying)
             {
-                b.transform.GetChild(0).GetComponent<Text>().text = "Stop";
+                text.text = "Stop";
                 MusicPlayer.instance.PlayTrack();
             }
             else
             {
-                b.transform.GetChild(0).GetComponent<Text>().text = "Play";
+                text.text = "Play";
                 MusicPlayer.instance.GetAudioSource.Stop();
             }
         }
 
+        
+        /// <summary>
+        /// Switches the track to the other track not in use in the demo.
+        /// </summary>
         public void SwitchTrack()
         {
-            var _currentTrack = MusicPlayer.instance.GetActiveTrack;
-            var _newTrack = tracks.FirstOrDefault(t => !t.Equals(_currentTrack));
+            var currentTrack = MusicPlayer.instance.GetActiveTrack;
+            var newTrack = tracks.FirstOrDefault(t => !t.Equals(currentTrack));
             
             if (startTime > 0 && endTime > 0)
-                MusicPlayer.instance.PlayTrack(_newTrack, startTime, endTime, TransType, transitionLength);
+                MusicPlayer.instance.PlayTrack(newTrack, startTime, endTime, Transition, transitionLength);
             else if (startTime > 0 && endTime.Equals(0))
-                MusicPlayer.instance.PlayTrack(_newTrack, startTime, TransType, transitionLength);
+                MusicPlayer.instance.PlayTrack(newTrack, startTime, Transition, transitionLength);
             else
-                MusicPlayer.instance.PlayTrack(_newTrack, TransType, transitionLength);
+                MusicPlayer.instance.PlayTrack(newTrack, Transition, transitionLength);
         }
+        
 
-        public void SetTransitionType(int value) => TransType = (TransitionType) value;
+        /// <summary>
+        /// Sets the transition type to the entered value.
+        /// </summary>
+        /// <param name="value">The transition selected as a int to convert back to the enum with a cast.</param>
+        public void SetTransitionType(int value)
+        {
+            Transition = (TransitionType)value;
+        }
+        
 
+        /// <summary>
+        /// Sets the start time of the music track.
+        /// </summary>
+        /// <param name="value">The start time to set to.</param>
         public void SetStartTime(string value)
         {
-            int.TryParse(value.Trim(), out var _string);
-            startTime = _string;
+            int.TryParse(value.Trim(), out var newValue);
+            startTime = newValue;
         }
         
+        
+        /// <summary>
+        /// Sets the start time of the music track.
+        /// </summary>
+        /// <param name="value">The end time to set to.</param>
         public void SetEndTime(string value)
         {
-            int.TryParse(value.Trim(), out var _string);
-            endTime = _string;
+            int.TryParse(value.Trim(), out var newValue);
+            endTime = newValue;
         }
         
+        
+        /// <summary>
+        /// Sets the transition length.
+        /// </summary>
+        /// <param name="value">The length of the transition.</param>
         public void SetTransitionLength(string value)
         {
-            int.TryParse(value.Trim(), out var _string);
-            transitionLength = _string;
+            int.TryParse(value.Trim(), out var newValue);
+            transitionLength = newValue;
         }
     }
 }

@@ -15,7 +15,7 @@ GameObject:
   m_Layer: 0
   m_Name: Audio Prefab
   m_TagString: Untagged
-  m_Icon: {fileID: 8418204508859773708, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 2800000, guid: 9099cdb7f1bf63e49bb02c9bd03ca716, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
