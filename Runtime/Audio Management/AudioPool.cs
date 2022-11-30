@@ -49,6 +49,12 @@ namespace CarterGames.Assets.AudioManager
             DontDestroyOnLoad(this);
         }
         
+        private void OnDisable()
+        {
+            _memberObjects = null;
+            _unavailableObjects = null;
+        }
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
