@@ -2,7 +2,7 @@
     "name": "CarterGames.AudioManager.Demo",
     "rootNamespace": "CarterGames.Assets.AudioManager.Demo",
     "references": [
-        "GUID:fbc16a6aa1721e64fa2a7f35f22adbdd"
+        "GUID:91fd2ddf85f92854e8e10eef3c91fb12"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

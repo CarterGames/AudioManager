@@ -1,3 +1,27 @@
+/*
+ * Copyright (c) 2018-Present Carter Games
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ *    
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -235,12 +259,40 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.EndHorizontal();
 
 
-            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
+            if (GUILayout.Button("Force Update Library"))
+            {
+                // library.ClearArray();
+                var strings = new List<string>();
+                var list = new List<AudioClip>();
+                AudioManagerScriptHelper.AddAudioClips(directories, isPopulated, list);
+                AudioManagerScriptHelper.AddStrings(list, strings);
+                
+                for (var i = 0; i < list.Count; i++)
+                {
+                    if (library.arraySize > i)
+                    {
+                        library.GetArrayElementAtIndex(i).FindPropertyRelative("key").stringValue = strings[i];
+                        library.GetArrayElementAtIndex(i).FindPropertyRelative("value").objectReferenceValue = list[i];
+                    }
+                    else
+                    {
+                        library.InsertArrayElementAtIndex(i);
+                        library.GetArrayElementAtIndex(i).FindPropertyRelative("key").stringValue = strings[i];
+                        library.GetArrayElementAtIndex(i).FindPropertyRelative("value").objectReferenceValue = list[i];
+                    }
+                }
+
+                EditorUtility.DisplayDialog("Audio Manager | Library Updated", "The file has been updated with the latest scan of the directories entered.", "Continue");
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.Update();
+            }
+            
             if (GUILayout.Button("Clear Library"))
             {
                 library.ClearArray();
             }
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
             
             GUILayout.Space(2.5f);
             EditorGUILayout.EndVertical();

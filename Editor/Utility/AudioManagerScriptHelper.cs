@@ -1,4 +1,27 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * Copyright (c) 2018-Present Carter Games
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ *    
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -15,7 +38,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-        private static bool _shouldUpdateDirectories;
+        private static bool shouldUpdateDirectories;
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
@@ -168,8 +191,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         public static void DirectoriesDisplay(SerializedProperty fileDirs)
         {
             var defaultCol = GUI.backgroundColor;
-            var options = DirectorySelectHelper.GetDirectoriesFromBase(_shouldUpdateDirectories);
-            _shouldUpdateDirectories = false;
+            var options = DirectorySelectHelper.GetDirectoriesFromBase(shouldUpdateDirectories);
+            shouldUpdateDirectories = false;
             
             if (fileDirs.arraySize <= 0) return;
             for (var i = 0; i < fileDirs.arraySize; i++)
@@ -188,7 +211,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 fileDirs.GetArrayElementAtIndex(i).stringValue = DirectorySelectHelper.ConvertIntToDir(EditorGUILayout.Popup(DirectorySelectHelper.ConvertStringToIndex(fileDirs.GetArrayElementAtIndex(i).stringValue, options), options.ToArray()), options);
                 if (EditorGUI.EndChangeCheck())
                 {
-                    _shouldUpdateDirectories = true;
+                    shouldUpdateDirectories = true;
                     fileDirs.serializedObject.ApplyModifiedProperties();
                     fileDirs.serializedObject.Update();
                 }
@@ -203,7 +226,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         fileDirs.InsertArrayElementAtIndex(i);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        _shouldUpdateDirectories = true;
+                        shouldUpdateDirectories = true;
                         fileDirs.serializedObject.ApplyModifiedProperties();
                         fileDirs.serializedObject.Update();
                     }
@@ -220,7 +243,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         fileDirs.DeleteArrayElementAtIndex(i);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        _shouldUpdateDirectories = true;
+                        shouldUpdateDirectories = true;
                         fileDirs.serializedObject.ApplyModifiedProperties();
                         fileDirs.serializedObject.Update();
                     }
@@ -405,6 +428,9 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             DirectorySelectHelper.RefreshAllDirectories();
             var valid = DirectorySelectHelper.GetDirectoriesFromBase(true);
+            
+            if (fileDir == null) return;
+            if (fileDir.arraySize <= 0) return;
             
             for (var i = fileDir.arraySize - 1; i >= 0; i--)
             {
