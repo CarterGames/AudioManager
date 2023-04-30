@@ -56,6 +56,9 @@ namespace CarterGames.Assets.AudioManager
         /// Gets whether or not the pool system has initialised.
         /// </summary>
         public static bool IsInitialised => _memberObjects != null && _unavailableObjects != null;
+
+
+        public static Transform Parent => _parent;
         
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────

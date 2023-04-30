@@ -51,6 +51,7 @@ namespace CarterGames.Assets.AudioManager
 
         private void OnDisable()
         {
+            transform.SetParent(AudioPool.Parent);
             StopAllCoroutines();
         }
         
@@ -89,6 +90,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         private void RemovalLogic()
         {
+            transform.SetParent(AudioPool.Parent);
             AudioPool.Return(source);
             gameObject.SetActive(false);
         }

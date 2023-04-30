@@ -196,30 +196,14 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             EditorGUILayout.BeginHorizontal();
             
-            if (GUILayout.Button("Asset Store", GUILayout.Height(30), GUILayout.MinWidth(100)))
-                Application.OpenURL("https://assetstore.unity.com/packages/tools/audio/audio-manager-cg-149123");
-            
             if (GUILayout.Button("GitHub", GUILayout.Height(30), GUILayout.MinWidth(100)))
                 Application.OpenURL("https://github.com/CarterGames/AudioManager");
 
             if (GUILayout.Button("Documentation", GUILayout.Height(30), GUILayout.MinWidth(100)))
                 Application.OpenURL("https://carter.games/audiomanager");
 
-            if (GUILayout.Button("Change Log", GUILayout.Height(30), GUILayout.MinWidth(100)))
-                Application.OpenURL("https://carter.games/audiomanager/changelog");
-
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("Email", GUILayout.Height(30), GUILayout.MinWidth(100)))
-                Application.OpenURL("mailto:hello@carter.games?subject=Audio Manager Asset Enquiry");
-
-            if (GUILayout.Button("Discord", GUILayout.Height(30), GUILayout.MinWidth(100)))
-                Application.OpenURL("https://carter.games/discord");
-
-            if (GUILayout.Button("Report Issues", GUILayout.Height(30), GUILayout.MinWidth(100)))
-                Application.OpenURL("https://carter.games/report");
+            if (GUILayout.Button("Support", GUILayout.Height(30), GUILayout.MinWidth(100)))
+                Application.OpenURL("https://carter.games/contact");
 
             EditorGUILayout.EndHorizontal();
 

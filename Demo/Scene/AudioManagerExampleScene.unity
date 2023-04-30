@@ -462,7 +462,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 936949953}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: CarterGames.Assets.AudioManager.Demo.DemoSceneScript,
+          CarterGames.AudioManager.Demo
         m_MethodName: SetTransitionType
         m_Mode: 0
         m_Arguments:
@@ -1633,7 +1634,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeToStartFrom: 0
   timeToLoopAt: 0
-  musicTrack: {fileID: 8300000, guid: bc80d3d0cf42f754d9a017656ba878da, type: 3}
+  musicTrack: {fileID: 8300000, guid: 5fa23c7498945a747be89a53f67ea2f3, type: 3}
   mixer: {fileID: 0}
   shouldLoop: 1
   playOnAwake: 0
@@ -2294,7 +2295,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 936949953}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: CarterGames.Assets.AudioManager.Demo.DemoSceneScript,
+          CarterGames.AudioManager.Demo
         m_MethodName: SetTransitionLength
         m_Mode: 0
         m_Arguments:
@@ -2528,7 +2530,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 936949953}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: CarterGames.Assets.AudioManager.Demo.DemoSceneScript,
+          CarterGames.AudioManager.Demo
         m_MethodName: SetEndTime
         m_Mode: 0
         m_Arguments:
@@ -2690,12 +2693,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 936949952}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85555f046a9856d48b0dcbd270387c6c, type: 3}
+  m_Script: {fileID: 11500000, guid: 614136fb201c2674e8efd3d6bafcd884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   tracks:
-  - {fileID: 8300000, guid: bc80d3d0cf42f754d9a017656ba878da, type: 3}
-  - {fileID: 8300000, guid: 0f35d0da0c3232a498e0e585f3e77691, type: 3}
+  - {fileID: 8300000, guid: 5fa23c7498945a747be89a53f67ea2f3, type: 3}
+  - {fileID: 8300000, guid: c471e8fb238af8c4a9ec73bfac1c6430, type: 3}
 --- !u!4 &936949954
 Transform:
   m_ObjectHideFlags: 0
@@ -2966,7 +2969,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 936949953}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: CarterGames.Assets.AudioManager.Demo.DemoSceneScript,
+          CarterGames.AudioManager.Demo
         m_MethodName: SetStartTime
         m_Mode: 0
         m_Arguments:
@@ -3351,7 +3355,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 936949953}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: CarterGames.Assets.AudioManager.Demo.DemoSceneScript,
+          CarterGames.AudioManager.Demo
         m_MethodName: OpenDocs
         m_Mode: 1
         m_Arguments:
@@ -5048,7 +5053,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 936949953}
-        m_TargetAssemblyTypeName: 
+        m_TargetAssemblyTypeName: CarterGames.Assets.AudioManager.Demo.DemoSceneScript,
+          CarterGames.AudioManager.Demo
         m_MethodName: SwitchTrack
         m_Mode: 1
         m_Arguments:
@@ -5866,7 +5872,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2104004365}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 936949953}
+        m_TargetAssemblyTypeName: CarterGames.Assets.AudioManager.Demo.DemoSceneScript,
+          CarterGames.AudioManager.Demo
+        m_MethodName: SwitchTrack
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2104004365
 MonoBehaviour:
   m_ObjectHideFlags: 0
