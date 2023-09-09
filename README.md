@@ -68,5 +68,8 @@ You can access a online of the documentation here: <a href="https://carter.games
 ## Authors
 - <a href="https://github.com/JonathanMCarter">Jonathan Carter</a>
 
+## Additional Contributors
+- <a href="https://github.com/Yemeni">Yousef Al-Hadhrami</a> - (2.6.1) - Hotfix to AudioPool.cs class throwing a null reference exception error.
+
 ## Licence
 MIT Licence
