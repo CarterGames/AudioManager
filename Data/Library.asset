@@ -1,0 +1,180 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b35e70643df4a4daf1e8f488bf3b7da, type: 3}
+  m_Name: Library
+  m_EditorClassIdentifier: 
+  library:
+    list:
+    - key: DEMO_Click_01-67024cba-b256-4edc-87ec-db3f49cf1d5f
+      value:
+        key: DEMO_Click_01
+        id: DEMO_Click_01-67024cba-b256-4edc-87ec-db3f49cf1d5f
+        defaultKey: DEMO_Click_01-67024cba-b256-4edc-87ec-db3f49cf1d5f
+        value: {fileID: 8300000, guid: f4a67057b593f434c883025f2ff22162, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Soundboard/Audio/DEMO_Click_01.wav
+        dynamicStartTime:
+          time: 0.0030729168
+          threshold: 0.00064067054
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+    - key: DEMO_Click_02-633ab6c2-ed91-4f28-aba1-26de11708492
+      value:
+        key: DEMO_Click_02
+        id: DEMO_Click_02-633ab6c2-ed91-4f28-aba1-26de11708492
+        defaultKey: DEMO_Click_02-633ab6c2-ed91-4f28-aba1-26de11708492
+        value: {fileID: 8300000, guid: 9a1d74ee9eeeee94189c41f2ab85966d, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Soundboard/Audio/DEMO_Click_02.wav
+        dynamicStartTime:
+          time: 0.0012395834
+          threshold: 0.0010832978
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+    - key: DEMO_Click_03-5ac6975f-ff3e-4a64-809c-a0737ea3ba67
+      value:
+        key: DEMO_Click_03
+        id: DEMO_Click_03-5ac6975f-ff3e-4a64-809c-a0737ea3ba67
+        defaultKey: DEMO_Click_03-5ac6975f-ff3e-4a64-809c-a0737ea3ba67
+        value: {fileID: 8300000, guid: eb72b403afb10e34d8f7a9ce5baa725c, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Soundboard/Audio/DEMO_Click_03.wav
+        dynamicStartTime:
+          time: 0.0028854166
+          threshold: 0.00050748617
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+    - key: DEMO_Click_04-bf2c41f5-7178-4753-8269-7a008488d7b6
+      value:
+        key: DEMO_Click_04
+        id: DEMO_Click_04-bf2c41f5-7178-4753-8269-7a008488d7b6
+        defaultKey: DEMO_Click_04-bf2c41f5-7178-4753-8269-7a008488d7b6
+        value: {fileID: 8300000, guid: 5968a376051b20b4fbeee52169e53de9, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Soundboard/Audio/DEMO_Click_04.wav
+        dynamicStartTime:
+          time: 0.0007604167
+          threshold: 0.0009586966
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+    - key: DEMO_Click_05-62e5a667-98f3-4e5f-9ac6-1d4f6fdca90e
+      value:
+        key: DEMO_Click_05
+        id: DEMO_Click_05-62e5a667-98f3-4e5f-9ac6-1d4f6fdca90e
+        defaultKey: DEMO_Click_05-62e5a667-98f3-4e5f-9ac6-1d4f6fdca90e
+        value: {fileID: 8300000, guid: f6d8803e9d8b81a47a5afeaef20d16fb, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Soundboard/Audio/DEMO_Click_05.wav
+        dynamicStartTime:
+          time: 0.00021875
+          threshold: 0.0013533082
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+    - key: DEMO_Music_CloisteredVinyl-10554005-e3eb-475f-b3e6-7914dec443c1
+      value:
+        key: DEMO_Music_CloisteredVinyl
+        id: DEMO_Music_CloisteredVinyl-10554005-e3eb-475f-b3e6-7914dec443c1
+        defaultKey: DEMO_Music_CloisteredVinyl-10554005-e3eb-475f-b3e6-7914dec443c1
+        value: {fileID: 8300000, guid: 75e4bd8d49229c84b9e62942208d39bb, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Music/Audio/DEMO_Music_CloisteredVinyl.mp3
+        dynamicStartTime:
+          time: 2.6268253
+          threshold: 0.0024941342
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+    - key: DEMO_Ping-480ecb77-8403-4b72-97d5-a743f3ceb0c2
+      value:
+        key: DEMO_Ping
+        id: DEMO_Ping-480ecb77-8403-4b72-97d5-a743f3ceb0c2
+        defaultKey: DEMO_Ping-480ecb77-8403-4b72-97d5-a743f3ceb0c2
+        value: {fileID: 8300000, guid: 63fb410de8c329a49a220d7859bb2d43, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Soundboard/Audio/DEMO_Ping.wav
+        dynamicStartTime:
+          time: 0.27614585
+          threshold: 0.00053935125
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+    - key: DEMO_Reject-2c51dce7-4216-4960-8f48-3ab7d916e643
+      value:
+        key: DEMO_Reject
+        id: DEMO_Reject-2c51dce7-4216-4960-8f48-3ab7d916e643
+        defaultKey: DEMO_Reject-2c51dce7-4216-4960-8f48-3ab7d916e643
+        value: {fileID: 8300000, guid: 54dd85768b4e063439954e8bb5ff72a9, type: 3}
+        path: Assets/Carter Games/Audio Manager/~Samples/Demo_Soundboard/Audio/DEMO_Reject.wav
+        dynamicStartTime:
+          time: 0
+          threshold: 0.0019711107
+          option: 0
+          tabPos: 0
+        showDynamicTime: 0
+  libraryReverseLookup:
+    list:
+    - key: DEMO_Music_CloisteredVinyl
+      value: DEMO_Music_CloisteredVinyl-10554005-e3eb-475f-b3e6-7914dec443c1
+    - key: DEMO_Click_01
+      value: DEMO_Click_01-67024cba-b256-4edc-87ec-db3f49cf1d5f
+    - key: DEMO_Click_02
+      value: DEMO_Click_02-633ab6c2-ed91-4f28-aba1-26de11708492
+    - key: DEMO_Click_03
+      value: DEMO_Click_03-5ac6975f-ff3e-4a64-809c-a0737ea3ba67
+    - key: DEMO_Click_04
+      value: DEMO_Click_04-bf2c41f5-7178-4753-8269-7a008488d7b6
+    - key: DEMO_Click_05
+      value: DEMO_Click_05-62e5a667-98f3-4e5f-9ac6-1d4f6fdca90e
+    - key: DEMO_Ping
+      value: DEMO_Ping-480ecb77-8403-4b72-97d5-a743f3ceb0c2
+    - key: DEMO_Reject
+      value: DEMO_Reject-2c51dce7-4216-4960-8f48-3ab7d916e643
+  groups:
+    list:
+    - key: 1f522aea-c788-4915-8225-c9d00f122dbf
+      value:
+        groupName: DEMO_Clicks
+        groupPlayMode: 0
+        clipNames:
+        - DEMO_Click_01
+        - DEMO_Click_02
+        - DEMO_Click_03
+        - DEMO_Click_04
+        - DEMO_Click_05
+  groupsReverseLookup:
+    list:
+    - key: DEMO_Clicks
+      value: 1f522aea-c788-4915-8225-c9d00f122dbf
+  mixers:
+    list: []
+  mixersReverseLookup:
+    list: []
+  tracks:
+    list:
+    - key: 72edc988-b3aa-4e87-8e72-86b35b8bf5fa
+      value:
+        listKey: DEMO_Music_DemoTrackList
+        tracks:
+        - clipKey: DEMO_Music_CloisteredVinyl
+          clipId: DEMO_Music_CloisteredVinyl-94bceb95-df1b-454d-950a-c8484cb1ee44
+          startTime: 2.6268253
+          endTime: 210.07674
+        trackListType: 0
+        loop: 0
+        shuffle: 0
+        useCustomTransitions: 0
+        startingTransition: 0
+        startingTransitionDuration: 0
+        switchTrackTransition: 0
+        switchingTransitionDuration: 0
+  tracksReverseLookup:
+    list:
+    - key: DEMO_Music_DemoTrackList
+      value: 72edc988-b3aa-4e87-8e72-86b35b8bf5fa
