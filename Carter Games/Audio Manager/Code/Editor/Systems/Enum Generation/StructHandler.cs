@@ -280,6 +280,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             if (!File.Exists(path))
             {
+                FileEditorUtil.CreateToDirectory(path.Replace(structGenerator.ClassName + ".cs", string.Empty));
+                
                 var fileStream = new FileStream(path, FileMode.Create);
                 fileStream.Close();
             }
