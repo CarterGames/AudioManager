@@ -24,6 +24,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
@@ -35,6 +36,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        private static string DefaultUtilityFilePaths => $"{FileEditorUtil.AssetBasePath}/Carter Games/Audio Manager/Code/Runtime/Utility/Generated Classes/";
         
         // Honestly regex is not something I'm super familiar with, but this works xD
         private const string ValueNamePattern = @"[\W]";
@@ -271,7 +274,17 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <param name="structGenerator">The data to use to reset from.</param>
         private static void GenerateEmptyClass(StructGeneratorBase structGenerator)
         {
-            using (var file = new StreamWriter(structGenerator.ClassPath))
+            var path = string.IsNullOrEmpty(structGenerator.ClassPath)
+                ? DefaultUtilityFilePaths + structGenerator.ClassName + ".cs"
+                : structGenerator.ClassPath;
+            
+            if (!File.Exists(path))
+            {
+                var fileStream = new FileStream(path, FileMode.Create);
+                fileStream.Close();
+            }
+            
+            using (var file = new StreamWriter(path))
             {
                 WriteHeader(file, structGenerator.ClassName);
                 WriteFooter(file);

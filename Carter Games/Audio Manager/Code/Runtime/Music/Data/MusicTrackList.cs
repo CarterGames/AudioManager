@@ -127,7 +127,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>If the key was found or not.</returns>
         public bool HasTrack(string key)
         {
-            return tracks.Any(t => t.ClipKey.Equals(key));
+            return tracks.Any(t => AssetAccessor.GetAsset<AudioLibrary>().LibraryLookup[t.ClipId].key.Equals(key));
         }
         
         
@@ -138,7 +138,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The audio clip found.</returns>
         public AudioClip GetTrack(int index)
         {
-            return AssetAccessor.GetAsset<AudioLibrary>().GetData(tracks[index].ClipKey).value;
+            return AssetAccessor.GetAsset<AudioLibrary>().GetData(tracks[index].ClipId).value;
         }
         
         
@@ -171,7 +171,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The start time found.</returns>
         public float GetStartTime(string key)
         {
-            var data = tracks.FirstOrDefault(t => t.ClipKey.Equals(key));
+            var data = tracks.FirstOrDefault(t => AssetAccessor.GetAsset<AudioLibrary>().LibraryLookup[t.ClipId].key.Equals(key));
 
             if (data != null)
             {
@@ -200,7 +200,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The end time found.</returns>
         public float GetEndTime(string key)
         {
-            var data = tracks.FirstOrDefault(t => t.ClipKey.Equals(key));
+            var data = tracks.FirstOrDefault(t => AssetAccessor.GetAsset<AudioLibrary>().LibraryLookup[t.ClipId].key.Equals(key));
 
             if (data != null)
             {
@@ -231,7 +231,7 @@ namespace CarterGames.Assets.AudioManager
 
             foreach (var id in this.tracks)
             {
-                tracks.Add(AssetAccessor.GetAsset<AudioLibrary>().GetData(id.ClipKey).value);
+                tracks.Add(AssetAccessor.GetAsset<AudioLibrary>().GetData(id.ClipId).value);
             }
 
             return tracks;

@@ -205,17 +205,17 @@ namespace CarterGames.Assets.AudioManager
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-        private void Awake()
+        public void Initialize()
         {
-            sequencePrefab = (GameObject) Resources.Load(UtilRuntime.DefaultAudioSequencePrefabResourcesPath);
-            audioPrefab = (GameObject) Resources.Load(UtilRuntime.DefaultAudioPrefabResourcesPath);
-        }
-        
-        
-        public void OnValidate()
-        {
-            sequencePrefab = (GameObject) Resources.Load(UtilRuntime.DefaultAudioSequencePrefabResourcesPath);
-            audioPrefab = (GameObject) Resources.Load(UtilRuntime.DefaultAudioPrefabResourcesPath);
+            if (sequencePrefab == null)
+            {
+                sequencePrefab = (GameObject)Resources.Load(UtilRuntime.DefaultAudioSequencePrefabResourcesPath);
+            }
+            
+            if (audioPrefab == null)
+            {
+                audioPrefab = (GameObject)Resources.Load(UtilRuntime.DefaultAudioPrefabResourcesPath);
+            }
         }
         
         

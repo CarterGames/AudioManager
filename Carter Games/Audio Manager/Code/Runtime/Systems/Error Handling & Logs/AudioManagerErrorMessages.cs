@@ -93,13 +93,11 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Gets the message for an error code.
         /// </summary>
-        /// <remarks>
-        /// Doesn't check for if it exists, should be done separately if needed using HasMessage();
-        /// </remarks>
         /// <param name="errorCode">The code to check.</param>
         /// <returns>The default message for the code.</returns>
         public static string GetMessage(AudioManagerErrorCode errorCode)
         {
+            if (!HasMessage(errorCode)) return $"{errorCode}";
             return MessagesLookup[errorCode];
         }
     }

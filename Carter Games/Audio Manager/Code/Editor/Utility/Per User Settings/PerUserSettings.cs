@@ -21,6 +21,7 @@
  * THE SOFTWARE.
  */
 
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,37 +35,45 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        private const string UniqueIdId = "CarterGames_AudioManager_Editor_UUID";
+
+        private static readonly string AutoValidationAutoCheckId = $"{UniqueId}_CarterGames_AudioManager_Editor_AutoVersionCheck";
+        private static readonly string DeveloperDebugModeId = $"{UniqueId}_CarterGames_AudioManager_Editor_Developer_DebugMode";
         
-        private const string AutoValidationAutoCheckId = "AudioManager_Editor_AutoVersionCheck";
-        private const string DeveloperDebugModeId = "AudioManager_Editor_Developer_DebugMode";
+        private static readonly string ScannerInitializedId = $"{UniqueId}_CarterGames_AudioManager_Editor_Scanner_Initialized";
+        private static readonly string ScannerHasNewAudioClipId = $"{UniqueId}_CarterGames_AudioManager_Editor_Scanner_HasNewAudioClip";
+        private static readonly string ScannerHasScannedProjectId = $"{UniqueId}_CarterGames_AudioManager_Editor_Scanner_HasScanned";
         
-        private const string ScannerInitializedId = "AudioManager_Editor_Scanner_Initialized";
-        private const string ScannerHasNewAudioClipId = "AudioManager_Editor_Scanner_HasNewAudioClip";
-        private const string ScannerHasScannedProjectId = "AudioManager_Editor_Scanner_HasScanned";
+        private static readonly string EditorOptionsId = $"{UniqueId}_CarterGames_AudioManager_EditorSettings_ShowEditorOptions";
+        private static readonly string HelpBoxesId = $"{UniqueId}_CarterGames_AudioManager_EditorSettings_ShowHelpBoxes";
+        private static readonly string AudioOptionsId = $"{UniqueId}_CarterGames_AudioManager_EditorSettings_ShowAudioOptions";
         
-        private const string EditorOptionsId = "AudioManager_EditorSettings_ShowEditorOptions";
-        private const string HelpBoxesId = "AudioManager_EditorSettings_ShowHelpBoxes";
-        private const string AudioOptionsId = "AudioManager_EditorSettings_ShowAudioOptions";
+        private static readonly string EditorTabPositionId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_EditorTabPos";
         
-        private const string EditorTabPositionId = "AudioManager_EditorWindow_EditorTabPos";
+        private static readonly string LastLibraryEntryId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab01_LibIndex";
+        private static readonly string LibBtnScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab01_LibBtnScrollRectPos";
+        private static readonly string LibScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab01_LibScrollRectPos";
         
-        private const string LastLibraryEntryId = "AudioManager_EditorWindow_Tab01_LibIndex";
-        private const string LibBtnScrollRectPosId = "AudioManager_EditorWindow_Tab01_LibBtnScrollRectPos";
-        private const string LibScrollRectPosId = "AudioManager_EditorWindo_Tab01_LibScrollRectPos";
+        private static readonly string LastLibraryGroupEntryId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab02_LibGroupIndex";
+        private static readonly string GroupScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab02_ScrollRectPos";
         
-        private const string LastLibraryGroupEntryId = "AudioManager_EditorWindow_Tab02_LibGroupIndex";
-        private const string GroupScrollRectPosId = "AudioManager_EditorWindow_Tab02_ScrollRectPos";
+        private static readonly string LastLibMixerEntryId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab03_LibMixerIndex";
+        private static readonly string MixerScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab03_ScrollRectPos";
         
-        private const string LastLibMixerEntryId = "AudioManager_EditorWindow_Tab03_LibMixerIndex";
-        private const string MixerScrollRectPosId = "AudioManager_EditorWindow_Tab03_ScrollRectPos";
-        
-        private const string LastLibMusicEntryId = "AudioManager_EditorWindow_Tab04_LibMusicIndex";
-        private const string MusicScrollRectPosId = "AudioManager_EditorWindow_Tab04_ScrollRectPos";
+        private static readonly string LastLibMusicEntryId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab04_LibMusicIndex";
+        private static readonly string MusicScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab04_ScrollRectPos";
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
+        /// <summary>
+        /// The unique if for the assets settings to be per project...
+        /// </summary>
+        private static string UniqueId => (string)GetOrCreateValue<string>(UniqueIdId, SettingType.PlayerPref, Guid.NewGuid().ToString());
+
+
         /// <summary>
         /// Has the scanner been initialized.
         /// </summary>
@@ -250,117 +259,196 @@ namespace CarterGames.Assets.AudioManager.Editor
 
         private static object GetOrCreateValue<T>(string key, SettingType type, object defaultValue = null)
         {
-            if (type == SettingType.EditorPref)
+            switch (type)
             {
-                if (EditorPrefs.HasKey(key))
-                {
+                case SettingType.EditorPref:
+
+                    if (EditorPrefs.HasKey(key))
+                    {
+                        switch (typeof(T))
+                        {
+                            case var x when x == typeof(bool):
+                                return EditorPrefs.GetBool(key);
+                            case var x when x == typeof(int):
+                                return EditorPrefs.GetInt(key);
+                            case var x when x == typeof(float):
+                                return EditorPrefs.GetFloat(key);
+                            case var x when x == typeof(string):
+                                return EditorPrefs.GetString(key);
+                            case var x when x == typeof(Vector2):
+                                return JsonUtility.FromJson<Vector2>(EditorPrefs.GetString(key));
+                            default:
+                                return null;
+                        }
+                    }
+
                     switch (typeof(T))
                     {
                         case var x when x == typeof(bool):
+                            EditorPrefs.SetBool(key, defaultValue == null ? false : (bool)defaultValue);
                             return EditorPrefs.GetBool(key);
                         case var x when x == typeof(int):
+                            EditorPrefs.SetInt(key, defaultValue == null ? 0 : (int)defaultValue);
                             return EditorPrefs.GetInt(key);
                         case var x when x == typeof(float):
+                            EditorPrefs.SetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
                             return EditorPrefs.GetFloat(key);
                         case var x when x == typeof(string):
+                            EditorPrefs.SetString(key, (string)defaultValue);
                             return EditorPrefs.GetString(key);
                         case var x when x == typeof(Vector2):
+                            EditorPrefs.SetString(key,
+                                defaultValue == null
+                                    ? JsonUtility.ToJson(Vector2.zero)
+                                    : JsonUtility.ToJson(defaultValue));
                             return JsonUtility.FromJson<Vector2>(EditorPrefs.GetString(key));
                         default:
                             return null;
                     }
-                }
+                    
+                case SettingType.PlayerPref:
+                    
+                    if (PlayerPrefs.HasKey(key))
+                    {
+                        switch (typeof(T))
+                        {
+                            case var x when x == typeof(bool):
+                                return PlayerPrefs.GetInt(key) == 1;
+                            case var x when x == typeof(int):
+                                return PlayerPrefs.GetInt(key);
+                            case var x when x == typeof(float):
+                                return PlayerPrefs.GetFloat(key);
+                            case var x when x == typeof(string):
+                                return PlayerPrefs.GetString(key);
+                            case var x when x == typeof(Vector2):
+                                return JsonUtility.FromJson<Vector2>(PlayerPrefs.GetString(key));
+                            default:
+                                return null;
+                        }
+                    }
 
-                switch (typeof(T))
-                {
-                    case var x when x == typeof(bool):
-                        EditorPrefs.SetBool(key, defaultValue == null ? false : (bool)defaultValue);
-                        return EditorPrefs.GetBool(key);
-                    case var x when x == typeof(int):
-                        EditorPrefs.SetInt(key, defaultValue == null ? 0 : (int)defaultValue);
-                        return EditorPrefs.GetInt(key);
-                    case var x when x == typeof(float):
-                        EditorPrefs.SetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
-                        return EditorPrefs.GetFloat(key);
-                    case var x when x == typeof(string):
-                        EditorPrefs.SetString(key, (string)defaultValue);
-                        return EditorPrefs.GetString(key);
-                    case var x when x == typeof(Vector2):
-                        EditorPrefs.SetString(key,
-                            defaultValue == null ? JsonUtility.ToJson(Vector2.zero) : JsonUtility.ToJson(defaultValue));
-                        return JsonUtility.FromJson<Vector2>(EditorPrefs.GetString(key));
-                    default:
-                        return null;
-                }
-            }
-            else
-            {
-                switch (typeof(T))
-                {
-                    case var x when x == typeof(bool):
-                        return SessionState.GetBool(key, defaultValue == null ? false : (bool)defaultValue);
-                    case var x when x == typeof(int):
-                        return SessionState.GetInt(key, defaultValue == null ? 0 : (int)defaultValue);
-                    case var x when x == typeof(float):
-                        return SessionState.GetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
-                    case var x when x == typeof(string):
-                        return SessionState.GetString(key, (string)defaultValue);
-                    case var x when x == typeof(Vector2):
-                        return JsonUtility.FromJson<Vector2>(SessionState.GetString(key, JsonUtility.ToJson(defaultValue)));
-                    default:
-                        return null;
-                }
+                    switch (typeof(T))
+                    {
+                        case var x when x == typeof(bool):
+                            PlayerPrefs.SetInt(key,
+                                defaultValue == null ? 0 : defaultValue.ToString().ToLower() == "true" ? 1 : 0);
+                            return PlayerPrefs.GetInt(key) == 1;
+                        case var x when x == typeof(int):
+                            PlayerPrefs.SetInt(key, defaultValue == null ? 0 : (int)defaultValue);
+                            return PlayerPrefs.GetInt(key);
+                        case var x when x == typeof(float):
+                            PlayerPrefs.SetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
+                            return PlayerPrefs.GetFloat(key);
+                        case var x when x == typeof(string):
+                            PlayerPrefs.SetString(key, (string)defaultValue);
+                            return PlayerPrefs.GetString(key);
+                        case var x when x == typeof(Vector2):
+                            PlayerPrefs.SetString(key,
+                                defaultValue == null
+                                    ? JsonUtility.ToJson(Vector2.zero)
+                                    : JsonUtility.ToJson(defaultValue));
+                            return JsonUtility.FromJson<Vector2>(PlayerPrefs.GetString(key));
+                        default:
+                            return null;
+                    }
+                    
+                case SettingType.SessionState:
+
+                    switch (typeof(T))
+                    {
+                        case var x when x == typeof(bool):
+                            return SessionState.GetBool(key, defaultValue == null ? false : (bool)defaultValue);
+                        case var x when x == typeof(int):
+                            return SessionState.GetInt(key, defaultValue == null ? 0 : (int)defaultValue);
+                        case var x when x == typeof(float):
+                            return SessionState.GetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
+                        case var x when x == typeof(string):
+                            return SessionState.GetString(key, (string)defaultValue);
+                        case var x when x == typeof(Vector2):
+                            return JsonUtility.FromJson<Vector2>(SessionState.GetString(key,
+                                JsonUtility.ToJson(defaultValue)));
+                        default:
+                            return null;
+                    }
+                    
+                default:
+                    return null;
             }
         }
 
 
         private static void SetValue<T>(string key, SettingType type, object value)
         {
-            if (type == SettingType.EditorPref)
+            switch (type)
             {
-                switch (typeof(T))
-                {
-                    case var x when x == typeof(bool):
-                        EditorPrefs.SetBool(key, (bool)value);
-                        break;
-                    case var x when x == typeof(int):
-                        EditorPrefs.SetInt(key, (int)value);
-                        break;
-                    case var x when x == typeof(float):
-                        EditorPrefs.SetFloat(key, (float)value);
-                        break;
-                    case var x when x == typeof(string):
-                        EditorPrefs.SetString(key, (string)value);
-                        break;
-                    case var x when x == typeof(Vector2):
-                        EditorPrefs.SetString(key, JsonUtility.ToJson(value));
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else
-            {
-                switch (typeof(T))
-                {
-                    case var x when x == typeof(bool):
-                        SessionState.SetBool(key, (bool)value);
-                        break;
-                    case var x when x == typeof(int):
-                        SessionState.SetInt(key, (int)value);
-                        break;
-                    case var x when x == typeof(float):
-                        SessionState.SetFloat(key, (float)value);
-                        break;
-                    case var x when x == typeof(string):
-                        SessionState.SetString(key, (string)value);
-                        break;
-                    case var x when x == typeof(Vector2):
-                        SessionState.SetString(key, JsonUtility.ToJson(value));
-                        break;
-                    default:
-                        break;
-                }
+                case SettingType.EditorPref:
+                    
+                    switch (typeof(T))
+                    {
+                        case var x when x == typeof(bool):
+                            EditorPrefs.SetBool(key, (bool)value);
+                            break;
+                        case var x when x == typeof(int):
+                            EditorPrefs.SetInt(key, (int)value);
+                            break;
+                        case var x when x == typeof(float):
+                            EditorPrefs.SetFloat(key, (float)value);
+                            break;
+                        case var x when x == typeof(string):
+                            EditorPrefs.SetString(key, (string)value);
+                            break;
+                        case var x when x == typeof(Vector2):
+                            EditorPrefs.SetString(key, JsonUtility.ToJson(value));
+                            break;
+                    }
+                    
+                    break;
+                case SettingType.PlayerPref:
+                    
+                    switch (typeof(T))
+                    {
+                        case var x when x == typeof(bool):
+                            PlayerPrefs.SetInt(key, ((bool)value) ? 1 : 0);
+                            break;
+                        case var x when x == typeof(int):
+                            PlayerPrefs.SetInt(key, (int)value);
+                            break;
+                        case var x when x == typeof(float):
+                            PlayerPrefs.SetFloat(key, (float)value);
+                            break;
+                        case var x when x == typeof(string):
+                            PlayerPrefs.SetString(key, (string)value);
+                            break;
+                        case var x when x == typeof(Vector2):
+                            PlayerPrefs.SetString(key, JsonUtility.ToJson(value));
+                            break;
+                    }
+                    
+                    PlayerPrefs.Save();
+                    
+                    break;
+                case SettingType.SessionState:
+                    
+                    switch (typeof(T))
+                    {
+                        case var x when x == typeof(bool):
+                            SessionState.SetBool(key, (bool)value);
+                            break;
+                        case var x when x == typeof(int):
+                            SessionState.SetInt(key, (int)value);
+                            break;
+                        case var x when x == typeof(float):
+                            SessionState.SetFloat(key, (float)value);
+                            break;
+                        case var x when x == typeof(string):
+                            SessionState.SetString(key, (string)value);
+                            break;
+                        case var x when x == typeof(Vector2):
+                            SessionState.SetString(key, JsonUtility.ToJson(value));
+                            break;
+                    }
+                    
+                    break;
             }
         }
 

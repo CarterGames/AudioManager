@@ -57,6 +57,15 @@ namespace CarterGames.Assets.AudioManager
         public int ParamsCount => edits.Count;
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Constructors
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        public EditParameters()
+        {
+            Edits.Add("dynamicTime", true);
+        }
+        
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -133,6 +142,7 @@ namespace CarterGames.Assets.AudioManager
         public void ClearAllParams()
         {
             Edits.Clear();
+            Edits.Add("dynamicTime", true);
         }
     }
 }

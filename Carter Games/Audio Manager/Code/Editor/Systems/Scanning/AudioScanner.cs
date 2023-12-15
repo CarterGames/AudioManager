@@ -49,12 +49,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         public static void ManualScan()
         {
             if (!PerUserSettings.ScannerInitialized) return;
-
+            
             var option = EditorUtility.DisplayDialogComplex("Manual Audio Scan",
-                "Do you want to do a clean scan of all files or ust find new ones not in the library?",
+                "Do you want to do a clean scan of all files or just find new ones not in the library?",
                 "Clean Scan",
                 "New Only Scan", "Cancel");
-
+            
             if (option.Equals(2)) return;
             
             if (option.Equals(0))
@@ -93,15 +93,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                 if (!PerUserSettings.ScannerHasNewAudioClip) return;
 
-                if (GetAllClipsInProject(false, out var lookup))
-                {
-                    UtilEditor.SetLibraryData(lookup, false);
-
-                    StructHandler.RefreshClips();
-
-                    AssetDatabase.SaveAssets();
-                    AssetDatabase.Refresh();
-                }
+                ScanForAudio(false);
 
                 PerUserSettings.ScannerHasNewAudioClip = false;
             }
@@ -124,25 +116,23 @@ namespace CarterGames.Assets.AudioManager.Editor
             if (GetAllClipsInProject(cleanScan, out var lookup))
             {
                 UtilEditor.SetLibraryData(lookup, cleanScan);
-
-                var mixers = GetAllMixersInProject();
-                UtilEditor.SetLibraryMixerGroups(mixers);
                 
                 StructHandler.RefreshClips();
-                
-                if (mixers != null)
-                {
-                    StructHandler.RefreshMixers();
-                }
-                
-                EditorUtility.SetDirty(UtilEditor.Library);
-            
-                UtilEditor.LibraryObject.ApplyModifiedProperties();
-                UtilEditor.LibraryObject.Update();
             
                 AudioManagerEditorEvents.OnLibraryRefreshed.Raise();
             }
+            
+            var mixers = GetAllMixersInProject();
+            UtilEditor.SetLibraryMixerGroups(mixers);
 
+            if (mixers != null)
+            {
+                StructHandler.RefreshMixers();
+            }
+            
+            UtilEditor.LibraryObject.ApplyModifiedProperties();
+            UtilEditor.LibraryObject.Update();
+            
             PerUserSettings.ScannerHasScanned = true;
         }
         

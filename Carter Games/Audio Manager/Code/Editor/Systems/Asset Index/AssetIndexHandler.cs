@@ -108,6 +108,33 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             var indexProp = new SerializedObject(UtilEditor.AssetIndex);
             
+            RemoveNullReferences(indexProp);
+            UpdateIndexReferences(foundAssets ,indexProp);
+            
+            indexProp.ApplyModifiedProperties();
+            indexProp.Update();
+        }
+
+
+        private static void RemoveNullReferences(SerializedObject indexProp)
+        {
+            for (var i = 0; i < indexProp.Fp("assets").Fpr("list").arraySize; i++)
+            {
+                var entry = indexProp.Fp("assets").Fpr("list").GetIndex(i);
+                var jIndexAdjustment = 0;
+
+                for (var j = 0; j < entry.Fpr("value").arraySize; j++)
+                {
+                    if (entry.Fpr("value").GetIndex(j - jIndexAdjustment).objectReferenceValue != null) continue;
+                    entry.Fpr("value").DeleteIndex(j);
+                    jIndexAdjustment++;
+                }
+            }
+        }
+
+
+        private static void UpdateIndexReferences(IReadOnlyList<AudioManagerAsset> foundAssets, SerializedObject indexProp)
+        {
             for (var i = 0; i < foundAssets.Count; i++)
             {
                 for (var j = 0; j < indexProp.Fp("assets").Fpr("list").arraySize; j++)
@@ -141,10 +168,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     .Fpr("value").GetIndex(0).objectReferenceValue = foundAssets[i];
 
                 AlreadyExists: ;
-            }
-
-            indexProp.ApplyModifiedProperties();
-            indexProp.Update();
+            } 
         }
     }
 }

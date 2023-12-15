@@ -80,7 +80,7 @@ namespace CarterGames.Assets.AudioManager
             {
                 var time = 0f;
             
-                if (!EditParams.TryGetValue<bool>("dynamicTime", out var useDynamicTime))
+                if (EditParams.TryGetValue<bool>("dynamicTime", out var useDynamicTime))
                 {
                     time += data.value.length - (useDynamicTime ? data.dynamicStartTime.time : 0);
                 }
@@ -212,6 +212,14 @@ namespace CarterGames.Assets.AudioManager
             
             if (IsPrepared) return;
             IsPrepared = true;
+                
+            if (EditParams.TryGetValue("dynamicTime", out bool useDynamicTime))
+            {
+                if (useDynamicTime)
+                {
+                    PlayerSource.time = data.dynamicStartTime.time;
+                }
+            }
             
             if (PlayerSource.outputAudioMixerGroup == null)
             {

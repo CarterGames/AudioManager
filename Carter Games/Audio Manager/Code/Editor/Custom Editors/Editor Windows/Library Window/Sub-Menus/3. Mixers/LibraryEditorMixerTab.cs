@@ -21,6 +21,7 @@
  * THE SOFTWARE.
  */
 
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -36,6 +37,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         private static SerializedProperty SelectedProperty { get; set; }
+
+        private static Dictionary<string, UnityEditor.Editor> EditorsCache { get; set; }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   ILibraryTab
@@ -50,6 +53,15 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 SelectedProperty = UtilEditor.LibraryObject.Fp("mixers").Fpr("list")
                     .GetIndex(PerUserSettings.LastLibMixerEntry);
+            }
+
+            EditorsCache = new Dictionary<string, UnityEditor.Editor>();
+
+            for (var i = 0; i < UtilEditor.LibraryObject.Fp("mixers").Fpr("list").arraySize; i++)
+            {
+                EditorsCache.Add(UtilEditor.LibraryObject.Fp("mixers").Fpr("list").GetIndex(i).Fpr("key").stringValue,
+                    UnityEditor.Editor.CreateEditor(UtilEditor.LibraryObject.Fp("mixers").Fpr("list").GetIndex(i)
+                        .Fpr("value").Fpr("mixerGroup").objectReferenceValue));
             }
         }
 
@@ -251,7 +263,15 @@ namespace CarterGames.Assets.AudioManager.Editor
             UtilEditor.DrawHorizontalGUILine();
             GUILayout.Space(17.5f);
             
-            UnityEditor.Editor.CreateEditor(SelectedProperty.Fpr("value").Fpr("mixerGroup").objectReferenceValue).OnInspectorGUI();
+            if (EditorsCache.ContainsKey(SelectedProperty.Fpr("key").stringValue))
+            {
+                EditorsCache[SelectedProperty.Fpr("key").stringValue].OnInspectorGUI();
+            }
+            else
+            {
+                EditorsCache.Add(SelectedProperty.Fpr("key").stringValue, UnityEditor.Editor.CreateEditor(SelectedProperty.Fpr("value").Fpr("mixerGroup").objectReferenceValue));
+                EditorsCache[SelectedProperty.Fpr("key").stringValue].OnInspectorGUI();
+            }
 
             GUILayout.Space(2.5f);
             EditorGUILayout.EndVertical();

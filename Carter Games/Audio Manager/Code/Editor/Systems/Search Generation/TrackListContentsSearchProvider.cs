@@ -82,17 +82,19 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             foreach (var tracks in UtilEditor.Library.MusicTrackLookup[TrackListId].GetTracksRaw())
             {
-                if (ToExclude.Contains(tracks.ClipKey)) continue;
+                var key = UtilEditor.Library.LibraryLookup[tracks.ClipId].key;
+                
+                if (ToExclude.Contains(key)) continue;
 
                 Builder.Clear();
                 Builder.Append(" ");
-                Builder.Append(tracks.ClipKey);
+                Builder.Append(key);
 
                 searchList.Add(new SearchTreeEntry(GUIContent.none)
                 {
                     level = 1,
                     content = new GUIContent(Builder.ToString()),
-                    userData = tracks.ClipKey
+                    userData = tracks.ClipId
                 });
             }
 

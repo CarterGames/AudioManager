@@ -82,7 +82,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 return;
             }
 
-            window ??= GetWindow<LibraryEditorWindow>();
+            window = GetWindow<LibraryEditorWindow>();
 
             window.titleContent = new GUIContent("Audio Library")
             {

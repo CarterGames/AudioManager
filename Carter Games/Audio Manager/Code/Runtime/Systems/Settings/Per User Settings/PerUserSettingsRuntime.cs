@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
 {
@@ -11,7 +12,7 @@ namespace CarterGames.Assets.AudioManager
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        private const string DebugLogId = "AudioManager_Settings_ShowDebugLogs";
+        private static readonly string DebugLogId = "CarterGames_AudioManager_Settings_ShowDebugLogs";
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
@@ -96,6 +97,8 @@ namespace CarterGames.Assets.AudioManager
                 default:
                     break;
             }
+            
+            PlayerPrefs.Save();
         }
 
 

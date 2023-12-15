@@ -127,6 +127,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             if (GUILayout.Button("+ Add New Track"))
             {
                 AddNewBlankTrack();
+                GUI.FocusControl(null);
             }
             GUI.backgroundColor = Color.white;
             
@@ -159,6 +160,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                             .GetIndex(i);
 
                         PerUserSettings.LastLibMusicEntry = i;
+                        GUI.FocusControl(null);
                     }
 
 
@@ -349,6 +351,12 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             newReverseTrackProp.Fpr("key").stringValue = newTrackProp.Fpr("value").Fpr("listKey").stringValue;
             newReverseTrackProp.Fpr("value").stringValue = newTrackProp.Fpr("key").stringValue;
+
+            if (tracksProp.arraySize.Equals(1))
+            {
+                PerUserSettings.LastLibMusicEntry = 0;
+                SelectedProperty = newTrackProp;
+            }
             
             UtilEditor.LibraryObject.ApplyModifiedProperties();
             UtilEditor.LibraryObject.Update();

@@ -18,7 +18,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         private static readonly string AssetIndexPath = $"{AssetBasePath}/Carter Games/{AssetName}/Resources/Asset Index.asset";
         private static readonly string LibraryAssetPath = $"{AssetBasePath}/Carter Games/{AssetName}/Data/Library.asset";
-        private static readonly string LibraryAssetPath2 = $"{AssetBasePath}/Carter Games/{AssetName}/Data/";
+        private static readonly string DataFolderPath = $"{AssetBasePath}/Carter Games/{AssetName}/Data/";
         private static readonly string SettingsAssetPath = $"{AssetBasePath}/Carter Games/{AssetName}/Data/Runtime Settings.asset";
         
 
@@ -68,7 +68,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             get
             {
-                var files = Directory.GetFiles(LibraryAssetPath2);
+                var files = Directory.GetFiles(DataFolderPath);
                 files = files.Where(t => !t.Contains(".meta")).ToArray();
                 return files.Contains(LibraryAssetPath);
             }

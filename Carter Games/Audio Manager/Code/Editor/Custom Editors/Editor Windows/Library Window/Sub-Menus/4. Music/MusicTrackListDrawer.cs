@@ -47,7 +47,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// Draws the clips in the track list when called.
         /// </summary>
         /// <param name="prop">The base property to call.</param>
-        public static void  DrawTracks(SerializedProperty prop)
+        public static void DrawTracks(SerializedProperty prop)
         {
             var list = prop.Fpr("value").Fpr("tracks");
             var playType = prop.Fpr("value").Fpr("trackListType");
@@ -80,34 +80,41 @@ namespace CarterGames.Assets.AudioManager.Editor
             for (var i = 0; i < list.arraySize; i++)
             {
                 EditorGUILayout.BeginVertical();
-                
-                if (i.Equals(0))
+
+                if (list.arraySize > 0 && !string.IsNullOrEmpty(list.GetIndex(i).Fpr("clipId").stringValue))
                 {
-                    EditorGUILayout.BeginHorizontal();
+                    if (i.Equals(0))
+                    {
+                        EditorGUILayout.BeginHorizontal();
 
-                    EditorGUILayout.LabelField("Clip");
-                    EditorGUILayout.LabelField("", GUILayout.Width(50f));
-                    EditorGUILayout.LabelField("Start Time", GUILayout.Width(175f));
-                    EditorGUILayout.LabelField("End Time",GUILayout.Width(175f));
-                    EditorGUILayout.LabelField("", GUILayout.Width(50));
+                        EditorGUILayout.LabelField("Clip");
+                        EditorGUILayout.LabelField("", GUILayout.Width(50f));
+                        EditorGUILayout.LabelField("Start Time", GUILayout.Width(175f));
+                        EditorGUILayout.LabelField("End Time", GUILayout.Width(175f));
+                        EditorGUILayout.LabelField("", GUILayout.Width(50));
 
-                    EditorGUILayout.EndHorizontal();
-                    GUILayout.Space(1.5f);
+                        EditorGUILayout.EndHorizontal();
+                        GUILayout.Space(1.5f);
+                    }
                 }
-                
-                
+
+
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(1.5f);
                 
                 EditorGUI.BeginDisabledGroup(playType.intValue == 0 && i > 0);
                 
-                if (list.GetIndex(i).Fpr("clipKey").stringValue.Length <= 0)
+                if (string.IsNullOrEmpty(list.GetIndex(i).Fpr("clipId").stringValue))
                 {
                     OpenClipSelect(list, list.GetIndex(i));
                 }
                 else
                 {
-                    EditorGUILayout.PropertyField(list.GetIndex(i).Fpr("clipKey"), GUIContent.none);
+                    EditorGUI.BeginDisabledGroup(true);
+                    EditorGUILayout.TextField(GUIContent.none, UtilEditor.Library
+                        .LibraryLookup[list.GetIndex(i).Fpr("clipId").stringValue].key);
+                    EditorGUI.EndDisabledGroup();
+                    // EditorGUILayout.PropertyField(list.GetIndex(i).Fpr("clipId"), GUIContent.none);
 
                     if (GUILayout.Button("Edit", GUILayout.Width(50f)))
                     {
@@ -117,12 +124,13 @@ namespace CarterGames.Assets.AudioManager.Editor
                         
                         for (var j = 0; j < list.arraySize; j++)
                         {
-                            LibrarySearchProvider.ToExclude.Add(list.GetIndex(j).Fpr("clipKey").stringValue);
+                            if (string.IsNullOrEmpty(list.GetIndex(j).Fpr("clipId").stringValue)) continue;
+                            LibrarySearchProvider.ToExclude.Add(list.GetIndex(j).Fpr("clipId").stringValue);
                         }
 
                         TargetProperty = list.GetIndex(i);
                         
-                        LibrarySearchProvider.OnSearchTreeSelectionMade.AddAnonymous("clipSet", (ste) => SelectClip(TargetProperty, ste));
+                        LibrarySearchProvider.OnSearchTreeSelectionMade.Add(SelectClip);
                         SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), librarySearchProvider);
                     }
                     
@@ -139,7 +147,6 @@ namespace CarterGames.Assets.AudioManager.Editor
                 if (GUILayout.Button(" + ", GUILayout.MaxWidth(22.5f)))
                 {
                     list.InsertIndex(i + 1);
-                    list.GetIndex(i + 1).Fpr("clipKey").stringValue = string.Empty;
                     list.GetIndex(i + 1).Fpr("clipId").stringValue = string.Empty;
                     list.GetIndex(i + 1).Fpr("startTime").floatValue = 0f;
                     list.GetIndex(i + 1).Fpr("endTime").floatValue = 0f;
@@ -184,6 +191,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             librarySearchProvider ??= ScriptableObject.CreateInstance<LibrarySearchProvider>();
 
             GUI.backgroundColor = UtilEditor.Green;
+
+            TargetProperty = target;
             
             if (GUILayout.Button("+ Add Clip"))
             {
@@ -191,10 +200,11 @@ namespace CarterGames.Assets.AudioManager.Editor
                         
                 for (var j = 0; j < property.arraySize; j++)
                 {
-                    LibrarySearchProvider.ToExclude.Add(property.GetIndex(j).Fpr("clipKey").stringValue);
+                    if (string.IsNullOrEmpty(property.GetIndex(j).Fpr("clipId").stringValue)) continue;
+                    LibrarySearchProvider.ToExclude.Add(property.GetIndex(j).Fpr("clipId").stringValue);
                 }
                 
-                LibrarySearchProvider.OnSearchTreeSelectionMade.AddAnonymous("clipSet", (ste) => SelectClip(target, ste));
+                LibrarySearchProvider.OnSearchTreeSelectionMade.Add(SelectClip);
                 SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), librarySearchProvider);
             }
             
@@ -207,17 +217,18 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         /// <param name="property">The property to edit.</param>
         /// <param name="treeEntry">The entry selected.</param>
-        private static void SelectClip(SerializedProperty property, SearchTreeEntry treeEntry)
+        private static void SelectClip(SearchTreeEntry treeEntry)
         {
-            LibrarySearchProvider.OnSearchTreeSelectionMade.RemoveAnonymous("clipSet");
+            LibrarySearchProvider.OnSearchTreeSelectionMade.Remove(SelectClip);
             
-            property.Fpr("clipKey").stringValue = ((AudioData)treeEntry.userData).key;
-            property.Fpr("clipId").stringValue = ((AudioData)treeEntry.userData).id;
-            property.Fpr("startTime").floatValue = ((AudioData)treeEntry.userData).dynamicStartTime.time;
-            property.Fpr("endTime").floatValue = ((AudioData)treeEntry.userData).value.length;
+            TargetProperty.Fpr("clipId").stringValue = ((AudioData)treeEntry.userData).id;
+            TargetProperty.Fpr("startTime").floatValue = ((AudioData)treeEntry.userData).dynamicStartTime.time;
+            TargetProperty.Fpr("endTime").floatValue = ((AudioData)treeEntry.userData).value.length;
             
-            property.serializedObject.ApplyModifiedProperties();
-            property.serializedObject.Update();
+            TargetProperty.serializedObject.ApplyModifiedProperties();
+            TargetProperty.serializedObject.Update();
+            
+            GUI.FocusControl(null);
         }
     }
 }

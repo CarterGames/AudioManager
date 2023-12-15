@@ -42,6 +42,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         private static GroupSearchProvider groupSearchProvider;
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Properties
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+        
+        private static SerializedObject TargetObject { get; set; }
+        
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
@@ -51,6 +57,18 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <param name="targetObject">The target object.</param>
         public static void DrawInspector(SerializedObject targetObject)
         {
+            if (librarySearchProvider == null)
+            {
+                librarySearchProvider = ScriptableObject.CreateInstance<LibrarySearchProvider>();
+            }
+
+            if (groupSearchProvider == null)
+            {
+                groupSearchProvider = ScriptableObject.CreateInstance<GroupSearchProvider>();
+            }
+            
+            TargetObject = targetObject;
+            
             EditorGUILayout.BeginVertical("HelpBox");
             
             GUILayout.Space(3.5f);
@@ -72,10 +90,10 @@ namespace CarterGames.Assets.AudioManager.Editor
                     {
                         if (GUILayout.Button("Select Clip"))
                         {
-                            librarySearchProvider ??= ScriptableObject.CreateInstance<LibrarySearchProvider>();
-
+                            LibrarySearchProvider.ToExclude.Clear();
+                            
                             LibrarySearchProvider.OnSearchTreeSelectionMade.Clear();
-                            LibrarySearchProvider.OnSearchTreeSelectionMade.AddAnonymous("requestSearch", (s) => SelectClip(targetObject, s));
+                            LibrarySearchProvider.OnSearchTreeSelectionMade.Add(SelectClip);
                             SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), librarySearchProvider);
                         }
                         
@@ -89,8 +107,21 @@ namespace CarterGames.Assets.AudioManager.Editor
                         
                         if (!string.IsNullOrEmpty(targetObject.Fp("request").stringValue))
                         {
-                            EditorGUILayout.TextField("Request", UtilEditor.Library
-                                .LibraryLookup[targetObject.Fp("request").stringValue].key);
+                            if (UtilEditor.Library.LibraryLookup.ContainsKey(targetObject.Fp("request").stringValue))
+                            {
+                                EditorGUILayout.TextField("Request", UtilEditor.Library
+                                    .LibraryLookup[targetObject.Fp("request").stringValue].key);
+                            }
+                            else
+                            {
+                                targetObject.Fp("request").stringValue = string.Empty;
+                                EditorGUILayout.EndHorizontal();
+                                
+                                targetObject.ApplyModifiedProperties();
+                                targetObject.Update();
+                                
+                                return;
+                            }
                         }
                         else
                         {
@@ -101,13 +132,11 @@ namespace CarterGames.Assets.AudioManager.Editor
                         
                         if (GUILayout.Button("Change Clip", GUILayout.Width(100)))
                         {
-                            librarySearchProvider ??= ScriptableObject.CreateInstance<LibrarySearchProvider>();
-                        
                             LibrarySearchProvider.ToExclude.Clear();
                             LibrarySearchProvider.ToExclude.Add(UtilEditor.Library.LibraryLookup[targetObject.Fp("request").stringValue].id);
-                
+                            
                             LibrarySearchProvider.OnSearchTreeSelectionMade.Clear();
-                            LibrarySearchProvider.OnSearchTreeSelectionMade.AddAnonymous("requestSearch", (s) => SelectClip(targetObject, s));
+                            LibrarySearchProvider.OnSearchTreeSelectionMade.Add(SelectClip);
                             SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), librarySearchProvider);
                         }
                         
@@ -121,9 +150,9 @@ namespace CarterGames.Assets.AudioManager.Editor
                     {
                         if (GUILayout.Button("Select Group"))
                         {
-                            groupSearchProvider ??= ScriptableObject.CreateInstance<GroupSearchProvider>();
+                            GroupSearchProvider.OnSearchTreeSelectionMade.Clear();
+                            GroupSearchProvider.OnSearchTreeSelectionMade.Add(SelectGroup);
                             
-                            GroupSearchProvider.OnSearchTreeSelectionMade.AddAnonymous("groupSearch", (s) => SelectGroup(targetObject, s));
                             SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), groupSearchProvider);
                         }
                         
@@ -137,8 +166,22 @@ namespace CarterGames.Assets.AudioManager.Editor
                         
                         if (!string.IsNullOrEmpty(targetObject.Fp("groupRequest").stringValue))
                         {
-                            EditorGUILayout.TextField("Group Request", UtilEditor.Library
-                                .GroupsLookup[targetObject.Fp("groupRequest").stringValue].GroupName);
+                            if (UtilEditor.Library.GroupsLookup.ContainsKey(targetObject.Fp("groupRequest").stringValue))
+                            {
+                                EditorGUILayout.TextField("Group Request", UtilEditor.Library
+                                    .GroupsLookup[targetObject.Fp("groupRequest").stringValue].GroupName);
+                            }
+                            else
+                            {
+                                targetObject.Fp("groupRequest").stringValue = string.Empty;
+                                
+                                EditorGUILayout.EndHorizontal();
+                                
+                                targetObject.ApplyModifiedProperties();
+                                targetObject.Update();
+                                
+                                return;
+                            }
                         }
                         else
                         {
@@ -149,12 +192,11 @@ namespace CarterGames.Assets.AudioManager.Editor
                         
                         if (GUILayout.Button("Change Group", GUILayout.Width(100)))
                         {
-                            groupSearchProvider ??= ScriptableObject.CreateInstance<GroupSearchProvider>();
-                        
                             GroupSearchProvider.ToExclude.Clear();
                             GroupSearchProvider.ToExclude.Add(UtilEditor.Library.GroupsLookup[targetObject.Fp("groupRequest").stringValue].GroupName);
                 
-                            GroupSearchProvider.OnSearchTreeSelectionMade.AddAnonymous("groupSearch", (s) => SelectGroup(targetObject, s));
+                            GroupSearchProvider.OnSearchTreeSelectionMade.Clear();
+                            GroupSearchProvider.OnSearchTreeSelectionMade.Add(SelectGroup);
                             SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), groupSearchProvider);
                         }
                         
@@ -180,28 +222,28 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <summary>
         /// Runs when a clip is selected from the search provider.
         /// </summary>
-        /// <param name="targetObject">The target object.</param>
         /// <param name="treeEntry">The entry selected in the search provider.</param>
-        private static void SelectClip(SerializedObject targetObject, SearchTreeEntry treeEntry)
+        private static void SelectClip(SearchTreeEntry treeEntry)
         {
-            LibrarySearchProvider.OnSearchTreeSelectionMade.RemoveAnonymous("requestSearch");
-            targetObject.Fp("request").stringValue = ((AudioData)treeEntry.userData).id;
-            targetObject.ApplyModifiedProperties();
-            targetObject.Update();  
+            LibrarySearchProvider.OnSearchTreeSelectionMade.Remove(SelectClip);
+            
+            TargetObject.Fp("request").stringValue = ((AudioData)treeEntry.userData).id;
+            TargetObject.ApplyModifiedProperties();
+            TargetObject.Update();  
         }
         
         
         /// <summary>
         /// Runs when a group is selected from the search provider.
         /// </summary>
-        /// <param name="targetObject">The target object.</param>
         /// <param name="treeEntry">The entry selected in the search provider.</param>
-        private static void SelectGroup(SerializedObject targetObject, SearchTreeEntry treeEntry)
+        private static void SelectGroup(SearchTreeEntry treeEntry)
         {
-            GroupSearchProvider.OnSearchTreeSelectionMade.RemoveAnonymous("groupSearch");
-            targetObject.Fp("groupRequest").stringValue = UtilEditor.Library.GroupsLookup.ToList().First(t => t.Value.GroupName.Equals(((GroupData)treeEntry.userData).GroupName)).Key;
-            targetObject.ApplyModifiedProperties();
-            targetObject.Update();
+            GroupSearchProvider.OnSearchTreeSelectionMade.Remove(SelectGroup);
+            
+            TargetObject.Fp("groupRequest").stringValue = UtilEditor.Library.GroupsLookup.ToList().First(t => t.Value.GroupName.Equals(((GroupData)treeEntry.userData).GroupName)).Key;
+            TargetObject.ApplyModifiedProperties();
+            TargetObject.Update();
         }
     }
 }

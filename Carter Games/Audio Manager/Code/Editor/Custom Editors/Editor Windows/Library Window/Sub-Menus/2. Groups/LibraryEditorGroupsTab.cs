@@ -245,6 +245,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 {
                     PerUserSettings.LastLibraryGroupEntry = UtilEditor.Library.GroupsLookup.Keys.ToList().IndexOf(key);
                     SelectedProperty = GroupsDictionary.GetIndex(PerUserSettings.LastLibraryGroupEntry);
+                    GUI.FocusControl(null);
                 }
                 
                 GUI.backgroundColor = Color.white;
@@ -486,7 +487,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     else
                     {
                         EditorGUI.BeginDisabledGroup(true);
-                        EditorGUILayout.TextField(groupData["clipNames"].GetIndex(i).stringValue);
+                        EditorGUILayout.TextField(UtilEditor.Library.LibraryLookup[groupData["clipNames"].GetIndex(i).stringValue].key);
                         EditorGUI.EndDisabledGroup();
 
                         if (GUILayout.Button("Edit Clip", GUILayout.Width(80)))
@@ -495,6 +496,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                             for (var j = 0; j < groupData["clipNames"].arraySize; j++)
                             {
+                                if (string.IsNullOrEmpty(groupData["clipNames"].GetIndex(j).stringValue)) continue;
                                 LibrarySearchProvider.ToExclude.Add(groupData["clipNames"].GetIndex(j).stringValue);
                             }
 
@@ -533,6 +535,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         
                 for (var j = 0; j < groupData["clipNames"].arraySize; j++)
                 {
+                    if (string.IsNullOrEmpty(groupData["clipNames"].GetIndex(j).stringValue)) continue;
                     LibrarySearchProvider.ToExclude.Add(groupData["clipNames"].GetIndex(j).stringValue);
                 }
         
@@ -579,14 +582,13 @@ namespace CarterGames.Assets.AudioManager.Editor
                 : baseClipProperty.GetIndex(baseClipProperty.arraySize - 1);
             
             
-            propertyToEdit.stringValue = ((AudioData)searchTreeEntry.userData).key;
-
-
+            propertyToEdit.stringValue = ((AudioData)searchTreeEntry.userData).id;
+            
             IsEditingClip = false;
-            Undo.RecordObject(GroupsDictionary.serializedObject.targetObject, "Clip Selection Made");
             
             GroupsDictionary.serializedObject.ApplyModifiedProperties();
             GroupsDictionary.serializedObject.Update();
+            GUI.FocusControl(null);
         }
 
 

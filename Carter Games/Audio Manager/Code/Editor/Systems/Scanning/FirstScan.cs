@@ -36,10 +36,28 @@ namespace CarterGames.Assets.AudioManager.Editor
         [InitializeOnLoadMethod]
         private static void Init()
         {
-            if (PerUserSettings.ScannerInitialized && UtilEditor.Library.LibraryLookup.Count > 0) return;
-            
+            if (PerUserSettings.ScannerInitialized || UtilEditor.Library.LibraryLookup.Count > 0)
+            {
+                EditorApplication.update -= ShowFirstScan;
+                return;
+            }
+
             EditorApplication.update -= ShowFirstScan;
             EditorApplication.update += ShowFirstScan;
+        }
+
+
+        [InitializeOnLoadMethod]
+        private static void InitSettings()
+        {
+            if (UtilEditor.RuntimeSettings.SequencePrefab != null)
+            {
+                EditorApplication.delayCall -= UtilEditor.RuntimeSettings.Initialize;
+                return;
+            }
+            
+            EditorApplication.delayCall -= UtilEditor.RuntimeSettings.Initialize;
+            EditorApplication.delayCall += UtilEditor.RuntimeSettings.Initialize;
         }
 
 
@@ -49,6 +67,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         private static void ShowFirstScan()
         {
             EditorApplication.update -= ShowFirstScan;
+
+            if (PerUserSettings.ScannerInitialized) return;
             
             if (UtilEditor.Library.LibraryLookup.Count > 0)
             {

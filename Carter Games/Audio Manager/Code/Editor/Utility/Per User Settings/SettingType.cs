@@ -26,6 +26,7 @@ namespace CarterGames.Assets.AudioManager.Editor
     public enum SettingType
     {
         EditorPref,
+        PlayerPref,
         SessionState,
     }
 }

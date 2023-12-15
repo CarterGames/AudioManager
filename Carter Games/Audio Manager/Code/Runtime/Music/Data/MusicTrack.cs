@@ -36,7 +36,6 @@ namespace CarterGames.Assets.AudioManager
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        [SerializeField] private string clipKey;
         [SerializeField] private string clipId;
         [SerializeField] private float startTime;
         [SerializeField] private float endTime;
@@ -44,12 +43,6 @@ namespace CarterGames.Assets.AudioManager
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        /// <summary>
-        /// Gets the clip key of the clip.
-        /// </summary>
-        public string ClipKey => clipKey;
-        
         
         /// <summary>
         /// Gets the clip id of the clip.

@@ -47,6 +47,18 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         private static IMusicPlayer Player { get; set; }
 
+
+        /// <summary>
+        /// Gets the active track id.
+        /// </summary>
+        public static string ActiveId { get; private set; }
+        
+        
+        /// <summary>
+        /// Gets the active clip being played.
+        /// </summary>
+        public static AudioClip ActiveClip => MusicSource.Standard.MainSource.clip;
+
         
         /// <summary>
         /// Gets if the player is playing.
@@ -211,6 +223,7 @@ namespace CarterGames.Assets.AudioManager
             
             player.TrackList = ActiveTrackList;
             player.SetFirstTrack(ActiveTrackList.GetTrack(firstTrack));
+            ActiveId = firstTrack;
                 
             return player;
         }
@@ -238,6 +251,7 @@ namespace CarterGames.Assets.AudioManager
 
             player.TrackList = ActiveTrackList;
             player.SetFirstTrack(ActiveTrackList.GetTracks()[firstTrackIndex]);
+            ActiveId = ActiveTrackList.GetTracksRaw()[firstTrackIndex].ClipId;
                 
             return player;
         }
@@ -375,6 +389,7 @@ namespace CarterGames.Assets.AudioManager
                 return;
             }
             
+            ActiveId = clip;
             Player.DefaultVolumeTransition.Data.AddParam("musicClip", ActiveTrackList.GetTrack(clip));
             Player.DefaultVolumeTransition.Data.AddParam("musicClipStartTime", ActiveTrackList.GetStartTime(clip));
             Player.DefaultVolumeTransition.Transition(TransitionDirection.InAndOut);
@@ -408,7 +423,8 @@ namespace CarterGames.Assets.AudioManager
                 AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackNotInList));
                 return;
             }
-            
+
+            ActiveId = clip;
             musicTransition.Data.AddParam("musicClip", ActiveTrackList.GetTrack(clip));
             musicTransition.Data.AddParam("musicClipStartTime", ActiveTrackList.GetStartTime(clip));
             musicTransition.Data.AddParam("duration", duration);
