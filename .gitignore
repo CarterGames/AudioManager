@@ -58,7 +58,3 @@ sysinfo.txt
 crashlytics-build.properties
 
 *.idea
-
-/2x Develop Project
-/Audio Manager Development Project
-/Audio Manager Release Project

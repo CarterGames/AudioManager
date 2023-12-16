@@ -7,6 +7,7 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/CarterGames/AudioManager/total?style=for-the-badge)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/CarterGames/AudioManager?style=for-the-badge)
 ![GitHub repo size](https://img.shields.io/github/repo-size/CarterGames/AudioManager?style=for-the-badge)
+![Unity](https://img.shields.io/badge/Unity-2020.3.x_or_higher-critical?style=for-the-badge)
 
 ## Key Features
 - Automatic clip adding so you don't have to.
@@ -18,48 +19,65 @@
 Either download and import the package from the releases section or the <a href="https://assetstore.unity.com/packages/tools/audio/audio-manager-cg-149123">Unity Asset Store</a> and use the package manager. Alternatively, download this repo and copy all files into your project.
 
 ## Setup
+Unlike the ```2.x``` version of the asset. ```3.x``` doesn't have any user setup needed for it to actually function. Once you import the asset into your project, you'll be prompted to scan for audio, do the scan and you'll be all set for use. 
 
-### Audio Manager
-
-![AM-Setup-1](https://user-images.githubusercontent.com/33253710/154436213-3b2d109a-b513-4012-b746-85a2214cf1d9.png)
-
-First add the audio manager component to any gameobject you like. We recommend putting the script on a empty gameobject. Once added the inspector will show up asking for an Audio Manager File before moving forward. If this is your first time adding an Audio Manager script to an object, you'll find that the field may be populated for you by the scripts automatic setup which generates the file structure for the asset and makes a default Audio Manager File for you to use. 
-
-![AM-Setup-2](https://user-images.githubusercontent.com/33253710/154436245-b61e06f7-ac93-45a9-bf67-14cacf35ca4d.png)
-
-Next you'll need to assign the prefab that is to play the audio when you request it. We provide a correctly setup prefab in the package which we recommend you use with the asset. If you have lost it or are upgrading from an older version you may find your prefab is outdated. See the Audio Prefab section of the documentation for more on how the prefab should be setup. 
-
-![AM-Setup-3](https://user-images.githubusercontent.com/33253710/154436310-81415441-fb4e-4cc7-bf4e-e2fc66d02309.png)
-
-You can also assign audio mixers should you wish, though these are optional and are not required to use the manager to function. When you add mixer groups here you can use the ID listed next to them to use them when calling for a clip to be played without needed a direct reference to the mixer in the script you are calling from. 
-
-![AM-Setup-4](https://user-images.githubusercontent.com/33253710/154436342-f727640a-f7e0-470c-a879-bb6b9726dc93.png)
-
-From here you are almost ready to use the Audio Manager. The inspector should now show the options for directories & clips. Open the directories tab by pressing the show directories button if it is not already open. Here you'll see an empty field and a button to continue. If you audio clips are going to be stored in the base scan directory you can just press the continue button and the manager will scan and add any clips it finds. However if you want to use a folder structure you'll need to define the subdirectories here. See the How Scanning Works section of the documentation for examples of how to write these. You can add or remove elements with the + & - buttons along each row. When all the directories are valid the manager will scan, you may notice a little editor lag as this runs. 
-
-![AM-Setup-5](https://user-images.githubusercontent.com/33253710/154436374-66e25f8c-dc89-464d-a59d-1203f8cefd89.png)
-
-From here all of the clips in the directories selected should be in the clips section, press the show clips button to reveal the clips if needed, with both the directories and clip sections you can hide them to reduce the space the inspector takes up when not needed. Assuming you see the clips all listed you will be ready to use the Audio Manager. 
 
 ### Basic Scripting To Play A Clip
+You can play audio either through the inspector clip player which lets you setup a clip or a group through an editor or through code. 
 
-Static instance disabled
+#### Inspector
+![Untitled](https://github.com/CarterGames/AudioManager/assets/33253710/f19ee974-33c3-4dde-82eb-8d4148662471)
 
-With not other edits
-> audioManager.Play("MySound");
+A inspector class to allow users to play audio from the audio library like you can with the normal API but just from the inspector. The editor has options to apply some of the edit modules, play a single track/defined group and listen to events the setup would normally trigger. 
 
-With the volume set to 0.5
-> audioManager.Play("MySound", .5f);
+To play a clip from the inspector player, just reference it to another class or use a button unity event etc. to call Play() on the class. Example:
+```
+[SerializeField] private InspectorAudioClipPlayer player;
 
-Static instance enabled (an instance of the manager needs to be in the game still to function)
+private void OnEnable()
+{
+    player.Play();
+}
+```
 
-With not other edits
-> AudioManager.instance.Play("MySound");
+#### Code
+Like ```2.x``` the API is mostly the same but with a few edits. The same ```Play()```, ```PlayFromTime()```, ```PlayWithDelay()``` etc are present, but you can apply ```Edit Modules``` to any method which let you make these edits as needed. There are the common volume & pitch edits for all method variations, but for other edits the modules are used instead to save needing 1000s of lines of method overrides. 
 
-With the volume set to 0.5
-> AudioManager.instance.Play("MySound", .5f);
+```
+private void OnEnable()
+{
+    // Plays the clip with no user edits.
+    AudioManager.Play("MyClip");
 
-Lots more methods provided which can be seen in the documentation.
+    // Plays the clip with edits to volume.
+    AudioManager.Play("MyClip", .5f);
+
+    // Plays the clip with edits to volume via edit modules.
+    AudioManager.Play("MyClip", new VolumeEdit(.5f));
+}
+```
+
+You can play from a collection of clips with the group play methods, which work the exact same as the standard ones, but with groups. These can be defined in the library editor or in code should you wish. Example:
+
+```
+private void OnEnable()
+{
+    // Plays the group with no user edits.
+    AudioManager.PlayGroup(Group.MyGroup);
+
+    // Plays the group with edits to volume.
+    AudioManager.PlayGroup(Group.MyGroup, .5f);
+
+    // Plays the group with edits to volume via edit modules.
+    AudioManager.PlayGroup(Group.MyGroup, new VolumeEdit(.5f));
+
+    // Plays a group from an array of clip names.
+    string[] clips = new string[3] { "Click_01", "Click_02", "Click_03" };
+    AudioManger.PlayGroup(clips, GroupPlayMode.Random);
+}
+```
+
+For more information on all of this, please consult the documentation: https://carter.games/docs/audiomanager/3x
 
 ## Documentation
 You can access a online of the documentation here: <a href="https://carter.games/audiomanager">Online Documentation</a>. A offline copy if provided with the package and asset if needed. 
@@ -68,7 +86,7 @@ You can access a online of the documentation here: <a href="https://carter.games
 - <a href="https://github.com/JonathanMCarter">Jonathan Carter</a>
 
 ## Additional Contributors
-- <a href="https://github.com/Yemeni">Yousef Al-Hadhrami</a> - (2.6.1) - Hotfix to AudioPool.cs class throwing a null reference exception error.
+- <a href="https://github.com/Yemeni">Yousef Al-Hadhrami</a> - (Legacy - V:2.6.1) - Hotfix to AudioPool.cs class throwing a null reference exception error.
 
 ## Licence
 MIT Licence
