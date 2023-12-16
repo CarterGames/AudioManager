@@ -13,10 +13,15 @@
 You can still acces the legacy 2.x version in the ```2.x``` branch of this repo. 
 
 ## Key Features
-- Automatic clip adding so you don't have to.
-- Optional satic instancing for the audio manager script.
-- Basic Audio Player & Music Player included.
-- Custom inspectors for main scripts.
+- Automatic scanning of audio clips in the project.
+- Dynamic start time for each clip to start where it starts playing audable audio, cutting out deadspace.
+- Flexiable API for playing audio clips or groups of clips.
+- Editor to manage the library, assign groups of clips together and music track lists.
+- No setup needed, just import and go.
+- Entirely static API, no scene references needed.
+- Music playing setup.
+- Inspector players for quick prototyping without needing to write any code.
+- Regularly updated and maintained with ❤️ 
 
 ## How To Install
 Either download and import the package from the releases section or the <a href="https://assetstore.unity.com/packages/tools/audio/audio-manager-cg-149123">Unity Asset Store</a> and use the package manager. Alternatively, download this repo and copy all files into your project.
