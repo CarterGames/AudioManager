@@ -9,6 +9,9 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/CarterGames/AudioManager?style=for-the-badge)
 ![Unity](https://img.shields.io/badge/Unity-2020.3.x_or_higher-critical?style=for-the-badge)
 
+## Legacy Version
+You can still acces the legacy 2.x version in the ```2.x``` branch of this repo. 
+
 ## Key Features
 - Automatic clip adding so you don't have to.
 - Optional satic instancing for the audio manager script.
@@ -78,6 +81,9 @@ private void OnEnable()
 ```
 
 For more information on all of this, please consult the documentation: https://carter.games/docs/audiomanager/3x
+
+## Example Scene
+Please see the example project .zip for an example of the asset usage. It couldn't be provided in the package due to how the asset handles the audio library automation.
 
 ## Documentation
 You can access a online of the documentation here: <a href="https://carter.games/audiomanager">Online Documentation</a>. A offline copy if provided with the package and asset if needed. 
