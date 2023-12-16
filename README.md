@@ -7,6 +7,7 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/CarterGames/AudioManager/total?style=for-the-badge)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/CarterGames/AudioManager?style=for-the-badge)
 ![GitHub repo size](https://img.shields.io/github/repo-size/CarterGames/AudioManager?style=for-the-badge)
+![Unity](https://img.shields.io/badge/Unity-2020.3.x_or_higher-critical?style=for-the-badge)
 
 ## Key Features
 - Automatic clip adding so you don't have to.
