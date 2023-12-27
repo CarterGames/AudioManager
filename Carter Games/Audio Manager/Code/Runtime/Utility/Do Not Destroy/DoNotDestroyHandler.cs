@@ -90,7 +90,7 @@ namespace CarterGames.Assets.AudioManager
             {
                 if (cacheMusicRoutineHandler != null) return cacheMusicRoutineHandler;
                 SetupParent();
-                cacheMusicRoutineHandler = MusicParent.GetComponentInChildren<MusicRoutineHandler>();
+                cacheMusicRoutineHandler = MusicParent.GetComponentInChildren<MusicRoutineHandler>(true);
                 return cacheMusicRoutineHandler;
             }
         }
@@ -105,7 +105,7 @@ namespace CarterGames.Assets.AudioManager
             {
                 if (cacheMusicSourceHandler != null) return cacheMusicSourceHandler;
                 SetupParent();
-                cacheMusicSourceHandler = MusicParent.GetComponentInChildren<MusicSourceHandler>();
+                cacheMusicSourceHandler = MusicParent.GetComponentInChildren<MusicSourceHandler>(true);
                 return cacheMusicSourceHandler;
             }
         }
@@ -145,7 +145,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Initializes the class when called.
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
             if (cacheBaseParent != null) return;
@@ -158,8 +158,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         private static void SetupParent()
         {
-            if (IsInitialized) return;
-            IsInitialized = true;
+            if (cacheBaseParent != null) return;
             
             var obj = new GameObject("Audio Manager");
             cacheBaseParent = obj.transform;

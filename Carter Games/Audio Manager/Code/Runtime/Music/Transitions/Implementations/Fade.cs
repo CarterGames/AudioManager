@@ -122,6 +122,7 @@ namespace CarterGames.Assets.AudioManager
             var unscaled = Data.GetParam<bool>(TimeScaleId);
             var dir = Data.GetParam<TransitionDirection>(DirectionId);
             var duration = Data.GetParam<float>(DurationId);
+            
             var t = 0f;
             
             
@@ -171,11 +172,11 @@ namespace CarterGames.Assets.AudioManager
                 
                 if (dir == TransitionDirection.In)
                 {
-                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(t, 0f, MusicManager.PlayerVolume);
+                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp((t / duration), 0f, MusicManager.PlayerVolume);
                 }
                 else
                 {
-                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(1 - t, 0f, startingVolume);
+                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(1 - (t / duration), 0f, startingVolume);
                 }
 
                 yield return null;

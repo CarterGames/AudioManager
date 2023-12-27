@@ -166,11 +166,11 @@ namespace CarterGames.Assets.AudioManager
                 
                 if (dir == TransitionDirection.In)
                 {
-                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(t, 0f, startingVolume);
+                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp((t / duration), 0f, startingVolume);
                 }
                 else
                 {
-                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(1 - t, 0f, startingVolume);
+                    MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(1 - (t / duration), 0f, startingVolume);
                 }
                 
                 yield return null;
@@ -199,8 +199,8 @@ namespace CarterGames.Assets.AudioManager
             {
                 t += unscaled ? Time.unscaledDeltaTime : Time.deltaTime;
                 
-                MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(1 - t, 0f, startingVolume);
-                MusicManager.MusicSource.Standard.TransitionSource.volume = Mathf.Clamp(t, 0f, startingVolume);
+                MusicManager.MusicSource.Standard.MainSource.volume = Mathf.Clamp(1 - (t / duration), 0f, startingVolume);
+                MusicManager.MusicSource.Standard.TransitionSource.volume = Mathf.Clamp((t / duration), 0f, startingVolume);
                 
                 yield return null;
             }

@@ -65,6 +65,7 @@ namespace CarterGames.Assets.AudioManager
             get
             {
                 if (customTransition != null) return customTransition;
+                if (TrackList.StartingTransition != null) return TrackList.StartingTransition;
                 return DefaultVolumeTransition;
             }
         }
@@ -126,6 +127,9 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Play()
         {
+            Transition.Data.AddParam("musicClip", TrackList.GetTrack(0));
+            Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(0));
+            
             SetToFirstTrack();
             TransitionIn();
 
@@ -210,6 +214,10 @@ namespace CarterGames.Assets.AudioManager
             if (TrackList.TrackListLoops)
             {
                 MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime();
+                
+                Transition.Data.AddParam("musicClip", TrackList.GetTrack(0));
+                Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(0));
+                
                 Transition.Transition(TransitionDirection.InAndOut);
             }
             else
@@ -248,6 +256,10 @@ namespace CarterGames.Assets.AudioManager
             }
 
             if (!smoothTransition) return;
+            
+            Transition.Data.AddParam("musicClip", TrackList.GetTrack(0));
+            Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(0));
+            
             TransitionIn();
         }
 

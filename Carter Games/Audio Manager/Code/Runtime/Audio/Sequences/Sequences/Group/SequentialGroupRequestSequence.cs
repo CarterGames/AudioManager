@@ -150,7 +150,7 @@ namespace CarterGames.Assets.AudioManager
                 {
                     playerSequence.Players[0].EditParams.SetValue("delay", delayEdit);
                     hasDelayed = false;
-                    Debug.Log("Reset Edit Removal");
+                    // Debug.Log("Reset Edit Removal");
                 }
                 
                 playerSequence.PlayerComplete();

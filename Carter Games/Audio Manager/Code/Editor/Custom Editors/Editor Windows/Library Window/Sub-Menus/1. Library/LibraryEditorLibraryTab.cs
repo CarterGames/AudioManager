@@ -62,6 +62,13 @@ namespace CarterGames.Assets.AudioManager.Editor
                 
                 if (PerUserSettings.LastLibraryIndexShown > -1 && UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize > 0)
                 {
+                    if (PerUserSettings.LastLibraryIndexShown >
+                        UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize - 1)
+                    {
+                        PerUserSettings.LastLibraryIndexShown =
+                            UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize - 1;
+                    }
+                    
                     selectedPropertyCache = UtilEditor.LibraryObject.Fp("library").Fpr("list")
                         .GetIndex(PerUserSettings.LastLibraryIndexShown);
                 }
@@ -284,11 +291,20 @@ namespace CarterGames.Assets.AudioManager.Editor
         private static void DrawLibraryRow(SerializedProperty prop)
         {
             if (prop.Fpr("value") == null) return;
+
+            if (prop.Fpr("value").Fpr("value").objectReferenceValue == null)
+            {
+                AudioRemover.RemoveNullLibraryEntries();
+                selectedPropertyCache = null;
+                return;
+            }
             
             EditorGUILayout.BeginHorizontal("HelpBox");
             EditorGUILayout.BeginVertical();
+
+            var data = UtilEditor.Library.LibraryLookup[prop.Fpr("key").stringValue];
             
-            DrawPreviewButton((AudioClip)prop.Fpr("value").Fpr("value").objectReferenceValue);
+            DrawPreviewButton(data);
             
             EditorGUILayout.Space();
             UtilEditor.DrawHorizontalGUILine();
@@ -299,7 +315,6 @@ namespace CarterGames.Assets.AudioManager.Editor
             GUI.contentColor = UtilEditor.Yellow;
             EditorGUILayout.LabelField("File", EditorStyles.boldLabel);
             GUI.contentColor = Color.white;
-            
             
             LibraryEditorClip.DrawLibraryEditor(prop);
             
@@ -347,8 +362,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <summary>
         /// Draws the preview button for the clip.
         /// </summary>
-        /// <param name="clip">The clip to play if pressed.</param>
-        private static void DrawPreviewButton(AudioClip clip)
+        /// <param name="data">The clip to play if pressed.</param>
+        private static void DrawPreviewButton(AudioData data)
         {
             EditorGUILayout.Space(1.5f);
                 
@@ -358,10 +373,10 @@ namespace CarterGames.Assets.AudioManager.Editor
                     
                 if (GUILayout.Button(PreviewButton, GUILayout.Height(20)))
                 {
-                    EditorAudioClipPlayer.Play(clip);
+                    EditorAudioClipPlayer.Play(data);
                 }
             }
-            else if (EditorAudioClipPlayer.IsClipPlaying() && EditorAudioClipPlayer.CurrentClip == clip)
+            else if (EditorAudioClipPlayer.IsClipPlaying() && EditorAudioClipPlayer.CurrentClip == data.value)
             {
                 GUI.backgroundColor = UtilEditor.Red;
                     
@@ -376,7 +391,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     
                 if (GUILayout.Button(PreviewButton, GUILayout.Height(20)))
                 {
-                    EditorAudioClipPlayer.Play(clip);
+                    EditorAudioClipPlayer.Play(data);
                 }
             }
 

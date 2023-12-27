@@ -22,9 +22,7 @@
  */
 
 using System;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+// using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -80,9 +78,7 @@ namespace CarterGames.Assets.AudioManager
         {
             this.uuid = uuid;
             this.key = key;
-#if UNITY_EDITOR
-            path = AssetDatabase.GetAssetPath(mixerGroup);
-#endif
+            // path = AssetDatabase.GetAssetPath(mixerGroup);
             this.mixerGroup = mixerGroup;
         }
     }

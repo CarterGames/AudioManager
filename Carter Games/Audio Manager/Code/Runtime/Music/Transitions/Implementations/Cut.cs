@@ -77,6 +77,8 @@ namespace CarterGames.Assets.AudioManager
 
         public Cut()
         {
+            Data = new TransitionData();
+            // Debug.LogError("dhjsfh");
             IsComplete = false;
         }
         
@@ -108,7 +110,11 @@ namespace CarterGames.Assets.AudioManager
             yield return null;
             
             MusicManager.MusicSource.Standard.MainSource.clip = Data.GetParam<AudioClip>(ClipId);
+
+            // Debug.LogError(Data.GetParam<AudioClip>(ClipId));
+            
             MusicManager.MusicSource.Standard.MainSource.time = Data.GetParam(ClipStartTimeId, 0f);
+            MusicManager.MusicSource.Standard.MainSource.volume = MusicManager.PlayerVolume;
             MusicManager.MusicSource.Standard.MainSource.Play();
             
             IsComplete = true;

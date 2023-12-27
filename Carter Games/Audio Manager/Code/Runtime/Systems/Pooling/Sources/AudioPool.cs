@@ -59,9 +59,11 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Runs before any game logic runs and initializes the pools for use with some objects in them by default...
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
+            if (SequencePool != null) return;
+            
             // Initializes the pool collections...
             var seqPrefab = AssetAccessor.GetAsset<SettingsAssetRuntime>().SequencePrefab;
             var playerPrefab = AssetAccessor.GetAsset<SettingsAssetRuntime>().Prefab;

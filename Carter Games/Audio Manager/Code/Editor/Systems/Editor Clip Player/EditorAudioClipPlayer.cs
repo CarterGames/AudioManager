@@ -82,12 +82,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <summary>
         /// Plays the entered clip.
         /// </summary>
-        /// <param name="clip">The clip to play.</param>
-        public static void Play(AudioClip clip)
+        /// <param name="data">The clip to play.</param>
+        public static void Play(AudioData data)
         {
             StopAll();
             
-            CurrentClip = clip;
+            CurrentClip = data.value;
             
             var method = AudioUtilClass.GetMethod
             (
@@ -97,10 +97,16 @@ namespace CarterGames.Assets.AudioManager.Editor
                 new Type[] { typeof(AudioClip), typeof(int), typeof(bool) },
                 null
             );
+            
+            var samples = new float[data.value.samples * data.value.channels];
+            data.value.GetData(samples, 0);
 
-            method?.Invoke(null, new object[] { clip, 0, false });
+            var amountThrough = data.dynamicStartTime.time / data.value.length;
+            var startTime = Mathf.FloorToInt((samples.Length / 2f) * amountThrough);
+            
+            method?.Invoke(null, new object[] { data.value, startTime, false });
         }
-
+        
             
         /// <summary>
         /// Stops any clip currently in play.

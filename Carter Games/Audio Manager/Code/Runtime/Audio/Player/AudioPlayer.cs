@@ -344,7 +344,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         private void OnClipCompleted()
         {
-            Debug.LogError("Completed");
+            // Debug.LogError("Completed");
             Completed.Raise();
         }
 
@@ -378,7 +378,7 @@ namespace CarterGames.Assets.AudioManager
         private IEnumerator Co_ClipRuntimeRoutine()
         {
             yield return new WaitForSecondsRealtime(ClipTimeRemaining);
-            Debug.LogError(ClipTimeRemaining);
+            // Debug.LogError(ClipTimeRemaining);
             OnClipCompleted();
         }
 
@@ -387,14 +387,14 @@ namespace CarterGames.Assets.AudioManager
         {
             if (EditParams.TryGetValue("delay", out DelayEdit edit))
             {
-                Debug.LogError("Delayed");
+                // Debug.LogError("Delayed");
                 yield return new WaitForSeconds(edit.Delay);
-                Debug.LogError("Delay Completed");
+                // Debug.LogError("Delay Completed");
                 PlayerSource.Play();
                 yield break;
             }
 
-            Debug.LogError("Played Normal");
+            // Debug.LogError("Played Normal");
             PlayerSource.Play();
         }
     }

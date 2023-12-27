@@ -209,9 +209,11 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player prepared for use.</returns>
         public static IMusicPlayer Prepare(string id, string firstTrack)
         {
-            if (AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup.ContainsKey(id))
+            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(id);
+            
+            if (trackList != null)
             {
-                ActiveTrackList = AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup[id];
+                ActiveTrackList = trackList;
             }
             else
             {
@@ -237,9 +239,11 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player prepared for use.</returns>
         public static IMusicPlayer Prepare(string id, int firstTrackIndex)
         {
-            if (AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup.ContainsKey(id))
+            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(id);
+            
+            if (trackList != null)
             {
-                ActiveTrackList = AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup[id];
+                ActiveTrackList = trackList;
             }
             else
             {
@@ -269,13 +273,15 @@ namespace CarterGames.Assets.AudioManager
                 AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicDisabled));
                 return;
             }
+
+            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(id);
             
-            if (AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup.ContainsKey(id))
+            if (trackList != null)
             {
                 var player = Prepare(id);
                 player.Volume = volume;
                 
-                Play(AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup[id]);
+                Play(trackList);
             }
             else
             {
@@ -294,6 +300,12 @@ namespace CarterGames.Assets.AudioManager
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayMusic)
             {
                 AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicDisabled));
+                return;
+            }
+
+            if (trackList == null)
+            {
+                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
                 return;
             }
 
@@ -390,9 +402,14 @@ namespace CarterGames.Assets.AudioManager
             }
             
             ActiveId = clip;
+            
+            Player.Transition.Data.AddParam("musicClip", ActiveTrackList.GetTrack(clip));
+            Player.Transition.Data.AddParam("musicClipStartTime", ActiveTrackList.GetStartTime(clip));
+            
             Player.DefaultVolumeTransition.Data.AddParam("musicClip", ActiveTrackList.GetTrack(clip));
             Player.DefaultVolumeTransition.Data.AddParam("musicClipStartTime", ActiveTrackList.GetStartTime(clip));
-            Player.DefaultVolumeTransition.Transition(TransitionDirection.InAndOut);
+            
+            Player.Transition.Transition(TransitionDirection.InAndOut);
         }
         
         
@@ -416,7 +433,7 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="duration">The duration for the transition. Def: 1f</param>
         public static void TransitionTo(string clip, IMusicTransition musicTransition, float duration = 1f)
         {
-            Debug.Log(Player);
+            // Debug.Log(Player);
             
             if (!ActiveTrackList.HasTrack(clip))
             {   
