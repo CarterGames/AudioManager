@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CarterGames.Common;
 using UnityEngine;
 
@@ -80,6 +81,12 @@ namespace CarterGames.Assets.AudioManager
         /// Gets if the sequence has completed its loop or not.
         /// </summary>
         private bool IsLoopCompleted => !LoopInfo.IsInfiniteLoop && LoopInfo.CurrentLoopCount.Equals(LoopInfo.LoopCount);
+
+
+        /// <summary>
+        /// Returns if any audio is currently being played from this sequence.
+        /// </summary>
+        public bool IsPlaying => Players.Any(t => t.IsPlaying);
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Events

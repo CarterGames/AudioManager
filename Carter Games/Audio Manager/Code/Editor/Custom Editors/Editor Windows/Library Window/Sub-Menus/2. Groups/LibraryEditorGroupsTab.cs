@@ -148,6 +148,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             UtilEditor.DrawHorizontalGUILine();
             GUILayout.Space(7.5f);
             
+            PerUserSettings.GroupBtnScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.GroupBtnScrollRectPos);
             base.LeftSectionControl();
             EditorGUILayout.EndScrollView();
             
@@ -160,9 +161,11 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         protected override void RightSectionControl()
         {
+            PerUserSettings.GroupScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.GroupScrollRectPos);
             EditorGUILayout.BeginVertical("Box");
             base.RightSectionControl();
             EditorGUILayout.EndVertical();
+            EditorGUILayout.EndScrollView();
         }
 
 
@@ -205,7 +208,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 GUILayout.Space(5f);
             }
 
-            PerUserSettings.GroupScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.GroupScrollRectPos, GUILayout.MaxWidth(250));
+
             
             foreach (var key in groupKeys)
             {

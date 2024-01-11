@@ -40,6 +40,20 @@ namespace CarterGames.Assets.AudioManager.Editor
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
         private static bool LibraryExists => ScriptableRef.HasLibraryFile;
+
+
+        /// <summary>
+        /// Returns if any audio is found in the project or not.
+        /// </summary>
+        public static bool AnyAudioInProject
+        {
+            get
+            {
+                var assets = AssetDatabase.FindAssets("t:AudioClip", null);
+                if (assets == null) return false;
+                return assets.Length > 0;
+            }
+        }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Menu Items
@@ -113,13 +127,16 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             AudioRemover.RemoveNullLibraryEntries();
             
-            if (GetAllClipsInProject(cleanScan, out var lookup))
+            if (AnyAudioInProject)
             {
-                UtilEditor.SetLibraryData(lookup, cleanScan);
-                
-                StructHandler.RefreshClips();
-            
-                AudioManagerEditorEvents.OnLibraryRefreshed.Raise();
+                if (GetAllClipsInProject(cleanScan, out var lookup))
+                {
+                    UtilEditor.SetLibraryData(lookup, cleanScan);
+
+                    StructHandler.RefreshClips();
+
+                    AudioManagerEditorEvents.OnLibraryRefreshed.Raise();
+                }
             }
             
             var mixers = GetAllMixersInProject();

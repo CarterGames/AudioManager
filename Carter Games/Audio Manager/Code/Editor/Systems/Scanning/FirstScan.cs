@@ -76,9 +76,14 @@ namespace CarterGames.Assets.AudioManager.Editor
                 return;
             }
             
-            if (EditorUtility.DisplayDialog("Audio Library Scan", "Your library has no entries, do you want to scan for audio and mixer groups now?", "Scan", "Cancel"))
+            if (AudioScanner.AnyAudioInProject)
             {
-                AudioScanner.ScanForAudio(true);
+                if (EditorUtility.DisplayDialog("Audio Library Scan",
+                        "Your library has no entries, do you want to scan for audio and mixer groups now?", "Scan",
+                        "Cancel"))
+                {
+                    AudioScanner.ScanForAudio(true);
+                }
             }
             
             PerUserSettings.ScannerInitialized = true;

@@ -134,8 +134,6 @@ namespace CarterGames.Assets.AudioManager.Editor
             GUILayout.Space(7.5f);
             UtilEditor.DrawHorizontalGUILine();
             GUILayout.Space(7.5f);
-            
-            PerUserSettings.MusicScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.MusicScrollRectPos);
 
             if (UtilEditor.LibraryObject.Fp("tracks").Fpr("list").arraySize > 0)
             {
@@ -168,10 +166,24 @@ namespace CarterGames.Assets.AudioManager.Editor
                 }
             }
             
+            PerUserSettings.MusicBtnScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.MusicBtnScrollRectPos);
             base.LeftSectionControl();
             EditorGUILayout.EndScrollView();
 
             EditorGUILayout.EndVertical();
+        }
+        
+        
+        /// <summary>
+        /// Changes the right GUI control to something else.
+        /// </summary>
+        protected override void RightSectionControl()
+        {
+            PerUserSettings.MusicScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.MusicScrollRectPos);
+            EditorGUILayout.BeginVertical("Box");
+            base.RightSectionControl();
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndScrollView();
         }
 
 

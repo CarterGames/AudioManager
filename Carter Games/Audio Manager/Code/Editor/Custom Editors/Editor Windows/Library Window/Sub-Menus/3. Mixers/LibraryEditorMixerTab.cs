@@ -105,11 +105,24 @@ namespace CarterGames.Assets.AudioManager.Editor
             UtilEditor.DrawHorizontalGUILine();
             GUILayout.Space(7.5f);
             
-            PerUserSettings.MixerScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.MixerScrollRectPos);
+            PerUserSettings.MixerBtnScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.MixerBtnScrollRectPos);
             base.LeftSectionControl();
             EditorGUILayout.EndScrollView();
             
             EditorGUILayout.EndVertical();
+        }
+        
+        
+        /// <summary>
+        /// Changes the right GUI control to something else.
+        /// </summary>
+        protected override void RightSectionControl()
+        {
+            PerUserSettings.MixerScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.MixerScrollRectPos);
+            EditorGUILayout.BeginVertical("Box");
+            base.RightSectionControl();
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndScrollView();
         }
 
 

@@ -46,6 +46,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// Gets if the latest version is this version.
         /// </summary>
         public static bool IsLatestVersion => Versions.Data.Match(VersionInfo.ProjectVersionNumber);
+        
+        
+        /// <summary>
+        /// Gets if the version here is higher that the latest version.
+        /// </summary>
+        public static bool IsNewerVersion => Versions.Data.IsHigherVersion(VersionInfo.ProjectVersionNumber);
 
         
         /// <summary>

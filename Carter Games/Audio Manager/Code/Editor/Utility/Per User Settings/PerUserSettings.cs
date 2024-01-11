@@ -56,12 +56,15 @@ namespace CarterGames.Assets.AudioManager.Editor
         private static readonly string LibScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab01_LibScrollRectPos";
         
         private static readonly string LastLibraryGroupEntryId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab02_LibGroupIndex";
+        private static readonly string GroupBtnScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab02_GroupBtnScrollRectPos";
         private static readonly string GroupScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab02_ScrollRectPos";
         
         private static readonly string LastLibMixerEntryId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab03_LibMixerIndex";
+        private static readonly string MixerBtnScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab03_MixerBtnScrollRectPos";
         private static readonly string MixerScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab03_ScrollRectPos";
         
         private static readonly string LastLibMusicEntryId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab04_LibMusicIndex";
+        private static readonly string MusicBtnScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab04_MusicBtnScrollRectPos";
         private static readonly string MusicScrollRectPosId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_Tab04_ScrollRectPos";
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -207,6 +210,16 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <summary>
         /// The scroll rect pos of the group tab left GUI section.
         /// </summary>
+        public static Vector2 GroupBtnScrollRectPos
+        {
+            get => (Vector2) GetOrCreateValue<Vector2>(GroupBtnScrollRectPosId, SettingType.EditorPref);
+            set => SetValue<Vector2>(GroupBtnScrollRectPosId, SettingType.EditorPref, value);
+        }
+        
+        
+        /// <summary>
+        /// The scroll rect pos of the group tab right GUI section.
+        /// </summary>
         public static Vector2 GroupScrollRectPos
         {
             get => (Vector2) GetOrCreateValue<Vector2>(GroupScrollRectPosId, SettingType.EditorPref);
@@ -225,7 +238,17 @@ namespace CarterGames.Assets.AudioManager.Editor
         
         
         /// <summary>
-        /// The scroll rect pos of the group tab left GUI section.
+        /// The scroll rect pos of the mixer tab left GUI section.
+        /// </summary>
+        public static Vector2 MixerBtnScrollRectPos
+        {
+            get => (Vector2) GetOrCreateValue<Vector2>(MixerBtnScrollRectPosId, SettingType.EditorPref);
+            set => SetValue<Vector2>(MixerBtnScrollRectPosId, SettingType.EditorPref, value);
+        }
+        
+        
+        /// <summary>
+        /// The scroll rect pos of the group tab right GUI section.
         /// </summary>
         public static Vector2 MixerScrollRectPos
         {
@@ -245,7 +268,17 @@ namespace CarterGames.Assets.AudioManager.Editor
         
         
         /// <summary>
-        /// The scroll rect pos of the music track list tab left GUI section.
+        /// The scroll rect pos of the music tab left GUI section.
+        /// </summary>
+        public static Vector2 MusicBtnScrollRectPos
+        {
+            get => (Vector2) GetOrCreateValue<Vector2>(MusicBtnScrollRectPosId, SettingType.EditorPref);
+            set => SetValue<Vector2>(MusicBtnScrollRectPosId, SettingType.EditorPref, value);
+        }
+        
+        
+        /// <summary>
+        /// The scroll rect pos of the music track list tab right GUI section.
         /// </summary>
         public static Vector2 MusicScrollRectPos
         {
