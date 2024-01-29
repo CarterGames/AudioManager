@@ -31,12 +31,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <summary>
         /// The version number of the asset...
         /// </summary>
-        public static string VersionNumber => "2.6.2";
+        public static string VersionNumber => "2.6.3";
         
         
         /// <summary>
         /// The date this release of the asset was submitted for release...
         /// </summary>
-        public static string ReleaseDate => "30/04/2023";
+        public static string ReleaseDate => "29/01/2024";
     }
 }

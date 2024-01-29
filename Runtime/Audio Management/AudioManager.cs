@@ -1410,6 +1410,7 @@ namespace CarterGames.Assets.AudioManager
 
             source = SourceSetup(source, lib[request], volume, pitch);
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source.Play();
             
             AddToAudioRemoval(audioRemoval, source);
@@ -1435,6 +1436,7 @@ namespace CarterGames.Assets.AudioManager
             
             source = SourceSetup(source, lib[request], volume, pitch);
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source.outputAudioMixerGroup = mixer;
             source.Play();
             
@@ -1461,6 +1463,7 @@ namespace CarterGames.Assets.AudioManager
 
             source = SourceSetup(source, lib[request], volume, pitch);
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             source.Play();
             
@@ -1485,6 +1488,7 @@ namespace CarterGames.Assets.AudioManager
             
             source.clip = lib[request];
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source = UpdateSourceWithArgs(source, args);
             source.Play();
             
@@ -1510,6 +1514,7 @@ namespace CarterGames.Assets.AudioManager
 
             source = SourceSetup(source, lib[request], volume, pitch);
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source.Play();
             
             AddToAudioRemoval(audioRemoval, source);
@@ -1536,6 +1541,7 @@ namespace CarterGames.Assets.AudioManager
 
             source = SourceSetup(source, lib[request], volume, pitch);
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source.outputAudioMixerGroup = mixer;
             source.Play();
             
@@ -1563,6 +1569,7 @@ namespace CarterGames.Assets.AudioManager
 
             source = SourceSetup(source, lib[request], volume, pitch);
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source.outputAudioMixerGroup = audioManagerFile.audioMixer[mixerID];
             source.Play();
             
@@ -1588,6 +1595,7 @@ namespace CarterGames.Assets.AudioManager
 
             source.clip = lib[request];
             source.transform.SetParent(obj);
+            source.transform.localPosition = Vector3.zero;
             source = UpdateSourceWithArgs(source, args);
             source.Play();
             

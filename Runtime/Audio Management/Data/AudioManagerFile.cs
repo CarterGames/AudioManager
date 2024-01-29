@@ -33,11 +33,12 @@ namespace CarterGames.Assets.AudioManager
     [CreateAssetMenu(fileName = "Audio Manager File", menuName = "Carter Games/Audio Manager/Audio Manager File")]
     public class AudioManagerFile : AudioManagerAsset
     {
+#pragma warning disable
         /// <summary>
         /// Used in the audio manager file editor script to move the tab around...
         /// </summary>
         [SerializeField, HideInInspector] private int tabPos = 0;     
-        
+#pragma warning restore
         
         /// <summary>
         /// Holds a list of the audio clips stored in the AMF.

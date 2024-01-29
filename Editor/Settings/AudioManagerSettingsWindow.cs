@@ -147,7 +147,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.LabelField("Info", EditorStyles.boldLabel);
             
-            EditorGUILayout.HelpBox("The 2.x version of this asset will no longer receive official support by the end of 2023. The new 3.x version will be released this year to replace it.", MessageType.Info);
+            EditorGUILayout.HelpBox("The 2.x version of this asset is considered legacy and only limited support is available until the end of 2024.", MessageType.Info);
 
             EditorGUILayout.LabelField(new GUIContent("Version", "The version of the asset in use."),  new GUIContent(AssetVersionData.VersionNumber));
             EditorGUILayout.LabelField(new GUIContent("Release Date", "The date this version of the asset was published on."), new GUIContent(AssetVersionData.ReleaseDate));
