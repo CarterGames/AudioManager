@@ -31,9 +31,9 @@ namespace CarterGames.Assets.AudioManager.Editor
 
         // Asset Caches
         /* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        private static SettingsAssetRuntime settingsAssetRuntimeCache;
-        private static AudioLibrary audioLibraryCache;
-        private static AssetIndex assetIndexCache;
+        public static SettingsAssetRuntime settingsAssetRuntimeCache;
+        public static AudioLibrary audioLibraryCache;
+        public static AssetIndex assetIndexCache;
         
         
         // SerializedObject Caches

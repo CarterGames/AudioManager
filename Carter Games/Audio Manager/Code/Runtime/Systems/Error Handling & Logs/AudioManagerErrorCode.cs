@@ -1,17 +1,17 @@
 ﻿/*
- * Copyright (c) 2018-Present Carter Games
- * 
+ * Copyright (c) 2024 Carter Games
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- *    
+ *
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,9 +46,10 @@ namespace CarterGames.Assets.AudioManager
         TrackListCannotBeFound = 5,                     // (Runtime) A track list cannot be found.
         
         MusicDisabled = 6,                              // (Runtime) Music is disabled via play-state setting.
-        TrackNotInList = 7,                             // (Runtime) Track/AudioClip not in the track list that is being played.
+        TrackClipNotInListOrLibrary = 7,                // (Runtime) Track/AudioClip not in the track list that is being played.
         TransitionDataParameterNotFound = 8,            // (Runtime) Transition missing a parameter value.
         MusicPlayerNotInitialized = 9,                  // (Runtime) When a music player is null when a call was made.
+        MusicTrackListNotSet = 10,                      // (Runtime) When the user tries to play a track from a list before it is assigned.
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Editor Specific Errors

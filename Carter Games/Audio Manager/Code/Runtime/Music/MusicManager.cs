@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2018-Present Carter Games
+ * Copyright (c) 2024 Carter Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,11 +35,11 @@ namespace CarterGames.Assets.AudioManager
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
+
         /// <summary>
         /// The track list that is currently playing.
         /// </summary>
-        private static MusicTrackList ActiveTrackList { get; set; }
+        private static MusicTrackList ActiveTrackList { get; set; } = null;
         
         
         /// <summary>
@@ -59,6 +59,9 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public static AudioClip ActiveClip => MusicSource.Standard.MainSource.clip;
 
+
+        private static bool CanUse => ActiveTrackList != null;
+        
         
         /// <summary>
         /// Gets if the player is playing.
@@ -395,9 +398,15 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="clip">The clip to transition to.</param>
         public static void TransitionTo(string clip)
         {
-            if (!ActiveTrackList.HasTrack(clip))
+            if (!CanUse)
+            {
+                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicTrackListNotSet));
+                return;
+            }
+            
+            if (!ActiveTrackList.LibraryHasTrackClip(clip) && !ActiveTrackList.TrackIsInList(clip))
             {   
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackNotInList));
+                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
             
@@ -433,11 +442,15 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="duration">The duration for the transition. Def: 1f</param>
         public static void TransitionTo(string clip, IMusicTransition musicTransition, float duration = 1f)
         {
-            // Debug.Log(Player);
+            if (!CanUse)
+            {
+                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicTrackListNotSet));
+                return;
+            }
             
-            if (!ActiveTrackList.HasTrack(clip))
+            if (!ActiveTrackList.LibraryHasTrackClip(clip) && !ActiveTrackList.TrackIsInList(clip))
             {   
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackNotInList));
+                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
 
@@ -469,6 +482,16 @@ namespace CarterGames.Assets.AudioManager
             }
         }
 
+
+        /// <summary>
+        /// Sets the active track list and player, but nothing else.
+        /// </summary>
+        /// <param name="trackListId">The track list to use.</param>
+        public static void SetTrackList(string trackListId)
+        {
+            SetTrackList(AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(trackListId));
+        }
+        
         
         /// <summary>
         /// Sets the active track list and player, but nothing else.
@@ -476,6 +499,12 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="trackList">The track list to use.</param>
         public static void SetTrackList(MusicTrackList trackList)
         {
+            if (trackList == null)
+            {
+                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+                return;
+            }
+            
             if (ActiveTrackList != trackList)
             {
                 ActiveTrackList = trackList;
