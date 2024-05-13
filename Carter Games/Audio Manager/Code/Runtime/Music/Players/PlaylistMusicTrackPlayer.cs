@@ -49,7 +49,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// The track list to play.
         /// </summary>
-        public MusicTrackList TrackList { get; set; }
+        public MusicPlaylist Playlist { get; set; }
         
         
         /// <summary>
@@ -85,7 +85,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Gets if the playlist player is at the end of the playlist or not.
         /// </summary>
-        private bool IsAtEnd => TrackList.GetTracks().Count.Equals(TracksPlayed);
+        private bool IsAtEnd => Playlist.GetTracks().Count.Equals(TracksPlayed);
 
 
         /// <summary>
@@ -134,13 +134,13 @@ namespace CarterGames.Assets.AudioManager
                 if (TracksPlayed.Equals(0))
                 {
                     if (customTransition != null) return customTransition;
-                    if (TrackList.StartingTransition != null) return TrackList.StartingTransition;
+                    if (Playlist.StartingTransition != null) return Playlist.StartingTransition;
                     return DefaultVolumeTransition;
                 }
                 else
                 {
                     if (customTransition != null) return customTransition;
-                    if (TrackList.SwitchingTransition != null) return TrackList.SwitchingTransition;
+                    if (Playlist.SwitchingTransition != null) return Playlist.SwitchingTransition;
                     return DefaultVolumeTransition;
                 }
             }
@@ -162,9 +162,9 @@ namespace CarterGames.Assets.AudioManager
         private void SetToFirstTrack()
         {
             MusicManager.MusicSource.Standard.MainSource.playOnAwake = false;
-            MusicManager.MusicSource.Standard.MainSource.loop = TrackList.TrackListLoops;
-            MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(StartingTrackIndex);
-            MusicManager.MusicSource.Standard.MainSource.clip = TrackList.GetTrack(StartingTrackIndex);
+            MusicManager.MusicSource.Standard.MainSource.loop = Playlist.TrackListLoops;
+            MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(StartingTrackIndex);
+            MusicManager.MusicSource.Standard.MainSource.clip = Playlist.GetTrack(StartingTrackIndex);
             CurrentIndex = StartingTrackIndex;
         }
 
@@ -174,9 +174,9 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Play()
         {
-            if (TrackList.PlayListShuffled)
+            if (Playlist.PlayListShuffled)
             {
-                StartingTrackIndex = Random.Range(0, TrackList.GetTracks().Count);
+                StartingTrackIndex = Random.Range(0, Playlist.GetTracks().Count);
             }
             else
             {
@@ -188,7 +188,7 @@ namespace CarterGames.Assets.AudioManager
             
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                 return;
             }
 
@@ -197,7 +197,7 @@ namespace CarterGames.Assets.AudioManager
             MusicRoutineHandler.RunRoutine(RoutineId, Co_LifetimeRoutine());
             IsPlaying = true;
             
-            PlayedIndexes.Add(TrackList.GetTracks().IndexOf(MusicManager.MusicSource.Standard.MainSource.clip));
+            PlayedIndexes.Add(Playlist.GetTracks().IndexOf(MusicManager.MusicSource.Standard.MainSource.clip));
             
             MusicManager.Started.Raise();
         }
@@ -220,7 +220,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                 return;
             }
             
@@ -278,7 +278,7 @@ namespace CarterGames.Assets.AudioManager
             PlayedIndexes.Add(CurrentIndex);
 
             
-            if (TrackList.PlayListShuffled)
+            if (Playlist.PlayListShuffled)
             {
                 CurrentIndex = GetRandomUnPlayedTrack();
             }
@@ -290,15 +290,15 @@ namespace CarterGames.Assets.AudioManager
             
             if (smoothTransition)
             {
-                Transition.Data.AddParam("musicClip", TrackList.GetTrack(CurrentIndex));
-                Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(CurrentIndex));
+                Transition.Data.AddParam("musicClip", Playlist.GetTrack(CurrentIndex));
+                Transition.Data.AddParam("musicClipStartTime", Playlist.GetStartTime(CurrentIndex));
 
                 Transition.Transition(TransitionDirection.InAndOut);
             }
             else
             {
-                MusicManager.MusicSource.Standard.MainSource.clip = TrackList.GetTrack(CurrentIndex);
-                MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(CurrentIndex);
+                MusicManager.MusicSource.Standard.MainSource.clip = Playlist.GetTrack(CurrentIndex);
+                MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(CurrentIndex);
                 
                 TransitionIn();
             }
@@ -320,7 +320,7 @@ namespace CarterGames.Assets.AudioManager
                 if (MusicManager.MusicSource.Standard.MainSource.time > 3f)
                 {
                     // Restart clip...
-                    MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(CurrentIndex);
+                    MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(CurrentIndex);
                     
                     if (smoothTransition)
                     {
@@ -343,15 +343,15 @@ namespace CarterGames.Assets.AudioManager
             
             if (smoothTransition)
             {
-                Transition.Data.AddParam("musicClip", TrackList.GetTrack(CurrentIndex));
-                Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(CurrentIndex));
+                Transition.Data.AddParam("musicClip", Playlist.GetTrack(CurrentIndex));
+                Transition.Data.AddParam("musicClipStartTime", Playlist.GetStartTime(CurrentIndex));
 
                 Transition.Transition(TransitionDirection.InAndOut);
             }
             else
             {
-                MusicManager.MusicSource.Standard.MainSource.clip = TrackList.GetTrack(CurrentIndex);
-                MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(CurrentIndex);
+                MusicManager.MusicSource.Standard.MainSource.clip = Playlist.GetTrack(CurrentIndex);
+                MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(CurrentIndex);
 
                 TransitionIn();
             }
@@ -373,7 +373,7 @@ namespace CarterGames.Assets.AudioManager
         {
             var options = new List<int>();
 
-            for (var i = 0; i < TrackList.GetTracks().Count; i++)
+            for (var i = 0; i < Playlist.GetTracks().Count; i++)
             {
                 if (PlayedIndexes.Contains(i)) continue;
                 options.Add(i);
@@ -394,17 +394,17 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="audioClip">The clip to try and play.</param>
         public void SetFirstTrack(AudioClip audioClip)
         {
-            if (!TrackList.GetTracks().Contains(audioClip))
+            if (!Playlist.GetTracks().Contains(audioClip))
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
             
-            MusicManager.SetTrackList(TrackList);
+            MusicManager.SetPlaylist(Playlist);
             
             MusicManager.MusicSource.Standard.MainSource.playOnAwake = false;
-            MusicManager.MusicSource.Standard.MainSource.loop = TrackList.TrackListLoops;
-            MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(0);
+            MusicManager.MusicSource.Standard.MainSource.loop = Playlist.TrackListLoops;
+            MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(0);
             MusicManager.MusicSource.Standard.MainSource.clip = audioClip;
             
             MusicManager.MusicSource.Standard.MainSource.mute =
@@ -414,19 +414,19 @@ namespace CarterGames.Assets.AudioManager
         
         public void SetTrack(AudioClip audioClip)
         {
-            if (!TrackList.GetTracks().Contains(audioClip))
+            if (!Playlist.GetTracks().Contains(audioClip))
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
 
-            MusicManager.SetTrackList(TrackList);
+            MusicManager.SetPlaylist(Playlist);
             
-            var indexOfTrack = TrackList.GetTracks().IndexOf(audioClip);
+            var indexOfTrack = Playlist.GetTracks().IndexOf(audioClip);
             
             MusicManager.MusicSource.Standard.MainSource.playOnAwake = false;
-            MusicManager.MusicSource.Standard.MainSource.loop = TrackList.TrackListLoops;
-            MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(indexOfTrack);
+            MusicManager.MusicSource.Standard.MainSource.loop = Playlist.TrackListLoops;
+            MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(indexOfTrack);
             MusicManager.MusicSource.Standard.MainSource.clip = audioClip;
             
             MusicManager.MusicSource.Standard.MainSource.mute =
@@ -460,7 +460,7 @@ namespace CarterGames.Assets.AudioManager
 
                 yield return null;
 
-                if (MusicManager.MusicSource.Standard.MainSource.time >= TrackList.GetEndTime(CurrentIndex))
+                if (MusicManager.MusicSource.Standard.MainSource.time >= Playlist.GetEndTime(CurrentIndex))
                 {
                     if (Mathf.Approximately(EndCheckTimeout, 0f))
                     {
@@ -470,27 +470,27 @@ namespace CarterGames.Assets.AudioManager
                     
                     if (IsAtEnd)
                     {
-                        if (TrackList.TrackListLoops && !Transition.InProgress)
+                        if (Playlist.TrackListLoops && !Transition.InProgress)
                         {
                             CurrentIndex = StartingTrackIndex;
                             
                             PlayedIndexes.Clear();
                             PlayedIndexes.Add(CurrentIndex);
                             
-                            Transition.Data.AddParam("musicClip", TrackList.GetTrack(CurrentIndex));
-                            Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(CurrentIndex));
+                            Transition.Data.AddParam("musicClip", Playlist.GetTrack(CurrentIndex));
+                            Transition.Data.AddParam("musicClipStartTime", Playlist.GetStartTime(CurrentIndex));
                             Transition.Completed.Add(OnTransitionCompleted);
                             Transition.Transition(TransitionDirection.InAndOut);
 
                             MusicManager.TrackChanged.Raise();
                             
-                            EndCheckTimeout = TrackList.GetTrack(CurrentIndex).length / 20f;
+                            EndCheckTimeout = Playlist.GetTrack(CurrentIndex).length / 20f;
                             CanTransition = true;
                             TracksPlayed = 0;
                         }
                         else
                         {
-                            if (MusicManager.MusicSource.Standard.MainSource.time >= TrackList.GetEndTime(CurrentIndex) - Transition.Data.GetParam<float>("Duration"))
+                            if (MusicManager.MusicSource.Standard.MainSource.time >= Playlist.GetEndTime(CurrentIndex) - Transition.Data.GetParam<float>("Duration"))
                             {
                                 TransitionOut();
                                 CanTransition = false;
@@ -505,7 +505,7 @@ namespace CarterGames.Assets.AudioManager
                         {
                             PlayedIndexes.Add(CurrentIndex);
 
-                            if (TrackList.PlayListShuffled)
+                            if (Playlist.PlayListShuffled)
                             {
                                 CurrentIndex = GetRandomUnPlayedTrack();
                             }
@@ -514,10 +514,10 @@ namespace CarterGames.Assets.AudioManager
                                 CurrentIndex++;
                             }
 
-                            EndCheckTimeout = TrackList.GetTrack(CurrentIndex).length / 20f;
+                            EndCheckTimeout = Playlist.GetTrack(CurrentIndex).length / 20f;
                             
-                            Transition.Data.AddParam("musicClip", TrackList.GetTrack(CurrentIndex));
-                            Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(CurrentIndex));
+                            Transition.Data.AddParam("musicClip", Playlist.GetTrack(CurrentIndex));
+                            Transition.Data.AddParam("musicClipStartTime", Playlist.GetStartTime(CurrentIndex));
                             Transition.Completed.Add(OnTransitionCompleted);
                             Transition.Transition(TransitionDirection.InAndOut);
                             

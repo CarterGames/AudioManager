@@ -106,7 +106,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.BeginVertical("Box", GUILayout.MaxWidth(250));
 
             GUI.backgroundColor = UtilEditor.Yellow;
-            if (GUILayout.Button("Update Track Struct", GUILayout.MaxHeight(25)))
+            if (GUILayout.Button("Update Playlist Struct", GUILayout.MaxHeight(25)))
             {
                 StructHandler.RefreshTracks();
             }
@@ -115,7 +115,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             if (PerUserSettings.ShowHelpBoxes)
             {
-                EditorGUILayout.HelpBox("Press ^^^ to update the Track.??? struct to have the latest changes",
+                EditorGUILayout.HelpBox("Press ^^^ to update the Playlist.??? struct to have the latest changes",
                     MessageType.None);
             }
 
@@ -124,7 +124,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             GUILayout.Space(7.5f);
 
             GUI.backgroundColor = UtilEditor.Green;
-            if (GUILayout.Button("+ Add New Track"))
+            if (GUILayout.Button("+ Add New Playlist"))
             {
                 AddNewBlankTrack();
                 GUI.FocusControl(null);
@@ -203,7 +203,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 EditorGUILayout.BeginVertical("Box");
                 EditorGUILayout.BeginVertical("Box");
-                EditorGUILayout.LabelField("Select a track list to see its contents here.");
+                EditorGUILayout.LabelField("Select a playlist to see its contents here.");
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.EndVertical();
                 return;
@@ -250,10 +250,10 @@ namespace CarterGames.Assets.AudioManager.Editor
             }
             
             
-            EditorGUILayout.PropertyField(SelectedProperty.Fpr("value").Fpr("trackListType"));
+            // EditorGUILayout.PropertyField(SelectedProperty.Fpr("value").Fpr("playlistType"));
             EditorGUILayout.PropertyField(SelectedProperty.Fpr("value").Fpr("loop"));
 
-            if (SelectedProperty.Fpr("value").Fpr("trackListType").intValue == 1)
+            if (SelectedProperty.Fpr("value").Fpr("tracks").arraySize > 1)
             {
                 EditorGUILayout.PropertyField(SelectedProperty.Fpr("value").Fpr("shuffle"));
             }
@@ -293,10 +293,10 @@ namespace CarterGames.Assets.AudioManager.Editor
             GUILayout.Space(1.5f);
             GUI.backgroundColor = UtilEditor.Red;
             
-            if (GUILayout.Button("Delete Track List"))
+            if (GUILayout.Button("Delete Playlist"))
             {
-                if (!EditorUtility.DisplayDialog("Delete Track List",
-                        "Are you sure you want to delete this track list?", "Delete List", "Cancel")) return;
+                if (!EditorUtility.DisplayDialog("Delete Playlist",
+                        "Are you sure you want to delete this playlist?", "Delete", "Cancel")) return;
 
                 var oldKey = UtilEditor.LibraryObject.Fp("tracks").Fpr("list").GetIndex(PerUserSettings.LastLibMusicEntry).Fpr("key").stringValue;
                 UtilEditor.LibraryObject.Fp("tracks").Fpr("list").DeleteIndex(PerUserSettings.LastLibMusicEntry);
@@ -346,8 +346,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             var newTrackProp = tracksProp.GetIndex(tracksProp.arraySize - 1);
             
             newTrackProp.Fpr("key").stringValue = Guid.NewGuid().ToString();
-            newTrackProp.Fpr("value").Fpr("listKey").stringValue = "New Track List " + newTrackProp.Fpr("key").stringValue.Substring(0, 7);
-            newTrackProp.Fpr("value").Fpr("trackListType").intValue = 0;
+            newTrackProp.Fpr("value").Fpr("listKey").stringValue = "New Playlist " + newTrackProp.Fpr("key").stringValue.Substring(0, 7);
+            newTrackProp.Fpr("value").Fpr("playlistType").intValue = 0;
             newTrackProp.Fpr("value").Fpr("loop").boolValue = false;
             newTrackProp.Fpr("value").Fpr("shuffle").boolValue = false;
             newTrackProp.Fpr("value").Fpr("tracks").ClearArray();

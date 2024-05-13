@@ -87,6 +87,9 @@ namespace CarterGames.Assets.AudioManager
         /// Returns if any audio is currently being played from this sequence.
         /// </summary>
         public bool IsPlaying => Players.Any(t => t.IsPlaying);
+        
+        
+        public bool RecycleOnComplete { get; set; }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Events
@@ -286,6 +289,8 @@ namespace CarterGames.Assets.AudioManager
                 
             Completed.Raise();
 
+            if (!RecycleOnComplete) return;
+
             foreach (var player in Players)
             {
                 AudioPool.Return(player);
@@ -318,6 +323,20 @@ namespace CarterGames.Assets.AudioManager
             sequenceHandler.OnLoop();
             Looped.Raise();
             Play();
+        }
+
+
+        /// <summary>
+        /// Call to manually recycle this element into the pooling setup.
+        /// </summary>
+        public void RecycleManually()
+        {
+            foreach (var player in Players)
+            {
+                AudioPool.Return(player);
+            }
+            
+            AudioPool.Return(this);
         }
     }
 }

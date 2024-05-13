@@ -86,7 +86,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     if (delay < 0)
                     {
                         delay = 0;
-                        AmLog.Warning($"{AudioManagerErrorCode.InvalidAudioClipInspectorInput}\nDelay edit cannot have a value below 0.");
+                        AmDebugLogger.Warning($"{AudioManagerErrorCode.InvalidAudioClipInspectorInput}\nDelay edit cannot have a value below 0.");
                     }
                     
                     EditModuleInspectorHelper.SetValue(targetObject, index, "delay",delay.ToString());

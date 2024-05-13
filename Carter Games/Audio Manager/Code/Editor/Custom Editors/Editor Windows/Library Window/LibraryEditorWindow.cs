@@ -177,7 +177,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             
-            if (GUILayout.Button(UtilEditor.OpenBookIcon, GUIStyle.none, GUILayout.MaxHeight(110)))
+            if (GUILayout.Button(UtilEditor.OpenBookIcon, GUIStyle.none, GUILayout.MaxHeight(75)))
             {
                 GUI.FocusControl(null);
             }

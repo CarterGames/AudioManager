@@ -136,7 +136,7 @@ namespace CarterGames.Assets.AudioManager
                 return (T)value;
             }
 
-            AmLog.Warning($"{AudioManagerErrorCode.TransitionDataParameterNotFound}\nUnable to get parameter {key}.");
+            AmDebugLogger.Warning($"{AudioManagerErrorCode.TransitionDataParameterNotFound}\nUnable to get parameter {key}.");
             return default;
         }
         
@@ -155,7 +155,7 @@ namespace CarterGames.Assets.AudioManager
                 return (T)value;
             }
 
-            AmLog.Warning($"{AudioManagerErrorCode.TransitionDataParameterNotFound}\nUnable to get parameter {key}. Using provided default {defValue} instead.");
+            AmDebugLogger.Warning($"{AudioManagerErrorCode.TransitionDataParameterNotFound}\nUnable to get parameter {key}. Using provided default {defValue} instead.");
             return defValue;
         }
         
@@ -175,7 +175,7 @@ namespace CarterGames.Assets.AudioManager
                 return true;
             }
 
-            AmLog.Warning($"{AudioManagerErrorCode.TransitionDataParameterNotFound}\nUnable to get parameter {key}.");
+            AmDebugLogger.Warning($"{AudioManagerErrorCode.TransitionDataParameterNotFound}\nUnable to get parameter {key}.");
             value = default;
             return false;
         }

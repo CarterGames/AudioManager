@@ -90,7 +90,7 @@ namespace CarterGames.Assets.AudioManager
             // if not, do nothing as it won't be heard...
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                 return null;
             }
 
@@ -147,7 +147,7 @@ namespace CarterGames.Assets.AudioManager
             // if not, do nothing as it won't be heard...
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                 return null;
             }
 
@@ -183,7 +183,7 @@ namespace CarterGames.Assets.AudioManager
             // if not, do nothing as it won't be heard...
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                 return null;
             }
 

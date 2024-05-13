@@ -31,13 +31,34 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// <summary>
     /// Handles the setup of the asset index for runtime references to scriptable objects used for the asset.
     /// </summary>
-    public sealed class AssetIndexHandler : IPreprocessBuildWithReport
+    public sealed class AssetIndexHandler : IPreprocessBuildWithReport, IAssetEditorInitialize
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
         private const string AssetFilter = "t:audiomanagerasset";
+        
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   IAssetEditorInitialize Implementation
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        /// <summary>
+        /// Defines the order that this initializer run at.
+        /// </summary>
+        public int InitializeOrder => 1;
+
+        
+        /// <summary>
+        /// Runs when the asset initialize flow is used.
+        /// </summary>
+        public void OnEditorInitialized()
+        {
+            EditorApplication.update -= OnEditorUpdate;
+            EditorApplication.update += OnEditorUpdate;
+            
+            UpdateIndex();
+        }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   IPreprocessBuildWithReport Implementation

@@ -68,9 +68,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             get
             {
-                var files = Directory.GetFiles(DataFolderPath);
-                files = files.Where(t => !t.Contains(".meta")).ToArray();
-                return files.Contains(LibraryAssetPath);
+                var assets = AssetDatabase.FindAssets(AudioManagerLibraryFilter);
+                return assets != null && assets.Length > 0;
             }
         }
 
@@ -122,5 +121,45 @@ namespace CarterGames.Assets.AudioManager.Editor
         public static bool HasAllAssets =>
             File.Exists(AssetIndexPath) && File.Exists(SettingsAssetPath) &&
             File.Exists(LibraryAssetPath);
+        
+        
+        /// <summary>
+        /// Tries to create any missing assets when called.
+        /// </summary>
+        public static void TryCreateAssets()
+        {
+            AssetDatabase.StartAssetEditing();
+            
+            if (assetIndexCache == null)
+            {
+                FileEditorUtil.CreateSoGetOrAssignAssetCache(
+                    ref assetIndexCache, 
+                    AssetIndexFilter, 
+                    AssetIndexPath,
+                    AssetName, $"{AssetName}/Resources/Asset Index.asset");
+            }
+
+            
+            if (settingsAssetRuntimeCache == null)
+            {
+                FileEditorUtil.CreateSoGetOrAssignAssetCache(
+                    ref settingsAssetRuntimeCache, 
+                    RuntimeSettingsFilter, 
+                    SettingsAssetPath, 
+                    AssetName, $"{AssetName}/Data/Runtime Settings.asset");
+            }
+            
+            
+            if (audioLibraryCache == null)
+            {
+                FileEditorUtil.CreateSoGetOrAssignAssetCache(
+                    ref audioLibraryCache, 
+                    AudioManagerLibraryFilter, 
+                    LibraryAssetPath, 
+                    AssetName, $"{AssetName}/Data/Library.asset");
+            }
+            
+            AssetDatabase.StopAssetEditing();
+        }
     }
 }

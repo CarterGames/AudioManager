@@ -245,7 +245,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         }
                         else
                         {
-                            AmLog.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioSequence class attached.");
+                            AmDebugLogger.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioSequence class attached.");
                         }
                     }
                     else
@@ -281,7 +281,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         }
                         else
                         {
-                            AmLog.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioPlayer class attached.");
+                            AmDebugLogger.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioPlayer class attached.");
                         }
                     }
                     else

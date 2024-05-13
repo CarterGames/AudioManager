@@ -48,7 +48,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// The track list to play.
         /// </summary>
-        public MusicTrackList TrackList { get; set; }
+        public MusicPlaylist Playlist { get; set; }
         
         
         /// <summary>
@@ -65,7 +65,7 @@ namespace CarterGames.Assets.AudioManager
             get
             {
                 if (customTransition != null) return customTransition;
-                if (TrackList.StartingTransition != null) return TrackList.StartingTransition;
+                if (Playlist.StartingTransition != null) return Playlist.StartingTransition;
                 return DefaultVolumeTransition;
             }
         }
@@ -109,12 +109,12 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         private void SetToFirstTrack()
         {
-            MusicManager.SetTrackList(TrackList);
+            MusicManager.SetPlaylist(Playlist);
             
             MusicManager.MusicSource.Standard.MainSource.playOnAwake = false;
-            MusicManager.MusicSource.Standard.MainSource.loop = TrackList.TrackListLoops;
-            MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(0);
-            MusicManager.MusicSource.Standard.MainSource.clip = TrackList.GetTrack(0);
+            MusicManager.MusicSource.Standard.MainSource.loop = Playlist.TrackListLoops;
+            MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(0);
+            MusicManager.MusicSource.Standard.MainSource.clip = Playlist.GetTrack(0);
             MusicManager.MusicSource.Standard.MainSource.volume = Volume;
             
             MusicManager.MusicSource.Standard.MainSource.mute =
@@ -127,15 +127,15 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Play()
         {
-            Transition.Data.AddParam("musicClip", TrackList.GetTrack(0));
-            Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(0));
+            Transition.Data.AddParam("musicClip", Playlist.GetTrack(0));
+            Transition.Data.AddParam("musicClipStartTime", Playlist.GetStartTime(0));
             
             SetToFirstTrack();
             TransitionIn();
 
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                 return;
             }
             
@@ -164,7 +164,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                 return;
             }
             
@@ -211,12 +211,12 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void SkipForwards(bool smoothTransition = true)
         {
-            if (TrackList.TrackListLoops)
+            if (Playlist.TrackListLoops)
             {
-                MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime();
+                MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime();
                 
-                Transition.Data.AddParam("musicClip", TrackList.GetTrack(0));
-                Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(0));
+                Transition.Data.AddParam("musicClip", Playlist.GetTrack(0));
+                Transition.Data.AddParam("musicClipStartTime", Playlist.GetStartTime(0));
                 
                 Transition.Transition(TransitionDirection.InAndOut);
             }
@@ -237,7 +237,7 @@ namespace CarterGames.Assets.AudioManager
             if (MusicManager.MusicSource.Standard.MainSource.time > 3f)
             {
                 // Restart clip...
-                MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime();
+                MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime();
             }
             else
             {
@@ -245,7 +245,7 @@ namespace CarterGames.Assets.AudioManager
                 
                 if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayAudio)
                 {
-                    AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
+                    AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.AudioDisabled));
                     return;
                 }
                 
@@ -257,8 +257,8 @@ namespace CarterGames.Assets.AudioManager
 
             if (!smoothTransition) return;
             
-            Transition.Data.AddParam("musicClip", TrackList.GetTrack(0));
-            Transition.Data.AddParam("musicClipStartTime", TrackList.GetStartTime(0));
+            Transition.Data.AddParam("musicClip", Playlist.GetTrack(0));
+            Transition.Data.AddParam("musicClipStartTime", Playlist.GetStartTime(0));
             
             TransitionIn();
         }
@@ -270,15 +270,15 @@ namespace CarterGames.Assets.AudioManager
         /// <param name="audioClip">The clip to try and play.</param>
         public void SetFirstTrack(AudioClip audioClip)
         {
-            if (!TrackList.GetTracks().Contains(audioClip))
+            if (!Playlist.GetTracks().Contains(audioClip))
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
             
             MusicManager.MusicSource.Standard.MainSource.playOnAwake = false;
-            MusicManager.MusicSource.Standard.MainSource.loop = TrackList.TrackListLoops;
-            MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(0);
+            MusicManager.MusicSource.Standard.MainSource.loop = Playlist.TrackListLoops;
+            MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(0);
             MusicManager.MusicSource.Standard.MainSource.clip = audioClip;
             
             MusicManager.MusicSource.Standard.MainSource.mute =
@@ -288,15 +288,15 @@ namespace CarterGames.Assets.AudioManager
         
         public void SetTrack(AudioClip audioClip)
         {
-            if (!TrackList.GetTracks().Contains(audioClip))
+            if (!Playlist.GetTracks().Contains(audioClip))
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
             
             MusicManager.MusicSource.Standard.MainSource.playOnAwake = false;
-            MusicManager.MusicSource.Standard.MainSource.loop = TrackList.TrackListLoops;
-            MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(0);
+            MusicManager.MusicSource.Standard.MainSource.loop = Playlist.TrackListLoops;
+            MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(0);
             MusicManager.MusicSource.Standard.MainSource.clip = audioClip;
             
             MusicManager.MusicSource.Standard.MainSource.mute =
@@ -343,11 +343,11 @@ namespace CarterGames.Assets.AudioManager
             
             yield return null;
             
-            if (MusicManager.MusicSource.Standard.MainSource.time >= TrackList.GetEndTime(0))
+            if (MusicManager.MusicSource.Standard.MainSource.time >= Playlist.GetEndTime(0))
             {
-                if (TrackList.TrackListLoops)
+                if (Playlist.TrackListLoops)
                 {
-                    MusicManager.MusicSource.Standard.MainSource.time = TrackList.GetStartTime(0);
+                    MusicManager.MusicSource.Standard.MainSource.time = Playlist.GetStartTime(0);
                     MusicManager.Looped.Raise();
                 }
                 else

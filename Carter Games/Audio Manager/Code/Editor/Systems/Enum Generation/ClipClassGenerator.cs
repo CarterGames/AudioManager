@@ -67,13 +67,13 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                 if (data == null)
                 {
-                    AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorNoData));
+                    AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorNoData));
                 }
                 else
                 {
                     if (data.Count <= 0)
                     {
-                        AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorNoData));
+                        AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorNoData));
                     }
                     else
                     {
@@ -87,7 +87,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                                 DupeLookup[parsedName]++;
                                 dupeChangedName = $"{parsedName}{DupeLookup[parsedName]}";
 
-                                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructElementNameAlreadyExists));
+                                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructElementNameAlreadyExists));
                             }
 
 
@@ -102,7 +102,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 #pragma warning disable
                             catch (Exception e)
                             {
-                                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorElementFailed));
+                                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorElementFailed));
                             }
 #pragma warning restore
                         }

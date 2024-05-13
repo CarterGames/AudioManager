@@ -41,7 +41,11 @@ namespace CarterGames.Assets.AudioManager
         |   IAudioEditModule
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
+        /// <summary>
+        /// Gets if the edits should process when looping
+        /// </summary>
         public bool ProcessOnLoop => false;
+        
         
         /// <summary>
         /// Processes the edit when called.
