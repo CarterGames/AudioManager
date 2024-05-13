@@ -199,8 +199,6 @@ namespace CarterGames.Assets.AudioManager
             var player = ActivePlaylist.GetMusicPlayer();
 
             player.Playlist = ActivePlaylist;
-
-            AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup["MyTrackListId"].GetTracks();
             
             return player;
         }
