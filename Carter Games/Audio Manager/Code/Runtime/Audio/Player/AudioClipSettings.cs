@@ -48,7 +48,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Creates a new clip settings class with the options desired.
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="options">The options to apply.</param>
         public AudioClipSettings(IEnumerable<IEditModule> options)
         {
             Edits = new Dictionary<Type, IEditModule>();

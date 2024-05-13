@@ -126,7 +126,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (musicPlayer == null)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
                 return;
             }
             
@@ -141,7 +141,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (musicPlayer == null)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
                 return;
             }
             
@@ -156,7 +156,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (musicPlayer == null)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
                 return;
             }
             
@@ -172,7 +172,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (musicPlayer == null)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlayerNotInitialized));
                 return;
             }
             

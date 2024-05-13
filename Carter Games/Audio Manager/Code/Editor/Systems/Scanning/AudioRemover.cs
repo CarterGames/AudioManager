@@ -30,9 +30,16 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// </summary>
     public sealed class AudioRemover : UnityEditor.AssetModificationProcessor
     {
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Fields
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+        
         private static int loggedDataRemovals = 0;
         private static int loggedMixerRemovals = 0;
         
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   AssetModificationProcessor Implementation
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
         private static AssetDeleteResult OnWillDeleteAsset(string assetPath, RemoveAssetOptions options)
         {
@@ -40,6 +47,9 @@ namespace CarterGames.Assets.AudioManager.Editor
             return AssetDeleteResult.DidNotDelete;
         }
         
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Methods
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         private static void RemoveNullEntriesInLibrary(string removed)
         {
@@ -200,13 +210,11 @@ namespace CarterGames.Assets.AudioManager.Editor
             for (var i = 0; i < UtilEditor.LibraryObject.Fp("tracks").Fpr("list").arraySize; i++)
             {
                 var keyPair = UtilEditor.LibraryObject.Fp("tracks").Fpr("list").GetIndex(i);
-                var adjusted = 0;
                     
                 for (var j = 0; j < keyPair.Fpr("value").Fpr("tracks").arraySize; j++)
                 {
-                    if (clipName != keyPair.Fpr("value").Fpr("tracks").GetIndex(j - adjusted).Fpr("clipKey").stringValue) continue;
-                    keyPair.Fpr("value").Fpr("tracks").DeleteIndex(j - adjusted);
-                    adjusted += 1;
+                    if (clipName != keyPair.Fpr("value").Fpr("tracks").GetIndex(j).Fpr("clipId").stringValue) continue;
+                    keyPair.Fpr("value").Fpr("tracks").DeleteIndex(j);
                 }
             }
         }

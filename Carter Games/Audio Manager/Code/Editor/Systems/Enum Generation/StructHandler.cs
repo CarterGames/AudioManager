@@ -133,7 +133,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         }
         
         
-        [MenuItem("Tools/Carter Games/Audio Manager/Reset Music Track Helper Class", priority = 35)]
+        [MenuItem("Tools/Carter Games/Audio Manager/Reset Music Playlist Helper Class", priority = 35)]
         private static void ResetTrackClass()
         {
             GenerateEmptyClass(TrackGenerator);

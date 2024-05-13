@@ -144,7 +144,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     if (UtilEditor.FileExistsByFilter(UtilEditor.AudioPrefabName)) 
                         audioPrefab = UtilEditor.AudioPrefab;
                     else
-                        AmLog.Error("Unable to find the default audio prefab, setting to null.");
+                        AmDebugLogger.Error("Unable to find the default audio prefab, setting to null.");
                     
                     AudioManagerEditorEvents.OnSettingsReset.Raise();
                 }

@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace CarterGames.Assets.AudioManager
 {
@@ -33,7 +32,7 @@ namespace CarterGames.Assets.AudioManager
     /// Contains all the data for a track list of music.
     /// </summary>
     [Serializable]
-    public sealed class MusicTrackList
+    public sealed class MusicPlaylist
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
@@ -41,7 +40,7 @@ namespace CarterGames.Assets.AudioManager
 
         [SerializeField] private string listKey;
         [SerializeField] private List<MusicTrack> tracks;
-        [SerializeField] private TrackType trackListType;
+        // [SerializeField] private TrackType playlistType;
         [SerializeField] private bool loop = true;
         [SerializeField] private bool shuffle = false;
 
@@ -61,10 +60,11 @@ namespace CarterGames.Assets.AudioManager
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
+        // For a future update...
         /// <summary>
         /// Gets the type of track list this list is.
         /// </summary>
-        public TrackType TrackListType => trackListType;
+        // public TrackType PlaylistType => playlistType;
         
         
         /// <summary>
@@ -260,18 +260,28 @@ namespace CarterGames.Assets.AudioManager
         public IMusicPlayer GetMusicPlayer()
         {
             if (playerRef != null) return playerRef;
-            
-            switch (trackListType)
+
+            if (tracks.Count > 0)
             {
-                case TrackType.Single:
-                    playerRef = new SingleMusicTrackPlayer();
-                    break;
-                case TrackType.Playlist:
-                    playerRef = new PlaylistMusicTrackPlayer();
-                    break;
-                default:
-                    break;
+                playerRef = new SingleMusicTrackPlayer();
             }
+            else
+            {
+                playerRef = new PlaylistMusicTrackPlayer();
+            }
+            
+            // For future updates when layered music is added in....
+            // switch (playlistType)
+            // {
+            //     case TrackType.Single:
+            //         playerRef = new SingleMusicTrackPlayer();
+            //         break;
+            //     case TrackType.Playlist:
+            //         playerRef = new PlaylistMusicTrackPlayer();
+            //         break;
+            //     default:
+            //         break;
+            // }
 
             return playerRef;
         }

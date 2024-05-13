@@ -21,19 +21,24 @@
  * THE SOFTWARE.
  */
 
-namespace CarterGames.Assets.AudioManager
+using System;
+using System.Linq;
+
+namespace CarterGames.Assets.AudioManager.Editor
 {
-    public enum TrackType
+    public static class InterfaceHelper
     {
         /// <summary>
-        /// A single track that can loop.
+        /// Gets all the interface implementations and returns the result (Editor Only)
         /// </summary>
-        Single = 0,
-        
-        
-        /// <summary>
-        /// A list of tracks that can played through.
-        /// </summary>
-        Playlist = 1,
+        /// <returns>An Array of the interface type</returns>
+        public static T[] GetAllInterfacesInstancesOfType<T>()
+        {
+            var types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => x.IsClass && typeof(T).IsAssignableFrom(x));
+
+            return types.Select(type => (T)Activator.CreateInstance(type)).ToArray();
+        }
     }
 }

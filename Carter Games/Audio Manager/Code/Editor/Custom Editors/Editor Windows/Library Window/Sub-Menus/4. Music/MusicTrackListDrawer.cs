@@ -50,12 +50,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         public static void DrawTracks(SerializedProperty prop)
         {
             var list = prop.Fpr("value").Fpr("tracks");
-            var playType = prop.Fpr("value").Fpr("trackListType");
+            // var playType = prop.Fpr("value").Fpr("playlistType");
             
             EditorGUILayout.BeginVertical("HelpBox");
             
             GUI.color = UtilEditor.Yellow;
-            EditorGUILayout.LabelField("Clips Assigned", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Tracks", EditorStyles.boldLabel);
             GUI.color = Color.white;
             
             UtilEditor.DrawHorizontalGUILine();
@@ -102,7 +102,8 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.BeginHorizontal();
                 GUILayout.Space(1.5f);
                 
-                EditorGUI.BeginDisabledGroup(playType.intValue == 0 && i > 0);
+                EditorGUI.BeginDisabledGroup(list.arraySize == 1 && i > 0);
+                // EditorGUI.BeginDisabledGroup(playType.intValue == 0 && i > 0);
                 
                 if (string.IsNullOrEmpty(list.GetIndex(i).Fpr("clipId").stringValue))
                 {
@@ -141,7 +142,8 @@ namespace CarterGames.Assets.AudioManager.Editor
                 GUILayout.Space(1.5f);
                 
                 EditorGUI.EndDisabledGroup();
-                EditorGUI.BeginDisabledGroup(playType.intValue == 0);
+                // EditorGUI.BeginDisabledGroup(list.arraySize == 1);
+                // EditorGUI.BeginDisabledGroup(playType.intValue == 0);
                 
                 GUI.backgroundColor = UtilEditor.Green;
                 if (GUILayout.Button(" + ", GUILayout.MaxWidth(22.5f)))
@@ -155,7 +157,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     return;
                 }
                 
-                EditorGUI.EndDisabledGroup();
+                // EditorGUI.EndDisabledGroup();
                 
                 GUI.backgroundColor = UtilEditor.Red;
                 if (GUILayout.Button(" - ", GUILayout.MaxWidth(22.5f)))

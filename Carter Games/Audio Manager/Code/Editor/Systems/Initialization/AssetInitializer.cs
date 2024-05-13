@@ -21,38 +21,93 @@
  * THE SOFTWARE.
  */
 
+using System.Linq;
+using System.Threading.Tasks;
+using CarterGames.Common;
 using UnityEditor;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
     /// <summary>
-    /// Handles the auto setup of the save manager when the assets are changed in the project.
+    /// Handles any initial listeners in the project for the asset.
     /// </summary>
-    public sealed class AssetInitializer : AssetPostprocessor
+    public static class AssetInitializer
     {
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Fields
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        // The key for if the asset has been initialized.
+        private static readonly string AssetInitializeKey = $"{FileEditorUtil.AssetName}_Session_EditorInitialize";
+        
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Properties
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        /// <summary>
+        /// Gets if the asset is initialized or not. 
+        /// </summary>
+        public static bool IsInitialized
+        {
+            get => SessionState.GetBool(AssetInitializeKey, false);
+            private set => SessionState.SetBool(AssetInitializeKey, value);
+        }
+
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Events
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        /// <summary>
+        /// Is raised when the asset is initialized.
+        /// </summary>
+        public static readonly Evt Initialized = new Evt();
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Runs after assets have imported / script reload etc at a safe time to edit assets.
+        /// Initializes the editor logic for the asset when called.
         /// </summary>
-        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets,
-            string[] movedFromAssetPaths)
-        {
-            TryInitialize();
-        }
-        
-        
-        /// <summary>
-        /// Creates the scriptable objects for the asset if they don't exist yet.
-        /// </summary>
+        [InitializeOnLoadMethod]
         private static void TryInitialize()
         {
-            if (UtilEditor.HasInitialized) return;
-            UtilEditor.Initialize();
+            if (IsInitialized) return;
+            InitializeEditorClasses();
+        }
+
+
+        /// <summary>
+        /// Runs through all interfaces for initializing the editor asset logic and runs each in the defined order.
+        /// </summary>
+        private static async void InitializeEditorClasses()
+        {
+            var initClasses = InterfaceHelper.GetAllInterfacesInstancesOfType<IAssetEditorInitialize>();
+            
+            if (initClasses.Length > 0)
+            {
+                foreach (var init in initClasses.OrderBy(t => t.InitializeOrder))
+                {
+                    init.OnEditorInitialized();
+                    await Task.Yield();
+                }
+            }
+
+            OnAllClassesInitialized();
+        }
+        
+
+
+        /// <summary>
+        /// Runs any post initialize logic to complete the process.
+        /// </summary>
+        private static void OnAllClassesInitialized()
+        {
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+            
+            IsInitialized = true;
+            Initialized.Raise();
         }
     }
 }

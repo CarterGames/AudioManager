@@ -74,8 +74,8 @@ namespace CarterGames.Assets.AudioManager
                 $"{AudioManagerErrorCode.StructElementNameAlreadyExists}\nThere was another entry in the struct with the same name."
             },
             {
-                AudioManagerErrorCode.MusicTrackListNotSet,
-                $"{AudioManagerErrorCode.MusicTrackListNotSet}\nYou need to set the track list before trying to transition it. Use MusicManager.SetTrackList() to assign it if you are not using MusicManager.Play()"
+                AudioManagerErrorCode.MusicPlaylistNotSet,
+                $"{AudioManagerErrorCode.MusicPlaylistNotSet}\nYou need to set the playlist before trying to transition it. Use MusicManager.SetPlaylist() to assign it if you are not using MusicManager.Play()."
             },
         };
 

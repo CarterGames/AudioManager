@@ -39,7 +39,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// The track list that is currently playing.
         /// </summary>
-        private static MusicTrackList ActiveTrackList { get; set; } = null;
+        private static MusicPlaylist ActivePlaylist { get; set; } = null;
         
         
         /// <summary>
@@ -60,7 +60,7 @@ namespace CarterGames.Assets.AudioManager
         public static AudioClip ActiveClip => MusicSource.Standard.MainSource.clip;
 
 
-        private static bool CanUse => ActiveTrackList != null;
+        private static bool CanUse => ActivePlaylist != null;
         
         
         /// <summary>
@@ -180,26 +180,28 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Prepares a player for use, but doesn't play it.
         /// </summary>
-        /// <param name="id">The track list id to get.</param>
+        /// <param name="playlistId">The track list id to get.</param>
         /// <returns>The player prepared for use.</returns>
-        public static IMusicPlayer Prepare(string id)
+        public static IMusicPlayer Prepare(string playlistId)
         {
-            var list = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(id);
+            var list = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(playlistId);
             
             if (list != null)
             {
-                ActiveTrackList = list;
+                ActivePlaylist = list;
             }
             else
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
                 return null;
             }
             
-            var player = ActiveTrackList.GetMusicPlayer();
+            var player = ActivePlaylist.GetMusicPlayer();
 
-            player.TrackList = ActiveTrackList;
+            player.Playlist = ActivePlaylist;
 
+            AssetAccessor.GetAsset<AudioLibrary>().MusicTrackLookup["MyTrackListId"].GetTracks();
+            
             return player;
         }
         
@@ -207,27 +209,27 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Prepares a player for use, but doesn't play it.
         /// </summary>
-        /// <param name="id">The track list id to get.</param>
+        /// <param name="playlistId">The track list id to get.</param>
         /// <param name="firstTrack">The track clip name to first play.</param>
         /// <returns>The player prepared for use.</returns>
-        public static IMusicPlayer Prepare(string id, string firstTrack)
+        public static IMusicPlayer Prepare(string playlistId, string firstTrack)
         {
-            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(id);
+            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(playlistId);
             
             if (trackList != null)
             {
-                ActiveTrackList = trackList;
+                ActivePlaylist = trackList;
             }
             else
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
                 return null;
             }
             
-            var player = ActiveTrackList.GetMusicPlayer();
+            var player = ActivePlaylist.GetMusicPlayer();
             
-            player.TrackList = ActiveTrackList;
-            player.SetFirstTrack(ActiveTrackList.GetTrack(firstTrack));
+            player.Playlist = ActivePlaylist;
+            player.SetFirstTrack(ActivePlaylist.GetTrack(firstTrack));
             ActiveId = firstTrack;
                 
             return player;
@@ -237,28 +239,28 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Prepares a player for use, but doesn't play it.
         /// </summary>
-        /// <param name="id">The track list id to get.</param>
+        /// <param name="playlistId">The track list id to get.</param>
         /// <param name="firstTrackIndex">The index of the first track to play in the list.</param>
         /// <returns>The player prepared for use.</returns>
-        public static IMusicPlayer Prepare(string id, int firstTrackIndex)
+        public static IMusicPlayer Prepare(string playlistId, int firstTrackIndex)
         {
-            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(id);
+            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(playlistId);
             
             if (trackList != null)
             {
-                ActiveTrackList = trackList;
+                ActivePlaylist = trackList;
             }
             else
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
                 return null;
             }
             
-            var player = ActiveTrackList.GetMusicPlayer();
+            var player = ActivePlaylist.GetMusicPlayer();
 
-            player.TrackList = ActiveTrackList;
-            player.SetFirstTrack(ActiveTrackList.GetTracks()[firstTrackIndex]);
-            ActiveId = ActiveTrackList.GetTracksRaw()[firstTrackIndex].ClipId;
+            player.Playlist = ActivePlaylist;
+            player.SetFirstTrack(ActivePlaylist.GetTracks()[firstTrackIndex]);
+            ActiveId = ActivePlaylist.GetTracksRaw()[firstTrackIndex].ClipId;
                 
             return player;
         }
@@ -267,28 +269,28 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Plays the music track list of the entered id.
         /// </summary>
-        /// <param name="id">The id to play.</param>
+        /// <param name="playlistId">The id to play.</param>
         /// <param name="volume">The volume for the audio source to play at.</param>
-        public static void Play(string id, float volume = 1f)
+        public static void Play(string playlistId, float volume = 1f)
         {
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayMusic)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicDisabled));
                 return;
             }
 
-            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(id);
+            var trackList = AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(playlistId);
             
             if (trackList != null)
             {
-                var player = Prepare(id);
+                var player = Prepare(playlistId);
                 player.Volume = volume;
                 
                 Play(trackList);
             }
             else
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
             }
         }
 
@@ -296,28 +298,28 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Plays the music track list of the entered id.
         /// </summary>
-        /// <param name="trackList">The list to play.</param>
+        /// <param name="playlist">The list to play.</param>
         /// <param name="volume">The volume for the audio source to play at.</param>
-        private static void Play(MusicTrackList trackList, float volume = 1f)
+        private static void Play(MusicPlaylist playlist, float volume = 1f)
         {
             if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().CanPlayMusic)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicDisabled));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicDisabled));
                 return;
             }
 
-            if (trackList == null)
+            if (playlist == null)
             {
-                AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+                AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
                 return;
             }
 
-            ActiveTrackList = trackList;
+            ActivePlaylist = playlist;
             
-            Player = ActiveTrackList.GetMusicPlayer();
+            Player = ActivePlaylist.GetMusicPlayer();
             Player.Volume = volume;
 
-            Player.TrackList = ActiveTrackList;
+            Player.Playlist = ActivePlaylist;
             Player.TransitionIn();
             Player.Play();
         }
@@ -377,7 +379,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Transitions in the active player when called.
         /// </summary>
-        public static void TransitionIn()
+        public static void TransitionPlayerIn()
         {
             Player.TransitionIn();
         }
@@ -386,7 +388,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Transitions out the active player when called.
         /// </summary>
-        public static void TransitionOut()
+        public static void TransitionPlayerOut()
         {
             Player.TransitionOut();
         }
@@ -395,28 +397,28 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Transitions the active player when called to the new clip.
         /// </summary>
-        /// <param name="clip">The clip to transition to.</param>
-        public static void TransitionTo(string clip)
+        /// <param name="trackId">The clip to transition to.</param>
+        public static void TransitionToTrack(string trackId)
         {
             if (!CanUse)
             {
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicTrackListNotSet));
+                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlaylistNotSet));
                 return;
             }
             
-            if (!ActiveTrackList.LibraryHasTrackClip(clip) && !ActiveTrackList.TrackIsInList(clip))
+            if (!ActivePlaylist.LibraryHasTrackClip(trackId) && !ActivePlaylist.TrackIsInList(trackId))
             {   
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
+                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
             
-            ActiveId = clip;
+            ActiveId = trackId;
             
-            Player.Transition.Data.AddParam("musicClip", ActiveTrackList.GetTrack(clip));
-            Player.Transition.Data.AddParam("musicClipStartTime", ActiveTrackList.GetStartTime(clip));
+            Player.Transition.Data.AddParam("musicClip", ActivePlaylist.GetTrack(trackId));
+            Player.Transition.Data.AddParam("musicClipStartTime", ActivePlaylist.GetStartTime(trackId));
             
-            Player.DefaultVolumeTransition.Data.AddParam("musicClip", ActiveTrackList.GetTrack(clip));
-            Player.DefaultVolumeTransition.Data.AddParam("musicClipStartTime", ActiveTrackList.GetStartTime(clip));
+            Player.DefaultVolumeTransition.Data.AddParam("musicClip", ActivePlaylist.GetTrack(trackId));
+            Player.DefaultVolumeTransition.Data.AddParam("musicClipStartTime", ActivePlaylist.GetStartTime(trackId));
             
             Player.Transition.Transition(TransitionDirection.InAndOut);
         }
@@ -425,38 +427,38 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Transitions the active player when called to the new clip.
         /// </summary>
-        /// <param name="clip">The clip to transition to.</param>
+        /// <param name="trackId">The clip to transition to.</param>
         /// <param name="musicTransition">The transition to use.</param>
         /// <param name="duration">The duration for the transition. Def: 1f</param>
-        public static void TransitionTo(string clip, MusicTransition musicTransition, float duration = 1f)
+        public static void TransitionToTrack(string trackId, MusicTransition musicTransition, float duration = 1f)
         {
-            TransitionTo(clip, GetTransitionFromEnum(musicTransition, duration));
+            TransitionToTrack(trackId, GetTransitionFromEnum(musicTransition, duration), duration);
         }
         
         
         /// <summary>
         /// Transitions the active player when called to the new clip.
         /// </summary>
-        /// <param name="clip">The clip to transition to.</param>
+        /// <param name="trackId">The clip to transition to.</param>
         /// <param name="musicTransition">The transition to use.</param>
         /// <param name="duration">The duration for the transition. Def: 1f</param>
-        public static void TransitionTo(string clip, IMusicTransition musicTransition, float duration = 1f)
+        public static void TransitionToTrack(string trackId, IMusicTransition musicTransition, float duration = 1f)
         {
             if (!CanUse)
             {
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicTrackListNotSet));
+                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MusicPlaylistNotSet));
                 return;
             }
             
-            if (!ActiveTrackList.LibraryHasTrackClip(clip) && !ActiveTrackList.TrackIsInList(clip))
+            if (!ActivePlaylist.LibraryHasTrackClip(trackId) && !ActivePlaylist.TrackIsInList(trackId))
             {   
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
+                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackClipNotInListOrLibrary));
                 return;
             }
 
-            ActiveId = clip;
-            musicTransition.Data.AddParam("musicClip", ActiveTrackList.GetTrack(clip));
-            musicTransition.Data.AddParam("musicClipStartTime", ActiveTrackList.GetStartTime(clip));
+            ActiveId = trackId;
+            musicTransition.Data.AddParam("musicClip", ActivePlaylist.GetTrack(trackId));
+            musicTransition.Data.AddParam("musicClipStartTime", ActivePlaylist.GetStartTime(trackId));
             musicTransition.Data.AddParam("duration", duration);
             musicTransition.Transition(TransitionDirection.InAndOut);
         }
@@ -486,32 +488,32 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Sets the active track list and player, but nothing else.
         /// </summary>
-        /// <param name="trackListId">The track list to use.</param>
-        public static void SetTrackList(string trackListId)
+        /// <param name="playlistId">The track list to use.</param>
+        public static void SetPlaylist(string playlistId)
         {
-            SetTrackList(AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(trackListId));
+            SetPlaylist(AssetAccessor.GetAsset<AudioLibrary>().GetTrackList(playlistId));
         }
         
         
         /// <summary>
         /// Sets the active track list and player, but nothing else.
         /// </summary>
-        /// <param name="trackList">The track list to use.</param>
-        public static void SetTrackList(MusicTrackList trackList)
+        /// <param name="playlist">The track list to use.</param>
+        public static void SetPlaylist(MusicPlaylist playlist)
         {
-            if (trackList == null)
+            if (playlist == null)
             {
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
                 return;
             }
             
-            if (ActiveTrackList != trackList)
+            if (ActivePlaylist != playlist)
             {
-                ActiveTrackList = trackList;
+                ActivePlaylist = playlist;
             }
 
             if (Player != null) return;
-            Player = ActiveTrackList.GetMusicPlayer();
+            Player = ActivePlaylist.GetMusicPlayer();
         }
     }
 }

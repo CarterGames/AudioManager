@@ -28,36 +28,14 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// <summary>
     /// Handles the initial scan when the asset is imported.
     /// </summary>
-    public static class FirstScan
+    public class FirstScan : IAssetEditorReload
     {
-        /// <summary>
-        /// Runs when the editor is opened...
-        /// </summary>
-        [InitializeOnLoadMethod]
-        private static void Init()
+        public void OnEditorReloaded()
         {
             if (PerUserSettings.ScannerInitialized || UtilEditor.Library.LibraryLookup.Count > 0)
             {
-                EditorApplication.update -= ShowFirstScan;
-                return;
+                ShowFirstScan();
             }
-
-            EditorApplication.update -= ShowFirstScan;
-            EditorApplication.update += ShowFirstScan;
-        }
-
-
-        [InitializeOnLoadMethod]
-        private static void InitSettings()
-        {
-            if (UtilEditor.RuntimeSettings.SequencePrefab != null)
-            {
-                EditorApplication.delayCall -= UtilEditor.RuntimeSettings.Initialize;
-                return;
-            }
-            
-            EditorApplication.delayCall -= UtilEditor.RuntimeSettings.Initialize;
-            EditorApplication.delayCall += UtilEditor.RuntimeSettings.Initialize;
         }
 
 

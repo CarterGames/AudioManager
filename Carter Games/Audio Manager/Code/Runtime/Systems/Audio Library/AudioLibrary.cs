@@ -49,7 +49,7 @@ namespace CarterGames.Assets.AudioManager
         [SerializeField] private SerializableDictionary<string, MixerData> mixers;
         [SerializeField] private SerializableDictionary<string, string> mixersReverseLookup;
         
-        [SerializeField] private SerializableDictionary<string, MusicTrackList> tracks;
+        [SerializeField] private SerializableDictionary<string, MusicPlaylist> tracks;
         [SerializeField] private SerializableDictionary<string, string> tracksReverseLookup;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -126,7 +126,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Gets a lookup of all the music tracks in the library.
         /// </summary>
-        public Dictionary<string, MusicTrackList> MusicTrackLookup => tracks;
+        public Dictionary<string, MusicPlaylist> MusicTrackLookup => tracks;
         
         
         /// <summary>
@@ -155,7 +155,7 @@ namespace CarterGames.Assets.AudioManager
                 return LibraryLookup[request];
             }
             
-            AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.ClipCannotBeFound));
+            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.ClipCannotBeFound));
             return null;
         }
         
@@ -177,7 +177,7 @@ namespace CarterGames.Assets.AudioManager
                 return GroupsLookup[request];
             }
             
-            AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.GroupCannotBeFound));
+            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.GroupCannotBeFound));
             return null;
         }
 
@@ -199,7 +199,7 @@ namespace CarterGames.Assets.AudioManager
                 return MixerLookup[request].MixerGroup;
             }
             
-            AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MixerCannotBeFound));
+            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MixerCannotBeFound));
             return null;
         }
         
@@ -209,7 +209,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         /// <param name="request">The requested string.</param>
         /// <returns>The track list found.</returns>
-        public MusicTrackList GetTrackList(string request)
+        public MusicPlaylist GetTrackList(string request)
         {
             if (ReverseTrackListLookup.ContainsKey(request))
             {
@@ -221,7 +221,7 @@ namespace CarterGames.Assets.AudioManager
                 return MusicTrackLookup[request];
             }
             
-            AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
+            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
             return null;
         }
 
@@ -249,7 +249,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (Application.isPlaying)
             {
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.EditorOnlyMethod));
+                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.EditorOnlyMethod));
                 return;
             }
 
@@ -274,7 +274,7 @@ namespace CarterGames.Assets.AudioManager
             
             if (Application.isPlaying)
             {
-                AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.EditorOnlyMethod));
+                AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.EditorOnlyMethod));
                 return;
             }
 

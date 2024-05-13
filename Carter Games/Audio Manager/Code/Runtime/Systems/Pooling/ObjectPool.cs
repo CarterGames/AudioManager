@@ -145,7 +145,7 @@ namespace CarterGames.Assets.AudioManager
 
             if (!ShouldExpand)
             {
-                AmLog.Normal("No free member objects to return.");
+                AmDebugLogger.Normal("No free member objects to return.");
                 return default;
             }
             

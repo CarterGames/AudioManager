@@ -23,6 +23,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using CarterGames.Assets.AudioManager.Logging;
 using CarterGames.Common.Serializiation;
 using UnityEditor;
 using UnityEngine;
@@ -34,12 +35,15 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// Scans for audio clips when a new audio clip is added to the project...
     /// </summary>
     [DefaultExecutionOrder(1000)]
-    public sealed class AudioScanner : AssetPostprocessor
+    public sealed class AudioScanner : AssetPostprocessor, IAssetEditorReload
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+        private static bool ShouldUpdate { get; set; }
+        private static string[] LastImportedAssets { get; set; }
+        
         private static bool LibraryExists => ScriptableRef.HasLibraryFile;
 
 
@@ -54,6 +58,16 @@ namespace CarterGames.Assets.AudioManager.Editor
                 if (assets == null) return false;
                 return assets.Length > 0;
             }
+        }
+        
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   IAssetEditorReload Implementation
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+        
+        public void OnEditorReloaded()
+        {
+            if (!ShouldUpdate) return;
+            UpdateLibraryAsset();
         }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -85,39 +99,45 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   AssetPostprocessors
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
+        
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
             string[] movedAssets,
             string[] movedFromAssetPaths)
         {
             if (importedAssets.Length > 0 && movedAssets.Length <= 0 && movedFromAssetPaths.Length <= 0)
             {
-                if (!UtilEditor.HasInitialized)
-                {
-                    UtilEditor.Initialize();
-                }
-
-                CheckForAudioIfEmpty();
-                AudioRemover.RemoveNullLibraryEntries();
-
-                if (importedAssets.Any(t => t.Contains(".mixer")))
-                {
-                    UtilEditor.SetLibraryMixerGroups(GetAllMixersInProject());
-                    StructHandler.RefreshMixers();
-                }
-
-                if (!PerUserSettings.ScannerHasNewAudioClip) return;
-
-                ScanForAudio(false);
-
-                PerUserSettings.ScannerHasNewAudioClip = false;
+                ShouldUpdate = true;
+                LastImportedAssets = importedAssets;
             }
+        }
+        
+
+        private static void UpdateLibraryAsset()
+        {
+            // AmDebugLogger.Normal($"Update Library: {ShouldUpdate}");
+            
+            CheckForAudioIfEmpty();
+            AudioRemover.RemoveNullLibraryEntries();
+
+            if (LastImportedAssets.Any(t => t.Contains(".mixer")))
+            {
+                UtilEditor.SetLibraryMixerGroups(GetAllMixersInProject());
+                StructHandler.RefreshMixers();
+            }
+
+            if (!PerUserSettings.ScannerHasNewAudioClip) return;
+
+            ScanForAudio(false);
+
+            PerUserSettings.ScannerHasNewAudioClip = false;
+            ShouldUpdate = false;
         }
 
 
         private void OnPostprocessAudio(AudioClip a)
         {
             PerUserSettings.ScannerHasNewAudioClip = true;
+            ShouldUpdate = true;
         }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────

@@ -49,7 +49,7 @@ namespace CarterGames.Assets.AudioManager
         TrackClipNotInListOrLibrary = 7,                // (Runtime) Track/AudioClip not in the track list that is being played.
         TransitionDataParameterNotFound = 8,            // (Runtime) Transition missing a parameter value.
         MusicPlayerNotInitialized = 9,                  // (Runtime) When a music player is null when a call was made.
-        MusicTrackListNotSet = 10,                      // (Runtime) When the user tries to play a track from a list before it is assigned.
+        MusicPlaylistNotSet = 10,                      // (Runtime) When the user tries to play a track from a list before it is assigned.
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Editor Specific Errors

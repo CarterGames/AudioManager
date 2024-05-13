@@ -66,7 +66,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                 if (UtilEditor.Library.GroupsLookup.Count <= 0)
                 {
-                    AmLog.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorNoData));
+                    AmDebugLogger.Error(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorNoData));
                     StructHandler.WriteFooter(file);
                     return;
                 }
@@ -83,7 +83,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                             groupDupNameLookup[parsedName]++;
                             dupeChangedName = $"{parsedName}{groupDupNameLookup[parsedName]}";
 
-                            AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructElementNameAlreadyExists));
+                            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructElementNameAlreadyExists));
                         }
 
                         try
@@ -100,7 +100,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 #pragma warning disable
                         catch (Exception e)
                         {
-                            AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorElementFailed));
+                            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorElementFailed));
                         }
 #pragma warning restore
                     }
@@ -121,7 +121,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 #pragma warning disable
                         catch (Exception e)
                         {
-                            AmLog.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorElementFailed));
+                            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.StructGeneratorElementFailed));
                         }
 #pragma warning restore
                     }

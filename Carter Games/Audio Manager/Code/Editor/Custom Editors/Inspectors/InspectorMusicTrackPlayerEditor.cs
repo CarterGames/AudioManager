@@ -33,7 +33,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             GUILayout.Space(5f);
 
-            EditorGUILayout.LabelField("Track Info", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Playlist Info", EditorStyles.boldLabel);
             UtilEditor.DrawHorizontalGUILine();
             
             EditorGUILayout.BeginVertical("HelpBox");
@@ -43,7 +43,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 EditorGUILayout.BeginHorizontal();
                 
-                if (GUILayout.Button("Select Track List"))
+                if (GUILayout.Button("Select Playlist"))
                 {
                     trackSearchProvider ??= CreateInstance<TrackSearchProvider>();
                         
@@ -63,7 +63,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                 if (!string.IsNullOrEmpty(serializedObject.Fp("trackListId").stringValue))
                 {
-                    EditorGUILayout.TextField("Track List Id", UtilEditor.Library
+                    EditorGUILayout.TextField("Playlist Id", UtilEditor.Library
                         .MusicTrackLookup[serializedObject.Fp("trackListId").stringValue].ListKey);
                 }
                 else
@@ -97,7 +97,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 if (UtilEditor.Library.MusicTrackLookup.ContainsKey(serializedObject.Fp("trackListId").stringValue))
                 {
                     if (UtilEditor.Library.MusicTrackLookup[serializedObject.Fp("trackListId").stringValue]
-                            .TrackListType != TrackType.Single)
+                            .GetTracksRaw().Count > 1)
                     {
                         EditorGUI.BeginDisabledGroup(true);
                         EditorGUILayout.PropertyField(serializedObject.Fp("firstTrackId"));
@@ -202,7 +202,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 if (serializedObject.Fp("inTransitionDuration").floatValue < 0f)
                 {
-                    AmLog.Warning($"{AudioManagerErrorCode.InvalidMusicInspectorInput}\nTransition in cannot be a value below 0.");
+                    AmDebugLogger.Warning($"{AudioManagerErrorCode.InvalidMusicInspectorInput}\nTransition in cannot be a value below 0.");
                     serializedObject.Fp("inTransitionDuration").floatValue = 0f;
                 }
                 

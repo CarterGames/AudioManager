@@ -236,35 +236,6 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        public static void Initialize()
-        {
-            if (HasInitialized) return;
-            
-            AssetDatabase.Refresh();
-
-            if (ScriptableRef.assetIndexCache == null)
-            {
-                var index = AssetIndex;
-            }
-            
-            if (ScriptableRef.settingsAssetRuntimeCache == null)
-            {
-                var rSettings = RuntimeSettings;
-            }
-            
-            if (ScriptableRef.audioLibraryCache == null)
-            {
-                var library = Library;
-            }
-
-            AssetIndexHandler.UpdateIndex();
-            EditorUtility.SetDirty(AssetIndex);
-
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
-        }
-        
         
         /// <summary>
         /// Checks to see if a file exists in the editor.

@@ -112,7 +112,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                             if (loopCount < 0)
                             {
                                 loopCount = 0;
-                                AmLog.Warning($"{AudioManagerErrorCode.InvalidAudioClipInspectorInput}\nLoop count cannot have a value below 0 when using x times mode.");
+                                AmDebugLogger.Warning($"{AudioManagerErrorCode.InvalidAudioClipInspectorInput}\nLoop count cannot have a value below 0 when using x times mode.");
                             }
                             
                             EditModuleInspectorHelper.SetValue(targetObject, index, "loopCount", loopCount.ToString());

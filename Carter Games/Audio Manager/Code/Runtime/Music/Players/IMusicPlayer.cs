@@ -55,7 +55,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Gets the track list.
         /// </summary>
-        MusicTrackList TrackList { get; set; }
+        MusicPlaylist Playlist { get; set; }
         
         
         /// <summary>

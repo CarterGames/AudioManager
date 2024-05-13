@@ -72,7 +72,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             var searchList = new List<SearchTreeEntry>();
 
             // The group that names the search window popup when searching...
-            searchList.Add(new SearchTreeGroupEntry(new GUIContent("Search track lists"), 0));
+            searchList.Add(new SearchTreeGroupEntry(new GUIContent("Search playlists"), 0));
 
             foreach (var tracks in UtilEditor.Library.MusicTrackLookup)
             {
