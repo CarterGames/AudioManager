@@ -22,46 +22,56 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace CarterGames.Assets.AudioManager
+namespace CarterGames.Assets.AudioManager.Editor
 {
     /// <summary>
-    /// The data for an entry in the library...
+    /// Contains the result of a scan, which can be any type.
     /// </summary>
+    /// <typeparam name="T">The type to store.</typeparam>
     [Serializable]
-    public class AudioData
+    public sealed class AudioScanResult<T>
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        public string key;
-        public string id;
-        public string defaultKey;
-        public AudioClip value;
-        public string path;
-        public DynamicTime dynamicStartTime;
-        [SerializeField] private bool showDynamicTime;
+        [SerializeField] private List<T> foundData;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Constructors
+        |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Creates a new audio data with the key & clip entered.
+        /// Gets if there is any data stored.
         /// </summary>
-        /// <param name="key">The key to use.</param>
-        /// <param name="value">The clip data to use.</param>
-        /// <param name="path">The path of the clip.</param>
-        public AudioData(string key, AudioClip value, string path)
+        public bool HasData => foundData is { } && foundData.Count > 0;
+        
+        
+        /// <summary>
+        /// Gets the data stored.
+        /// </summary>
+        public List<T> Data => foundData;
+        
+        
+        /// <summary>
+        /// Gets the total number of entries in the data.
+        /// </summary>
+        public int DataCount => foundData.Count;
+        
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Properties
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+        
+        /// <summary>
+        /// Creates a new result with the entered data.
+        /// </summary>
+        /// <param name="data">The data to store.</param>
+        public AudioScanResult(List<T> data)
         {
-            id = $"{key}-{Guid.NewGuid().ToString()}";
-            this.key = key;
-            defaultKey = id;
-            this.value = value;
-            this.path = path;
-            dynamicStartTime = new DynamicTime();
+            foundData = data;
         }
     }
 }

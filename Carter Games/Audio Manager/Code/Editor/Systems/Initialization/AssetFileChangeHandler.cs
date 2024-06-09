@@ -24,20 +24,16 @@
 using System.Threading.Tasks;
 using CarterGames.Common;
 using UnityEditor;
-using UnityEditor.Callbacks;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
-    /// <summary>
-    /// Handles any reload listeners in the project for the asset.
-    /// </summary>
-    public static class AssetReloadHandler
+    public class AssetFileChangeHandler : AssetPostprocessor
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-        private static readonly string AssetReloadKey = $"{FileEditorUtil.AssetName}_Session_EditorReload";
+        private static readonly string AssetFileChangeKey = $"{FileEditorUtil.AssetName}_Session_EditorFileChange";
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
@@ -48,29 +44,26 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool HasProcessed
         {
-            get => SessionState.GetBool(AssetReloadKey, false);
-            private set => SessionState.SetBool(AssetReloadKey, value);
+            get => SessionState.GetBool(AssetFileChangeKey, false);
+            private set => SessionState.SetBool(AssetFileChangeKey, value);
         }
-        
+
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Events
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        /// <summary>
-        /// Raises when the reload has occured.
-        /// </summary>
-        public static readonly Evt Reloaded = new Evt();
+        public static readonly Evt ChangesDetected = new Evt();
         
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Methods
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        /// <summary>
-        /// Add subscription to the delay call when scripts reload.
-        /// </summary>
-        [DidReloadScripts]
-        private static void FireReloadCalls()
+        public override int GetPostprocessOrder() => 100;
+
+
+        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets,
+            string[] movedFromAssetPaths)
         {
+            if (importedAssets.Length <= 0 && deletedAssets.Length <= 0 && 
+                movedAssets.Length <= 0 && movedFromAssetPaths.Length <= 0) return;
+
             HasProcessed = false;
             
             if (EditorApplication.isCompiling || EditorApplication.isUpdating)
@@ -84,30 +77,26 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorApplication.delayCall += CallListeners;
         }
         
-
+        
         /// <summary>
         /// Updates all the listeners when called.
         /// </summary>
         private static async void CallListeners()
         {
-            var reloadClasses = InterfaceHelper.GetAllInterfacesInstancesOfType<IAssetEditorReload>();
+            if (HasProcessed) return;
             
-            if (reloadClasses.Length > 0)
+            var fileChangeClasses = InterfaceHelper.GetAllInterfacesInstancesOfType<IAssetEditorFileChanges>();
+            
+            if (fileChangeClasses.Length > 0)
             {
-                foreach (var init in reloadClasses)
+                foreach (var init in fileChangeClasses)
                 {
-                    init.OnEditorReloaded();
+                    init.OnEditorFileChanges();
                     await Task.Yield();
                 }
             }
-
-            OnReloadProcessed();
-        }
-
-        
-        private static void OnReloadProcessed()
-        {
-            Reloaded.Raise();
+            
+            ChangesDetected.Raise();
             HasProcessed = true;
         }
     }

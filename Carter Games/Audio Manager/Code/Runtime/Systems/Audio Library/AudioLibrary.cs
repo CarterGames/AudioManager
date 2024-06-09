@@ -289,5 +289,15 @@ namespace CarterGames.Assets.AudioManager
                 mixersReverseLookup.Add(key, uuid);
             }
         }
+
+        
+        public void ResetLibraryToDefault()
+        {
+            library.Clear();
+            libraryReverseLookup.Clear();
+            
+            mixers.Clear();
+            mixersReverseLookup.Clear();
+        }
     }
 }

@@ -79,6 +79,18 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                 return selectedPropertyCache;
             }
+            set
+            {
+                selectedPropertyCache = value;
+                SelectedPropertyKey = value.Fpr("key").stringValue;
+            }
+        }
+
+
+        public static string SelectedPropertyKey
+        {
+            get => SessionState.GetString("library-key", string.Empty);
+            set => SessionState.SetString("library-key", value);
         }
 
 
@@ -183,15 +195,19 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 if (UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(i) == null) continue;
                 
-                if (SelectedProperty != null)
+                if (UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(i).Fpr("key").stringValue == (SelectedPropertyKey))
                 {
-                    if (SelectedProperty.Fpr("value").Fpr("key").stringValue.Equals(UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue))
+                    if (SelectedProperty != null)
                     {
-                        GUI.backgroundColor = UtilEditor.Grey;
-                    }
-                    else
-                    {
-                        GUI.backgroundColor = Color.white;
+                        if (SelectedProperty.Fpr("value").Fpr("key").stringValue.Equals(UtilEditor.LibraryObject
+                                .Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue))
+                        {
+                            GUI.backgroundColor = UtilEditor.Grey;
+                        }
+                        else
+                        {
+                            GUI.backgroundColor = Color.white;
+                        }
                     }
                 }
 
@@ -199,7 +215,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 {
                     PerUserSettings.LastLibraryIndexShown = i;
                     
-                    selectedPropertyCache = UtilEditor.LibraryObject.Fp("library").Fpr("list")
+                    SelectedProperty = UtilEditor.LibraryObject.Fp("library").Fpr("list")
                         .GetIndex(PerUserSettings.LastLibraryIndexShown);
                 }
                 
@@ -229,7 +245,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             if (!CanUpdate) return;
             
-            if (SelectedProperty == null) return;
+            if (SelectedProperty == null || !UtilEditor.Library.LibraryLookup.ContainsKey(SelectedPropertyKey)) return;
             DrawLibraryRow(SelectedProperty);
         }
 
@@ -294,7 +310,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             if (prop.Fpr("value").Fpr("value").objectReferenceValue == null)
             {
-                AudioRemover.RemoveNullLibraryEntries();
+                // AudioRemover.RemoveNullLibraryEntries();
                 selectedPropertyCache = null;
                 return;
             }

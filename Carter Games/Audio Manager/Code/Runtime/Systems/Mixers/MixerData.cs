@@ -78,7 +78,6 @@ namespace CarterGames.Assets.AudioManager
         {
             this.uuid = uuid;
             this.key = key;
-            // path = AssetDatabase.GetAssetPath(mixerGroup);
             this.mixerGroup = mixerGroup;
         }
     }

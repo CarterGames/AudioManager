@@ -40,7 +40,6 @@ namespace CarterGames.Assets.AudioManager
 
         [SerializeField] private string listKey;
         [SerializeField] private List<MusicTrack> tracks;
-        // [SerializeField] private TrackType playlistType;
         [SerializeField] private bool loop = true;
         [SerializeField] private bool shuffle = false;
 
@@ -59,13 +58,6 @@ namespace CarterGames.Assets.AudioManager
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        // For a future update...
-        /// <summary>
-        /// Gets the type of track list this list is.
-        /// </summary>
-        // public TrackType PlaylistType => playlistType;
-        
         
         /// <summary>
         /// Gets if the track list should loop when completed.

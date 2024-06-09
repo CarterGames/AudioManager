@@ -21,60 +21,102 @@
  * THE SOFTWARE.
  */
 
-using UnityEditor;
+using System.Collections.Generic;
+using CarterGames.Assets.AudioManager.Logging;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
     /// <summary>
-    /// Handles the initial scan when the asset is imported.
+    /// Handles the cleaning up of any null mixer entries where the mixer group has been removed from the project but is still in the library.
     /// </summary>
-    public class FirstScan : IAssetEditorReload
+    public sealed class MixerCleanupScanProcess : IScanProcess
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   IAssetEditorReload Implementation
+        |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Runs when the editor is reloaded.
+        /// Stores all the null entry keys to clear.
         /// </summary>
-        public void OnEditorReloaded()
-        {
-            if (PerUserSettings.ScannerInitialized || UtilEditor.Library.LibraryLookup.Count > 0 && AudioScanner.AnyAudioInProject)
-            {
-                ShowFirstScan();
-            }
-        }
-
+        private List<string> NullEntryKeys { get; set; } = new List<string>();
+        
+        
+        /// <summary>
+        /// Defines the oder this scan processor runs in.
+        /// </summary>
+        public int Priority => 23;
+        
+        
+        /// <summary>
+        /// Defines if this processor did something or not.
+        /// </summary>
+        public bool DidSomething { get; set; }
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Shows the dialogue to scan for audio.
+        /// Works out if the library needs updates based on what this processor is used for.
         /// </summary>
-        private static void ShowFirstScan()
+        /// <returns>Gets if the library should be updated by this processor or not.</returns>
+        public bool ShouldUpdateLibrary()
         {
-            EditorApplication.update -= ShowFirstScan;
+            if (UtilEditor.Library.MixerLookup.Count <= 0) return false;
+            
+            NullEntryKeys.Clear();
 
-            if (PerUserSettings.ScannerInitialized) return;
-            
-            if (UtilEditor.Library.LibraryLookup.Count > 0)
+            foreach (var entry in UtilEditor.Library.MixerLookup)
             {
-                PerUserSettings.ScannerInitialized = true;
-                return;
-            }
-            
-            if (AudioScanner.AnyAudioInProject)
-            {
-                if (EditorUtility.DisplayDialog("Audio Library Scan",
-                        "Your library has no entries, do you want to scan for audio and mixer groups now?", "Scan",
-                        "Cancel"))
+                if (entry.Value.MixerGroup == null || (((object)entry.Value.MixerGroup) != null && !entry.Value.MixerGroup))
                 {
-                    ScanManager.ProcessHandlers();
+                    NullEntryKeys.Add(entry.Key);
                 }
             }
+
+            return NullEntryKeys.Count > 0;
+        }
+
+        
+        /// <summary>
+        /// Updates the library with the required changes when called.
+        /// </summary>
+        public void UpdateLibrary()
+        {
+            DidSomething = false;
             
-            PerUserSettings.ScannerInitialized = true;
+            if (NullEntryKeys.Count <= 0) return;
+
+            var lookup = UtilEditor.LibraryObject.Fp("mixers").Fpr("list");
+            var reverseLookup = UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list");
+            
+            foreach (var nullKey in NullEntryKeys)
+            {
+                var data = UtilEditor.Library.MixerLookup[nullKey];
+
+                if (PerUserSettings.DeveloperDebugMode)
+                {
+                    AmDebugLogger.Normal($"[Mixer cleanup]: removing: {nullKey}");
+                }
+
+                for (var j = 0; j < reverseLookup.arraySize; j++)
+                {
+                    if (reverseLookup.GetIndex(j).Fpr("key").stringValue != data.Key) continue;
+                    reverseLookup.DeleteIndex(j);
+                }
+                
+                
+                for (var j = 0; j < lookup.arraySize; j++)
+                {
+                    if (lookup.GetIndex(j).Fpr("key").stringValue != data.Uuid) continue;
+                    lookup.DeleteIndex(j);
+                }
+                
+                UtilEditor.LibraryObject.ApplyModifiedProperties();
+                UtilEditor.LibraryObject.Update();
+            }
+
+            DidSomething = true;
         }
     }
 }
