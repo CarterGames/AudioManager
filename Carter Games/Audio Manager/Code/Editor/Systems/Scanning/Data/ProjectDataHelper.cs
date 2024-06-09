@@ -21,47 +21,76 @@
  * THE SOFTWARE.
  */
 
-using System;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Audio;
 
-namespace CarterGames.Assets.AudioManager
+namespace CarterGames.Assets.AudioManager.Editor
 {
     /// <summary>
-    /// The data for an entry in the library...
+    /// A helper class for finding assets in the project.
     /// </summary>
-    [Serializable]
-    public class AudioData
+    public static class ProjectDataHelper
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        public string key;
-        public string id;
-        public string defaultKey;
-        public AudioClip value;
-        public string path;
-        public DynamicTime dynamicStartTime;
-        [SerializeField] private bool showDynamicTime;
-
+        private const string AudioClipFilter = "t:audioclip";        
+        private const string AudioMixerGroupFilter = "t:audiomixergroup";
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Constructors
+        |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Creates a new audio data with the key & clip entered.
+        /// Tries to get all audio clips in the project.
         /// </summary>
-        /// <param name="key">The key to use.</param>
-        /// <param name="value">The clip data to use.</param>
-        /// <param name="path">The path of the clip.</param>
-        public AudioData(string key, AudioClip value, string path)
+        /// <param name="clips">The clips found.</param>
+        /// <returns>If it was successful or not.</returns>
+        public static bool TryGetAllClipsInProject(out List<AudioClip> clips)
         {
-            id = $"{key}-{Guid.NewGuid().ToString()}";
-            this.key = key;
-            defaultKey = id;
-            this.value = value;
-            this.path = path;
-            dynamicStartTime = new DynamicTime();
+            clips = null;
+            
+            var assets = AssetDatabase.FindAssets(AudioClipFilter, null);
+
+            if (assets.Length <= 0) return false;
+
+            clips = new List<AudioClip>();
+
+            for (var i = 0; i < assets.Length; i++)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(assets[i]);
+                clips.Add((AudioClip)AssetDatabase.LoadAssetAtPath(path, typeof(AudioClip)));
+            }
+
+            return clips.Count > 0;
+        }
+        
+        
+        /// <summary>
+        /// Tries to get all audio mixer groups in the project.
+        /// </summary>
+        /// <param name="mixers">The mixer groups found.</param>
+        /// <returns>If it was successful or not.</returns>
+        public static bool TryGetAllMixersInProject(out List<AudioMixerGroup> mixers)
+        {
+            mixers = null;
+            
+            var assets = AssetDatabase.FindAssets(AudioMixerGroupFilter, null);
+
+            if (assets.Length <= 0) return false;
+
+            mixers = new List<AudioMixerGroup>();
+
+            for (var i = 0; i < assets.Length; i++)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(assets[i]);
+                mixers.Add((AudioMixerGroup)AssetDatabase.LoadAssetAtPath(path, typeof(AudioMixerGroup)));
+            }
+
+            return mixers.Count > 0;
         }
     }
 }

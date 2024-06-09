@@ -23,23 +23,8 @@
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
-    /// <summary>
-    /// Contains details for the asset.
-    /// </summary>
-    public static class AssetVersionData
+    public interface IAssetEditorFileChanges
     {
-        /// <summary>
-        /// The version number of the asset.
-        /// </summary>
-        public static string VersionNumber => "3.0.7";
-        
-        
-        /// <summary>
-        /// The date this release of the asset was submitted for release.
-        /// </summary>
-        /// <remarks>
-        /// Asset owner is in the UK, so its D/M/Y format.
-        /// </remarks>
-        public static string ReleaseDate => "09/06/2024";
+        void OnEditorFileChanges();
     }
 }

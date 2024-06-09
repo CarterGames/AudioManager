@@ -155,10 +155,10 @@ namespace CarterGames.Assets.AudioManager.Editor
                 _ => ShownTab
             };
             
-            if (UtilEditor.Library.LibraryTotal <= 0)
-            {
-                AudioScanner.ScanForAudio(false);
-            }
+            // if (UtilEditor.Library.LibraryTotal <= 0)
+            // {
+            //     AudioScanner.ScanForAudio(false);
+            // }
             
             libraryTab.Initialize();
             groupsTab.Initialize();

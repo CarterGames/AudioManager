@@ -21,47 +21,25 @@
  * THE SOFTWARE.
  */
 
-using System;
-using UnityEngine;
-
-namespace CarterGames.Assets.AudioManager
+namespace CarterGames.Assets.AudioManager.Editor
 {
     /// <summary>
-    /// The data for an entry in the library...
+    /// An interface to define logic that needs to run when the library should update.
     /// </summary>
-    [Serializable]
-    public class AudioData
+    public interface IScanProcess
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Fields
+        |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        public string key;
-        public string id;
-        public string defaultKey;
-        public AudioClip value;
-        public string path;
-        public DynamicTime dynamicStartTime;
-        [SerializeField] private bool showDynamicTime;
-
+        int Priority { get; }
+        bool DidSomething { get; set; }
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Constructors
+        |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        /// <summary>
-        /// Creates a new audio data with the key & clip entered.
-        /// </summary>
-        /// <param name="key">The key to use.</param>
-        /// <param name="value">The clip data to use.</param>
-        /// <param name="path">The path of the clip.</param>
-        public AudioData(string key, AudioClip value, string path)
-        {
-            id = $"{key}-{Guid.NewGuid().ToString()}";
-            this.key = key;
-            defaultKey = id;
-            this.value = value;
-            this.path = path;
-            dynamicStartTime = new DynamicTime();
-        }
+        bool ShouldUpdateLibrary();
+        void UpdateLibrary();
     }
 }

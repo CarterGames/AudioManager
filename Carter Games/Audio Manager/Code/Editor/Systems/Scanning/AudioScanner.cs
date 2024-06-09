@@ -21,13 +21,8 @@
  * THE SOFTWARE.
  */
 
-using System.Collections.Generic;
-using System.Linq;
-using CarterGames.Assets.AudioManager.Logging;
-using CarterGames.Common.Serializiation;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Audio;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
@@ -35,18 +30,12 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// Scans for audio clips when a new audio clip is added to the project...
     /// </summary>
     [DefaultExecutionOrder(1000)]
-    public sealed class AudioScanner : AssetPostprocessor, IAssetEditorReload
+    public sealed class AudioScanner : AssetPostprocessor, IAssetEditorFileChanges
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        private static bool ShouldUpdate { get; set; }
-        private static string[] LastImportedAssets { get; set; }
         
-        private static bool LibraryExists => ScriptableRef.HasLibraryFile;
-
-
         /// <summary>
         /// Returns if any audio is found in the project or not.
         /// </summary>
@@ -61,19 +50,24 @@ namespace CarterGames.Assets.AudioManager.Editor
         }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   IAssetEditorReload Implementation
+        |   IAssetEditorFileChanges Implementation
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        public void OnEditorReloaded()
+        /// <summary>
+        /// Runs when the editor detects any file changes.
+        /// </summary>
+        public void OnEditorFileChanges()
         {
-            if (!ShouldUpdate) return;
-            UpdateLibraryAsset();
+            ScanManager.ProcessHandlers();
         }
-        
+
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Menu Items
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
+        /// <summary>
+        /// Performs a scan on the user's command if needed.
+        /// </summary>
         [MenuItem("Tools/Carter Games/Audio Manager/Perform Manual Scan", priority = 22)]
         public static void ManualScan()
         {
@@ -85,205 +79,16 @@ namespace CarterGames.Assets.AudioManager.Editor
                 "New Only Scan", "Cancel");
             
             if (option.Equals(2)) return;
-            
-            if (option.Equals(0))
+
+            if (option.Equals(1))
             {
-                ScanForAudio(true);
+                ScanManager.ProcessHandlers();
             }
             else
             {
-                ScanForAudio(false);
+                UtilEditor.Library.ResetLibraryToDefault();
+                ScanManager.ProcessHandlers();
             }
-        }
-        
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   AssetPostprocessors
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
-            string[] movedAssets,
-            string[] movedFromAssetPaths)
-        {
-            if (importedAssets.Length > 0 && movedAssets.Length <= 0 && movedFromAssetPaths.Length <= 0)
-            {
-                ShouldUpdate = true;
-                LastImportedAssets = importedAssets;
-            }
-        }
-        
-
-        private static void UpdateLibraryAsset()
-        {
-            // AmDebugLogger.Normal($"Update Library: {ShouldUpdate}");
-            
-            CheckForAudioIfEmpty();
-            AudioRemover.RemoveNullLibraryEntries();
-
-            if (LastImportedAssets.Any(t => t.Contains(".mixer")))
-            {
-                UtilEditor.SetLibraryMixerGroups(GetAllMixersInProject());
-                StructHandler.RefreshMixers();
-            }
-
-            if (!PerUserSettings.ScannerHasNewAudioClip) return;
-
-            ScanForAudio(false);
-
-            PerUserSettings.ScannerHasNewAudioClip = false;
-            ShouldUpdate = false;
-        }
-
-
-        private void OnPostprocessAudio(AudioClip a)
-        {
-            PerUserSettings.ScannerHasNewAudioClip = true;
-            ShouldUpdate = true;
-        }
-
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Methods
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        public static void ScanForAudio(bool cleanScan)
-        {
-            AudioRemover.RemoveNullLibraryEntries();
-            
-            if (AnyAudioInProject)
-            {
-                if (GetAllClipsInProject(cleanScan, out var lookup))
-                {
-                    UtilEditor.SetLibraryData(lookup, cleanScan);
-
-                    StructHandler.RefreshClips();
-
-                    AudioManagerEditorEvents.OnLibraryRefreshed.Raise();
-                }
-            }
-            
-            var mixers = GetAllMixersInProject();
-            UtilEditor.SetLibraryMixerGroups(mixers);
-
-            if (mixers != null)
-            {
-                StructHandler.RefreshMixers();
-            }
-            
-            UtilEditor.LibraryObject.ApplyModifiedProperties();
-            UtilEditor.LibraryObject.Update();
-            
-            PerUserSettings.ScannerHasScanned = true;
-        }
-        
-        
-        
-        private static void CheckForAudioIfEmpty()
-        {
-            if (!LibraryExists)
-            {
-                CreateLibrary();
-                return;
-            }
-
-            if (PerUserSettings.ScannerHasScanned) return;
-            ManualScan();
-        }
-        
-        
-        private static void CreateLibrary()
-        {
-            AssetDatabase.CreateAsset(ScriptableObject.CreateInstance(typeof(AudioLibrary)), UtilEditor.LibraryAssetPath);
-            ManualScan();
-        }
-
-
-        private static bool GetAllClipsInProject(bool cleanScan, out Dictionary<AudioData, bool> lookup)
-        {
-            lookup = new SerializableDictionary<AudioData, bool>();
-            var alreadyIn = new List<AudioClip>();
-            
-            AssetDatabase.Refresh();
-            
-            var lib = AssetAccessor.GetAsset<AudioLibrary>();
-            var assets = AssetDatabase.FindAssets("t:AudioClip", null);
-
-            if (assets.Length <= 0) return false;
-            
-            var clips = new AudioClip[assets.Length];
-            var foundNew = false;
-
-            for (var i = 0; i < assets.Length; i++)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(assets[i]);
-                clips[i] = (AudioClip)AssetDatabase.LoadAssetAtPath(path, typeof(AudioClip));
-            }
-            
-            for (var i = 0; i < clips.Length; i++)
-            {
-                if (lib == null) break;
-                
-                // Probs a bit in-efficient, but it will work...
-                if (lib.LibraryTotal > 0)
-                {
-                    if (!cleanScan)
-                    {
-                        for (int j = 0; j < UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize; j++)
-                        {
-                            if (UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(j).Fpr("value").Fpr("value")
-                                    .objectReferenceValue == clips[i])
-                            {
-                                // Debug.Log($"Adding | {UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(j).Fpr("key").stringValue}");
-                                lookup.Add(UtilEditor.Library.GetData(UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(j).Fpr("key").stringValue), false);
-                                alreadyIn.Add((AudioClip) UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(j).Fpr("value").Fpr("value").objectReferenceValue);
-                            }
-                        }
-                    }
-                }
-                
-                if (alreadyIn.Contains(clips[i]))
-                {
-                    // Debug.Log("Already IN - Skipped");
-                    continue;
-                }
-                    
-                var toAdd = new AudioData(clips[i].name, clips[i], AssetDatabase.GetAssetPath(clips[i]));
-
-                if (!DynamicTimeDetector.TryDetectStartTime(clips[i], out var time))
-                {
-                    lookup.Add(toAdd, true);
-                    foundNew = true;
-                    continue;
-                }
-                
-                toAdd.dynamicStartTime = time;
-                lookup.Add(toAdd, true);
-                foundNew = true;
-            }
-
-            return foundNew;
-        }
-        
-        
-        private static AudioMixerGroup[] GetAllMixersInProject()
-        {
-            var assets = AssetDatabase.FindAssets("t:AudioMixerGroup", null);
-
-            if (assets.Length <= 0) return null;
-
-            var mixers = new List<AudioMixerGroup>();
-
-            for (var i = 0; i < assets.Length; i++)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(assets[i]);
-                var mixer = (AudioMixer)AssetDatabase.LoadAssetAtPath(path, typeof(AudioMixer));
-
-                for (var j = 0; j < mixer.FindMatchingGroups(string.Empty).Length; j++)
-                {
-                    if (mixers.Contains(mixer.FindMatchingGroups(string.Empty)[j])) continue;
-                    mixers.Add(mixer.FindMatchingGroups(string.Empty)[j]);
-                }
-            }
-
-            return mixers.ToArray();
         }
     }
 }

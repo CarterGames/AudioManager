@@ -21,47 +21,76 @@
  * THE SOFTWARE.
  */
 
-using System;
-using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using CarterGames.Assets.AudioManager.Logging;
+using UnityEditor;
 
-namespace CarterGames.Assets.AudioManager
+namespace CarterGames.Assets.AudioManager.Editor
 {
     /// <summary>
-    /// The data for an entry in the library...
+    /// Handles going through all the scan processes when required.
     /// </summary>
-    [Serializable]
-    public class AudioData
+    public static class ScanManager
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        public string key;
-        public string id;
-        public string defaultKey;
-        public AudioClip value;
-        public string path;
-        public DynamicTime dynamicStartTime;
-        [SerializeField] private bool showDynamicTime;
-
+        /// <summary>
+        /// A list of all the processes in the project, mainly to help performance wise.
+        /// Could be done dynamically if needed in the future.
+        /// </summary>
+        private static readonly List<IScanProcess> ProcessedCache = new List<IScanProcess>()
+        {
+            new LibraryCleanupProcess(),
+            new ClipScanProcess(),
+            new GroupsCleanupScanProcess(),
+            new TracksCleanupScanProcess(),
+            new MixerScanProcess(),
+            new MixerCleanupScanProcess(),
+        };
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Constructors
+        |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Creates a new audio data with the key & clip entered.
+        /// Gets through each process and runs it.
         /// </summary>
-        /// <param name="key">The key to use.</param>
-        /// <param name="value">The clip data to use.</param>
-        /// <param name="path">The path of the clip.</param>
-        public AudioData(string key, AudioClip value, string path)
+        public static void ProcessHandlers()
         {
-            id = $"{key}-{Guid.NewGuid().ToString()}";
-            this.key = key;
-            defaultKey = id;
-            this.value = value;
-            this.path = path;
-            dynamicStartTime = new DynamicTime();
+            var processesRun = 0;
+            
+            foreach (var scanProcess in ProcessedCache.OrderBy(t => t.Priority).ToArray())
+            {
+                if (!scanProcess.ShouldUpdateLibrary())
+                {
+                    if (PerUserSettings.DeveloperDebugMode)
+                    {
+                        AmDebugLogger.Normal($"[Scan]: ({scanProcess.GetType().Name}) skipped.");
+                    }
+                    
+                    continue;
+                }
+                
+                scanProcess.UpdateLibrary();
+                
+                if (PerUserSettings.DeveloperDebugMode)
+                {
+                    AmDebugLogger.Normal($"[Scan]: ({scanProcess.GetType().Name}) ran.");
+                }
+
+                if (!scanProcess.DidSomething) continue;
+                processesRun++;
+            }
+
+            if (processesRun <= 0) return;
+            
+            EditorUtility.SetDirty(UtilEditor.Library);
+            AssetDatabase.SaveAssets();
+            
+            LibraryEditorWindow.ForceUpdate();
         }
     }
 }
