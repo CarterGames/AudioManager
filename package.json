@@ -1,0 +1,22 @@
+{
+  "name": "games.carter.audiomanager",
+  "version": "3.0.7",
+  "displayName": "Audio Manager",
+  "description": "A free audio/sound management system for Unity with automatic library management & more!",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://carter.games/audiomanager/",
+  "licence": "MIT",
+  "licenceUrl": "https://github.com/CarterGames/AudioManager/blob/main/LICENSE",
+  "keywords": [
+    "audio",
+    "audio manager",
+    "audio library",
+    "music manager"
+  ],
+  "author": {
+    "name": "Carter Games",
+    "email": "hello@carter.games",
+    "url": "https://carter.games/"
+  }
+}
