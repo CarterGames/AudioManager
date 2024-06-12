@@ -234,7 +234,9 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// Forces the GUI to update when called.
         /// </summary>
         public static void ForceUpdate()
-        { 
+        {
+            if (!HasOpenInstances<LibraryEditorWindow>()) return;
+            
             window ??= GetWindow<LibraryEditorWindow>();
             window.Repaint();
         }
