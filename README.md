@@ -4,7 +4,7 @@
 
 ## Badges
 ![CodeFactor](https://www.codefactor.io/repository/github/cartergames/audiomanager/badge?style=for-the-badge)
-![GitHub all releases](https://img.shields.io/github/downloads/CarterGames/AudioManager/total?style=for-the-badge)
+![GitHub all releases](https://img.shields.io/github/downloads/CarterGames/AudioManager/total?style=for-the-badge&color=8d6ca1)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/CarterGames/AudioManager?style=for-the-badge)
 ![GitHub repo size](https://img.shields.io/github/repo-size/CarterGames/AudioManager?style=for-the-badge)
 ![Unity](https://img.shields.io/badge/Unity-2020.3.x_or_higher-critical?style=for-the-badge)
