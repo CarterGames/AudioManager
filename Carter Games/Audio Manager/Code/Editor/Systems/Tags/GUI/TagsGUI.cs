@@ -68,6 +68,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 
                 SearchProviderInstancing.SearchProviderTags.Open(exclude);
 
+                EditorGUILayout.EndHorizontal();
                 return;
                 void OnTagSearchSelectionMade(SearchTreeEntry entry)
                 {
