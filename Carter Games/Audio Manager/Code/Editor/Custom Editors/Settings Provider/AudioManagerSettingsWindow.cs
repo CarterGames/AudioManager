@@ -141,7 +141,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     
             if (managerHeader)
             {
-                if (GUILayout.Button(managerHeader, GUIStyle.none, GUILayout.MaxHeight(125)))
+                if (GUILayout.Button(managerHeader, GUIStyle.none, GUILayout.MaxHeight(110)))
                 {
                     GUI.FocusControl(null);
                 }
