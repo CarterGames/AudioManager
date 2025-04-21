@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,6 +22,7 @@
  */
 
 using System.Collections.Generic;
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,6 +36,9 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        private static AudioLibrary LibAsset => ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef;
+        private static SerializedObject LibObj => ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef;
         
         private static SerializedProperty SelectedProperty { get; set; }
 
@@ -49,18 +53,18 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public void Initialize()
         {
-            if (UtilEditor.Library.MixerCount > 0 && PerUserSettings.LastLibMixerEntry >= 0)
+            if (LibAsset.MixerCount > 0 && PerUserSettings.LastLibMixerEntry >= 0)
             {
-                SelectedProperty = UtilEditor.LibraryObject.Fp("mixers").Fpr("list")
+                SelectedProperty = LibObj.Fp("mixers").Fpr("list")
                     .GetIndex(PerUserSettings.LastLibMixerEntry);
             }
 
             EditorsCache = new Dictionary<string, UnityEditor.Editor>();
 
-            for (var i = 0; i < UtilEditor.LibraryObject.Fp("mixers").Fpr("list").arraySize; i++)
+            for (var i = 0; i < LibObj.Fp("mixers").Fpr("list").arraySize; i++)
             {
-                EditorsCache.Add(UtilEditor.LibraryObject.Fp("mixers").Fpr("list").GetIndex(i).Fpr("key").stringValue,
-                    UnityEditor.Editor.CreateEditor(UtilEditor.LibraryObject.Fp("mixers").Fpr("list").GetIndex(i)
+                EditorsCache.Add(LibObj.Fp("mixers").Fpr("list").GetIndex(i).Fpr("key").stringValue,
+                    UnityEditor.Editor.CreateEditor(LibObj.Fp("mixers").Fpr("list").GetIndex(i)
                         .Fpr("value").Fpr("mixerGroup").objectReferenceValue));
             }
         }
@@ -71,7 +75,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public void Display()
         {
-            if (UtilEditor.LibraryObject.Fp("mixers").Fpr("list").arraySize <= 0)
+            if (LibObj.Fp("mixers").Fpr("list").arraySize <= 0)
             {
                 EditorGUILayout.HelpBox("No mixer groups found in the project so there is nothing to show.", MessageType.Info);
                 return;
@@ -87,11 +91,16 @@ namespace CarterGames.Assets.AudioManager.Editor
         protected override void LeftSectionControl()
         {
             EditorGUILayout.BeginVertical("Box", GUILayout.MaxWidth(250));
+            GUILayout.Space(5f);
             
-            GUI.backgroundColor = UtilEditor.Yellow;
+            GUI.backgroundColor = EditorColors.PrimaryYellow;
             if (GUILayout.Button("Update Mixers Struct", GUILayout.MaxHeight(25)))
             {
-                StructHandler.RefreshMixers();
+                if (EditorUtility.DisplayDialog("Update Mixers Struct",
+                        "Are you sure you want to update the mixers struct?", "Update Mixers Struct", "Cancel"))
+                {
+                    StructHandler.RefreshMixers();
+                }
             }
             GUI.backgroundColor = Color.white;
             
@@ -101,9 +110,9 @@ namespace CarterGames.Assets.AudioManager.Editor
                     MessageType.None);
             }
             
-            GUILayout.Space(7.5f);
+            GUILayout.Space(1.5f);
             UtilEditor.DrawHorizontalGUILine();
-            GUILayout.Space(7.5f);
+            GUILayout.Space(1.5f);
             
             PerUserSettings.MixerBtnScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.MixerBtnScrollRectPos);
             base.LeftSectionControl();
@@ -131,7 +140,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         protected override void OnLeftGUI()
         {
-            var mixers = UtilEditor.LibraryObject.Fp("mixers").Fpr("list");
+            var mixers = LibObj.Fp("mixers").Fpr("list");
 
             if (mixers.arraySize.Equals(0)) return;
             
@@ -171,9 +180,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             if (SelectedProperty == null)
             {
                 EditorGUILayout.BeginVertical("Box");
-                EditorGUILayout.BeginVertical("Box");
                 EditorGUILayout.LabelField("Select a mixer option to see its contents here.");
-                EditorGUILayout.EndVertical();
                 EditorGUILayout.EndVertical();
                 return;
             }
@@ -186,109 +193,20 @@ namespace CarterGames.Assets.AudioManager.Editor
 
         private void DrawMixerGroup()
         {
-            EditorGUILayout.BeginVertical("Box");
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
             
-            GUILayout.Space(2.5f);
+            EditorGUILayout.Space(2.5f);
             
-            EditorGUILayout.BeginVertical("HelpBox");
+            MixerGUIMixerInfo.Draw(SelectedProperty);
+            
+            EditorGUILayout.Space(5f);
+            
+            MixerGUIMixerInspector.Draw(SelectedProperty, EditorsCache);
 
-            GUI.contentColor = UtilEditor.Yellow;
-            EditorGUILayout.LabelField("Meta Data", EditorStyles.boldLabel);
-            GUI.contentColor = Color.white;
-            
-            UtilEditor.DrawHorizontalGUILine();
-            GUILayout.Space(5f);
-            
-            EditorGUILayout.BeginHorizontal();
-            
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(SelectedProperty.Fpr("value").Fpr("key"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                var oldIndexReverse = -1;
-                
-                for (var i = 0; i < UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list").arraySize; i++)
-                {
-                    if (UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list").GetIndex(i).Fpr("value").stringValue == SelectedProperty.Fpr("key").stringValue)
-                    {
-                        oldIndexReverse = i;
-                    }
-                }
-
-                if (oldIndexReverse > -1)
-                {
-                    UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list").DeleteIndex(oldIndexReverse);
-                }
-                
-                UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list")
-                    .InsertIndex(UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list").arraySize);
-                    
-                UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list")
-                    .GetIndex(UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list").arraySize - 1)
-                    .Fpr("key").stringValue = SelectedProperty.Fpr("value").Fpr("key").stringValue;
-                    
-                UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list")
-                    .GetIndex(UtilEditor.LibraryObject.Fp("mixersReverseLookup").Fpr("list").arraySize - 1)
-                    .Fpr("value").stringValue = SelectedProperty.Fpr("key").stringValue;
-
-                UtilEditor.LibraryObject.ApplyModifiedProperties();
-                UtilEditor.LibraryObject.Update();
-            }
-            
-            
-            GUI.backgroundColor = UtilEditor.Yellow;
-
-            if (GUILayout.Button("Copy Key", GUILayout.Width(80)))
-            {
-                Clipboard.Copy(SelectedProperty.Fpr("value").Fpr("key").stringValue);
-                EditorUtility.DisplayDialog("Copy Mixer Key", "Key copied to clipboard", "Continue");
-            }
-
-            GUI.backgroundColor = Color.white;
-            
+            EditorGUILayout.Space(5f);
+            EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
-            
-            EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.PropertyField(SelectedProperty.Fpr("value").Fpr("mixerGroup"), new GUIContent("Mixer Reference", "The mixer this entry is for."));
-            EditorGUI.EndDisabledGroup();
-            
-            if (GUILayout.Button("Select Mixer", GUILayout.Width("Select Mixer    ".Width())))
-            {
-                Selection.activeObject = SelectedProperty.Fpr("value").Fpr("mixerGroup").objectReferenceValue;
-            }
-
-            EditorGUILayout.EndHorizontal();
-            GUILayout.Space(2.5f);
-            EditorGUILayout.EndVertical();
-            
-            EditorGUILayout.EndVertical();
-            
-            GUILayout.Space(5f);
-            
-            EditorGUILayout.BeginVertical("HelpBox");
-            
-            GUI.contentColor = UtilEditor.Yellow;
-            EditorGUILayout.LabelField("Mixer Inspector", EditorStyles.boldLabel);
-            GUI.contentColor = Color.white;
-            
-            UtilEditor.DrawHorizontalGUILine();
-            GUILayout.Space(17.5f);
-            
-            if (EditorsCache.ContainsKey(SelectedProperty.Fpr("key").stringValue))
-            {
-                EditorsCache[SelectedProperty.Fpr("key").stringValue].OnInspectorGUI();
-            }
-            else
-            {
-                EditorsCache.Add(SelectedProperty.Fpr("key").stringValue, UnityEditor.Editor.CreateEditor(SelectedProperty.Fpr("value").Fpr("mixerGroup").objectReferenceValue));
-                EditorsCache[SelectedProperty.Fpr("key").stringValue].OnInspectorGUI();
-            }
-
-            GUILayout.Space(2.5f);
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndVertical();
         }
     }
 }

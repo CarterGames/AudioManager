@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -43,13 +43,8 @@ namespace CarterGames.Assets.AudioManager
         ClipCannotBeFound = 2,                          // (Runtime) A clip cannot be found.
         GroupCannotBeFound = 3,                         // (Runtime) A group be found.
         MixerCannotBeFound = 4,                         // (Runtime) A mixer cannot be found.
-        TrackListCannotBeFound = 5,                     // (Runtime) A track list cannot be found.
         
-        MusicDisabled = 6,                              // (Runtime) Music is disabled via play-state setting.
-        TrackClipNotInListOrLibrary = 7,                // (Runtime) Track/AudioClip not in the track list that is being played.
-        TransitionDataParameterNotFound = 8,            // (Runtime) Transition missing a parameter value.
-        MusicPlayerNotInitialized = 9,                  // (Runtime) When a music player is null when a call was made.
-        MusicPlaylistNotSet = 10,                      // (Runtime) When the user tries to play a track from a list before it is assigned.
+        TagCannotBeFound = 20,
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Editor Specific Errors

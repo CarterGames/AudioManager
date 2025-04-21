@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -25,7 +25,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CarterGames.Assets.AudioManager.Logging;
-using CarterGames.Common.Serializiation;
+using CarterGames.Assets.Shared.Common.Serializiation;
+using CarterGames.Assets.Shared.PerProject;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -34,33 +35,27 @@ namespace CarterGames.Assets.AudioManager
     /// <summary>
     /// Holds all the clips
     /// </summary>
-    public class AudioLibrary : AudioManagerAsset
+    [Serializable]
+    public class AudioLibrary : AudioManagerDataAsset
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
         [SerializeField] private SerializableDictionary<string, AudioData> library;
-        [SerializeField] private SerializableDictionary<string, string> libraryReverseLookup;
-        
         [SerializeField] private SerializableDictionary<string, GroupData> groups = new SerializableDictionary<string, GroupData>();
-        [SerializeField] private SerializableDictionary<string, string> groupsReverseLookup;
-
         [SerializeField] private SerializableDictionary<string, MixerData> mixers;
-        [SerializeField] private SerializableDictionary<string, string> mixersReverseLookup;
+        [SerializeField] private List<string> categories;
+        [SerializeField] private List<string> tags;
         
-        [SerializeField] private SerializableDictionary<string, MusicPlaylist> tracks;
-        [SerializeField] private SerializableDictionary<string, string> tracksReverseLookup;
-
+        private SerializableDictionary<string, string> cacheLibraryReverseLookup;
+        private SerializableDictionary<string, string> cacheGroupsReverseLookup;
+        private SerializableDictionary<string, string> cacheMixersReverseLookup;
+        private SerializableDictionary<string, List<string>> cacheClipByTagLookup;
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        /// <summary>
-        /// Gets the total entries in the library.
-        /// </summary>
-        public int LibraryTotal => LibraryLookup.Count;
-        
         
         /// <summary>
         /// The lookup of all the library entries.
@@ -71,8 +66,22 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// A lookup of all the clips with clip key as the id and the uuid as the value.
         /// </summary>
-        public SerializableDictionary<string, string> ReverseLibraryLookup => libraryReverseLookup;
-        
+        public SerializableDictionary<string, string> ReverseLibraryLookup
+        {
+            get
+            {
+                if (cacheLibraryReverseLookup is { } && cacheLibraryReverseLookup.Count > 0) return cacheLibraryReverseLookup;
+                cacheLibraryReverseLookup = new SerializableDictionary<string, string>();
+
+                foreach (var libraryEntry in LibraryLookup)
+                {
+                    cacheLibraryReverseLookup.Add(libraryEntry.Value.key, libraryEntry.Key);
+                }
+                
+                return cacheLibraryReverseLookup;
+            }
+        }
+
 
         /// <summary>
         /// Gets the number of clips stored in the library...
@@ -108,7 +117,21 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// A lookup of all the clips with clip key as the id and the uuid as the value.
         /// </summary>
-        public SerializableDictionary<string, string> ReverseGroupsLookup => groupsReverseLookup;
+        public SerializableDictionary<string, string> ReverseGroupsLookup
+        {
+            get
+            {
+                if (cacheGroupsReverseLookup is { } && cacheGroupsReverseLookup.Count > 0) return cacheGroupsReverseLookup;
+                cacheGroupsReverseLookup = new SerializableDictionary<string, string>();
+
+                foreach (var libraryEntry in GroupsLookup)
+                {
+                    cacheGroupsReverseLookup.Add(libraryEntry.Value.GroupName, libraryEntry.Key);
+                }
+                
+                return cacheGroupsReverseLookup;
+            }
+        }
         
         
         /// <summary>
@@ -120,19 +143,49 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// A lookup of all the mixers with the user key as the id and the uuid as the value.
         /// </summary>
-        public SerializableDictionary<string, string> ReverseMixerLookup => mixersReverseLookup;
+        public SerializableDictionary<string, string> ReverseMixerLookup
+        {
+            get
+            {
+                if (cacheMixersReverseLookup is { } && cacheMixersReverseLookup.Count > 0) return cacheMixersReverseLookup;
+                cacheMixersReverseLookup = new SerializableDictionary<string, string>();
+
+                foreach (var libraryEntry in MixerLookup)
+                {
+                    cacheMixersReverseLookup.Add(libraryEntry.Value.Key, libraryEntry.Key);
+                }
+                
+                return cacheMixersReverseLookup;
+            }
+        }
         
         
-        /// <summary>
-        /// Gets a lookup of all the music tracks in the library.
-        /// </summary>
-        public Dictionary<string, MusicPlaylist> MusicTrackLookup => tracks;
         
-        
-        /// <summary>
-        /// A lookup of all the clips with clip key as the id and the uuid as the value.
-        /// </summary>
-        public SerializableDictionary<string, string> ReverseTrackListLookup => tracksReverseLookup;
+        public SerializableDictionary<string, List<string>> ClipByTagLookup
+        {
+            get
+            {
+                if (cacheClipByTagLookup is { } && cacheClipByTagLookup.Count > 0) return cacheClipByTagLookup;
+                cacheClipByTagLookup = new SerializableDictionary<string, List<string>>();
+
+                foreach (var libraryEntry in LibraryLookup)
+                {
+                    var data = libraryEntry.Value;
+                    
+                    foreach (var tagOnData in data.Tags)
+                    {
+                        if (!cacheClipByTagLookup.ContainsKey(tagOnData))
+                        {
+                            cacheClipByTagLookup.Add(tagOnData, new List<string>());
+                        }
+                        
+                        cacheClipByTagLookup[tagOnData].Add(data.key);
+                    }
+                }
+                
+                return cacheClipByTagLookup;
+            }
+        }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
@@ -143,20 +196,29 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         /// <param name="request">The clip to find...</param>
         /// <returns>The audio data received...</returns>
-        public AudioData GetData(string request)
+        public bool TryGetClip(string request, out AudioData data)
         {
+            data = null;
+            
+            if (!LibraryHelper.HasClip(request))
+            {
+                AmDebugLogger.Error(AudioManagerErrorCode.ClipCannotBeFound.CodeToMessage());
+                return false;
+            }
+            
             if (ReverseLibraryLookup.ContainsKey(request))
             {
-                return LibraryLookup[ReverseLibraryLookup[request]];
+                data = LibraryLookup[ReverseLibraryLookup[request]];
+                return true;
             }
             
             if (LibraryLookup.ContainsKey(request))
             {
-                return LibraryLookup[request];
+                data = LibraryLookup[request];
+                return true;
             }
-            
-            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.ClipCannotBeFound));
-            return null;
+
+            return false;
         }
         
         
@@ -198,32 +260,12 @@ namespace CarterGames.Assets.AudioManager
             {
                 return MixerLookup[request].MixerGroup;
             }
-            
+
+            Debug.Log(request);
             AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.MixerCannotBeFound));
             return null;
         }
         
-        
-        /// <summary>
-        /// Gets the track list requested.
-        /// </summary>
-        /// <param name="request">The requested string.</param>
-        /// <returns>The track list found.</returns>
-        public MusicPlaylist GetTrackList(string request)
-        {
-            if (ReverseTrackListLookup.ContainsKey(request))
-            {
-                return MusicTrackLookup[ReverseTrackListLookup[request]];
-            }
-            
-            if (MusicTrackLookup.ContainsKey(request))
-            {
-                return MusicTrackLookup[request];
-            }
-            
-            AmDebugLogger.Warning(AudioManagerErrorMessages.GetMessage(AudioManagerErrorCode.TrackListCannotBeFound));
-            return null;
-        }
 
         
         /// <summary>
@@ -286,7 +328,7 @@ namespace CarterGames.Assets.AudioManager
                 var key = $"{mixerValue.name}{uuid.Substring(0, 7)}";
                 
                 mixers.Add(uuid, new MixerData(uuid,key, mixerValue));
-                mixersReverseLookup.Add(key, uuid);
+                cacheMixersReverseLookup.Add(key, uuid);
             }
         }
 
@@ -294,10 +336,10 @@ namespace CarterGames.Assets.AudioManager
         public void ResetLibraryToDefault()
         {
             library.Clear();
-            libraryReverseLookup.Clear();
+            cacheLibraryReverseLookup.Clear();
             
             mixers.Clear();
-            mixersReverseLookup.Clear();
+            cacheMixersReverseLookup.Clear();
         }
     }
 }

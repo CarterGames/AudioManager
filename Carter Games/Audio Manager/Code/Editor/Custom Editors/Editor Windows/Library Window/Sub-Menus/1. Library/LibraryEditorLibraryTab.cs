@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -23,9 +23,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using GUIStyle = UnityEngine.GUIStyle;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
@@ -37,7 +39,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
+        
         private static readonly GUIContent PreviewButton = new GUIContent(" Preview Clip", UtilEditor.PlayIcon);
         private static readonly GUIContent StopButton = new GUIContent(" Stop Clip", UtilEditor.StopIcon);
         private static readonly GUIContent SearchButton = new GUIContent(" Search Library", UtilEditor.SearchIcon, "Opens a search provider to let you search through all entries in the library by name.");
@@ -51,6 +53,9 @@ namespace CarterGames.Assets.AudioManager.Editor
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
+        private static SerializedObject LibObj => ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef;
+        
+        
         /// <summary>
         /// The currently selected property/element of the library clips.
         /// </summary>
@@ -60,17 +65,14 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 if (selectedPropertyCache != null) return selectedPropertyCache;
                 
-                if (PerUserSettings.LastLibraryIndexShown > -1 && UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize > 0)
+                if (PerUserSettings.LastLibraryIndexShown > -1 && LibObj.Fp("library").Fpr("list").arraySize > 0)
                 {
-                    if (PerUserSettings.LastLibraryIndexShown >
-                        UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize - 1)
+                    if (PerUserSettings.LastLibraryIndexShown > LibObj.Fp("library").Fpr("list").arraySize - 1)
                     {
-                        PerUserSettings.LastLibraryIndexShown =
-                            UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize - 1;
+                        PerUserSettings.LastLibraryIndexShown = LibObj.Fp("library").Fpr("list").arraySize - 1;
                     }
                     
-                    selectedPropertyCache = UtilEditor.LibraryObject.Fp("library").Fpr("list")
-                        .GetIndex(PerUserSettings.LastLibraryIndexShown);
+                    selectedPropertyCache = LibObj.Fp("library").Fpr("list").GetIndex(PerUserSettings.LastLibraryIndexShown);
                 }
                 else
                 {
@@ -115,23 +117,25 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public void Display()
         {
-            if (UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize <= 0)
+            if (LibObj.Fp("library").Fpr("list").arraySize <= 0)
             {
                 EditorGUILayout.HelpBox("No clips in the library so there is nothing to show.", MessageType.Info);
                 
                 EditorGUI.BeginDisabledGroup(EditorApplication.isCompiling);
-                GUI.backgroundColor = UtilEditor.Yellow;
                 
+                GUI.backgroundColor = EditorColors.PrimaryYellow;
                 if (GUILayout.Button("Scan For Audio", GUILayout.Height(25)))
                 {
                     AudioScanner.ManualScan();
                 }
-
                 GUI.backgroundColor = Color.white;
+                
                 EditorGUI.EndDisabledGroup();
                 
                 return;
             }
+            
+            DrawSearchButton();
             
             DisplaySections();
 
@@ -145,11 +149,16 @@ namespace CarterGames.Assets.AudioManager.Editor
         protected override void LeftSectionControl()
         {
             EditorGUILayout.BeginVertical("Box", GUILayout.MaxWidth(250));
+            GUILayout.Space(5f);
             
-            GUI.backgroundColor = UtilEditor.Yellow;
+            GUI.backgroundColor = EditorColors.PrimaryYellow;
             if (GUILayout.Button("Update Clips Struct", GUILayout.MaxHeight(25)))
             {
-                StructHandler.RefreshClips();
+                if (EditorUtility.DisplayDialog("Update Clips Struct",
+                        "Are you sure you want to update the clips struct?", "Update Clips Struct", "Cancel"))
+                {
+                    StructHandler.RefreshClips();
+                }
             }
             GUI.backgroundColor = Color.white;
             
@@ -159,9 +168,9 @@ namespace CarterGames.Assets.AudioManager.Editor
                     MessageType.None);
             }
             
-            GUILayout.Space(7.5f);
+            EditorGUILayout.Space(1.5f);
             UtilEditor.DrawHorizontalGUILine();
-            GUILayout.Space(7.5f);
+            EditorGUILayout.Space(1.5f);
             
             PerUserSettings.LibBtnScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.LibBtnScrollRectPos);
             base.LeftSectionControl();
@@ -176,6 +185,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         protected override void RightSectionControl()
         {
+            if (SelectedProperty == null || !ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.LibraryLookup.ContainsKey(SelectedPropertyKey)) return;
             PerUserSettings.LibScrollRectPos = EditorGUILayout.BeginScrollView(PerUserSettings.LibScrollRectPos);
             EditorGUILayout.BeginVertical("Box");
             base.RightSectionControl();
@@ -189,17 +199,17 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         protected override void OnLeftGUI()
         {
-            if (UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize <= 0) return;
+            if (LibObj.Fp("library").Fpr("list").arraySize <= 0) return;
             
-            for (var i = 0; i < UtilEditor.LibraryObject.Fp("library").Fpr("list").arraySize; i++)
+            for (var i = 0; i < LibObj.Fp("library").Fpr("list").arraySize; i++)
             {
-                if (UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(i) == null) continue;
+                if (LibObj.Fp("library").Fpr("list").GetIndex(i) == null) continue;
                 
-                if (UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(i).Fpr("key").stringValue == (SelectedPropertyKey))
+                if (LibObj.Fp("library").Fpr("list").GetIndex(i).Fpr("key").stringValue == (SelectedPropertyKey))
                 {
                     if (SelectedProperty != null)
                     {
-                        if (SelectedProperty.Fpr("value").Fpr("key").stringValue.Equals(UtilEditor.LibraryObject
+                        if (SelectedProperty.Fpr("value").Fpr("key").stringValue.Equals(LibObj
                                 .Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue))
                         {
                             GUI.backgroundColor = UtilEditor.Grey;
@@ -211,11 +221,11 @@ namespace CarterGames.Assets.AudioManager.Editor
                     }
                 }
 
-                if (GUILayout.Button(UtilEditor.LibraryObject.Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue))
+                if (GUILayout.Button(LibObj.Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue))
                 {
                     PerUserSettings.LastLibraryIndexShown = i;
                     
-                    SelectedProperty = UtilEditor.LibraryObject.Fp("library").Fpr("list")
+                    SelectedProperty = LibObj.Fp("library").Fpr("list")
                         .GetIndex(PerUserSettings.LastLibraryIndexShown);
                 }
                 
@@ -229,23 +239,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         protected override void OnRightGUI()
         {
-            DrawSearchButton();
-            
-            GUILayout.Space(10);
-
-            if (SelectedProperty == null)
-            {
-                EditorGUILayout.BeginVertical("Box");
-                EditorGUILayout.BeginVertical("Box");
-                EditorGUILayout.LabelField("Select a clip to see its contents here.");
-                EditorGUILayout.EndVertical();
-                EditorGUILayout.EndVertical();
-                return;
-            }
-            
             if (!CanUpdate) return;
-            
-            if (SelectedProperty == null || !UtilEditor.Library.LibraryLookup.ContainsKey(SelectedPropertyKey)) return;
+            if (SelectedProperty == null || !ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.LibraryLookup.ContainsKey(SelectedPropertyKey)) return;
             DrawLibraryRow(SelectedProperty);
         }
 
@@ -259,8 +254,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         private void RefreshLibraryCache()
         {
             LibraryDisplayDataCache.Clear();
-            UtilEditor.LibraryObject.ApplyModifiedProperties();
-            UtilEditor.LibraryObject.Update();
+            LibObj.ApplyModifiedProperties();
+            LibObj.Update();
             LibraryEditorWindow.ForceUpdate();
             CanUpdate = true;
         }
@@ -276,19 +271,26 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             EditorGUILayout.BeginVertical();
 
-            var librarySearchProvider = ScriptableObject.CreateInstance<LibrarySearchProvider>();
-
-            GUI.backgroundColor = UtilEditor.Yellow;
+            GUI.backgroundColor = EditorColors.PrimaryOrange;
+            
+            EditorGUILayout.BeginHorizontal();
             
             if (GUILayout.Button(SearchButton, GUILayout.MaxHeight(25)))
             {
-                LibrarySearchProvider.ToExclude.Clear();
-                LibrarySearchProvider.OnSearchTreeSelectionMade.Add(ShowSelected);
-                SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), librarySearchProvider);
+                SearchProviderInstancing.SearchProviderLibrary.SelectionMade.Add(ShowSelected);
+                SearchProviderInstancing.SearchProviderLibrary.Open();
             }
             
             GUI.backgroundColor = Color.white;
 
+            if (GUILayout.Button(TagsGUI.TagStdButtonContent, GUILayout.MaxWidth(50), GUILayout.MaxHeight(25)))
+            {
+                // open filter options...
+                TagsEditor.ShowWindow();
+            }
+
+            EditorGUILayout.EndHorizontal();
+            
             if (PerUserSettings.ShowHelpBoxes)
             {
                 EditorGUILayout.HelpBox(
@@ -310,50 +312,62 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             if (prop.Fpr("value").Fpr("value").objectReferenceValue == null)
             {
-                // AudioRemover.RemoveNullLibraryEntries();
                 selectedPropertyCache = null;
                 return;
             }
             
-            EditorGUILayout.BeginHorizontal("HelpBox");
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
-
-            var data = UtilEditor.Library.LibraryLookup[prop.Fpr("key").stringValue];
             
-            DrawPreviewButton(data);
+            GUILayout.Space(2.5f);
             
-            EditorGUILayout.Space();
-            UtilEditor.DrawHorizontalGUILine();
-            EditorGUILayout.Space();
-            
+            // File details for entry...
             EditorGUILayout.BeginVertical("HelpBox");
+            EditorGUILayout.BeginHorizontal();
             
-            GUI.contentColor = UtilEditor.Yellow;
+            GUI.contentColor = EditorColors.PrimaryYellow;
             EditorGUILayout.LabelField("File", EditorStyles.boldLabel);
             GUI.contentColor = Color.white;
+
+            DrawPreviewButton(ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.LibraryLookup[prop.Fpr("key").stringValue]);
+            EditorGUILayout.EndHorizontal();
+            
+            UtilEditor.DrawHorizontalGUILine();
             
             LibraryEditorClip.DrawLibraryEditor(prop);
-            
             EditorGUILayout.EndVertical();
             
-            EditorGUILayout.Space();
-            UtilEditor.DrawHorizontalGUILine();
-            EditorGUILayout.Space();
-
+            
+            // Spacer.
+            EditorGUILayout.Space(5f);
+            
+            
+            // Extra options for entry...
             EditorGUILayout.BeginVertical("HelpBox");
             
-            GUI.contentColor = UtilEditor.Yellow;
-            EditorGUILayout.LabelField("Extra's", EditorStyles.boldLabel);
+            GUI.contentColor = EditorColors.PrimaryYellow;
+            EditorGUILayout.LabelField("Extra Options", EditorStyles.boldLabel);
             GUI.contentColor = Color.white;
 
-            EditorGUILayout.Space();
+            UtilEditor.DrawHorizontalGUILine();
 
+            LibraryEditorDefaultClipSettings.DrawLibraryEditor(prop);
             LibraryEditorDynamicTime.DrawLibraryEditor(prop);
             
             EditorGUILayout.EndVertical();
             
-            EditorGUILayout.Space();
+            // Spacer.
+            EditorGUILayout.Space(5f);
             
+            // Metadata
+            // EditorGUILayout.PropertyField(prop.Fpr("value").Fpr("metaData").Fpr("category"));
+            
+            EditorGUILayout.LabelField("Tags");
+            UtilEditor.DrawHorizontalGUILine();
+
+            TagsGUI.DrawClipSection(prop);
+            
+            EditorGUILayout.Space(2.5f);
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
         }
@@ -365,54 +379,50 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <param name="entry">The entry selected.</param>
         private void ShowSelected(SearchTreeEntry entry)
         {
-            LibrarySearchProvider.OnSearchTreeSelectionMade.Remove(ShowSelected);
+            SearchProviderInstancing.SearchProviderLibrary.SelectionMade.Remove(ShowSelected);
             
             if (!LibraryEditorWindow.ShownTab.Equals(this)) return;
             
-            PerUserSettings.LastLibraryIndexShown = UtilEditor.Library.GetIndexOfData((AudioData)entry.userData);
-            selectedPropertyCache = UtilEditor.LibraryObject.Fp("library").Fpr("list")
-                .GetIndex(PerUserSettings.LastLibraryIndexShown);
+            PerUserSettings.LastLibraryIndexShown = ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.GetIndexOfData((AudioData)entry.userData);
+            SelectedProperty = LibObj.Fp("library").Fpr("list").GetIndex(PerUserSettings.LastLibraryIndexShown);
         }
-
-
+        
+        
         /// <summary>
         /// Draws the preview button for the clip.
         /// </summary>
         /// <param name="data">The clip to play if pressed.</param>
         private static void DrawPreviewButton(AudioData data)
         {
-            EditorGUILayout.Space(1.5f);
-                
             if (!EditorAudioClipPlayer.IsClipPlaying())
             {
-                GUI.backgroundColor = UtilEditor.Green;
+                GUI.backgroundColor = EditorColors.PrimaryGreen;
                     
-                if (GUILayout.Button(PreviewButton, GUILayout.Height(20)))
+                if (GUILayout.Button(PreviewButton, GUILayout.Height(20), GUILayout.Width(125)))
                 {
                     EditorAudioClipPlayer.Play(data);
                 }
             }
             else if (EditorAudioClipPlayer.IsClipPlaying() && EditorAudioClipPlayer.CurrentClip == data.value)
             {
-                GUI.backgroundColor = UtilEditor.Red;
+                GUI.backgroundColor = EditorColors.PrimaryRed;
                     
-                if (GUILayout.Button(StopButton,GUILayout.Height(20)))
+                if (GUILayout.Button(StopButton,GUILayout.Height(20), GUILayout.Width(125)))
                 {
                     EditorAudioClipPlayer.StopAll();
                 }
             }
             else
             {
-                GUI.backgroundColor = UtilEditor.Green;
+                GUI.backgroundColor = EditorColors.PrimaryGreen;
                     
-                if (GUILayout.Button(PreviewButton, GUILayout.Height(20)))
+                if (GUILayout.Button(PreviewButton, GUILayout.Height(20), GUILayout.Width(125)))
                 {
                     EditorAudioClipPlayer.Play(data);
                 }
             }
 
             GUI.backgroundColor = Color.white;
-            EditorGUILayout.Space(1.5f);
         }
     }
 }

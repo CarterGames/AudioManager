@@ -33,6 +33,8 @@ namespace CarterGames.Assets.AudioManager.Logging
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+        private const string ShowLogsPrefKey = "AudioManager_Settings_ShowDebugLogs";
         
         private const string LogPrefix = "<color=#E77A7A><b>Audio Manager</b></color> | ";
         private const string WarningPrefix = "<color=#D6BA64><b>Warning</b></color> | ";
@@ -49,9 +51,9 @@ namespace CarterGames.Assets.AudioManager.Logging
         {
             get
             {
-                if (PlayerPrefs.HasKey("AudioManager_Settings_ShowDebugLogs"))
+                if (PlayerPrefs.HasKey(ShowLogsPrefKey))
                 {
-                    return PlayerPrefs.GetInt("AudioManager_Settings_ShowDebugLogs") == 1;
+                    return PlayerPrefs.GetInt(ShowLogsPrefKey) == 1;
                 }
 
                 return false;

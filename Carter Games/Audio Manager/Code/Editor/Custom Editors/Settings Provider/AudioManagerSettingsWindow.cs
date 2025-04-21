@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,8 +22,12 @@
  */
 
 using System.Collections.Generic;
+using System.Linq;
 using CarterGames.Assets.AudioManager.Logging;
+using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager.Editor
@@ -46,6 +50,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         private static bool EventsSubbed { get; set; }
+        
+        private static SerializedObject SettingsObj => ScriptableRef.GetAssetDef<AmAssetSettings>().ObjectRef;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Menu Items
@@ -80,9 +86,6 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                     EditorGUI.BeginChangeCheck();
                     
-                    GUILayout.Space(7.5f);
-                    DrawDisclaimer();                    
-                    
                     GUILayout.Space(2f);
                     DrawAssetMetaData();
 
@@ -98,13 +101,16 @@ namespace CarterGames.Assets.AudioManager.Editor
                     
                     GUILayout.Space(2.5f);
                     DrawAudioPrefabOptions();
+
+                    GUILayout.Space(2.5f);
+                    DrawPoolingOptions();
                     
                     EditorGUILayout.EndVertical();
 
                     if (EditorGUI.EndChangeCheck())
                     {
-                        UtilEditor.SettingsObject.ApplyModifiedProperties();
-                        UtilEditor.SettingsObject.Update();
+                        SettingsObj.ApplyModifiedProperties();
+                        SettingsObj.Update();
                     }
                     
                     GUILayout.Space(2.5f);
@@ -122,38 +128,6 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        /// <summary>
-        /// Draws a disclaimer section warning users of possible bugs & instability in the new rewrite...
-        /// </summary>
-        private static void DrawDisclaimer()
-        {
-            GUI.backgroundColor = UtilEditor.Yellow;
-            
-            EditorGUILayout.BeginVertical("HelpBox");
-            GUILayout.Space(1.5f);
-
-
-            EditorGUILayout.LabelField("Disclaimer", EditorStyles.boldLabel);
-            
-            GUI.backgroundColor = Color.white;
-            UtilEditor.DrawHorizontalGUILine();
-            
-            EditorGUILayout.HelpBox("This is an early version of a total re-write of the asset. Bugs are to be expected as I simply don't have the time to test every edge-case before release.\nPlease let me know of any issues that arise so I can fix them.", MessageType.Info);
-
-            GUI.backgroundColor = UtilEditor.Yellow;
-            
-            if (GUILayout.Button("Report Issue"))
-            {
-                Application.OpenURL("https://carter.games/report/");
-            }
-            
-            GUILayout.Space(2.5f);
-            EditorGUILayout.EndVertical();
-            
-            GUI.backgroundColor = Color.white;
-        }
-        
         
         /// <summary>
         /// Draws the header section of the settings window.
@@ -196,7 +170,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.EndHorizontal();
             
-            EditorGUILayout.LabelField(new GUIContent("Release Date"), new GUIContent(AssetVersionData.ReleaseDate));
+            EditorGUILayout.LabelField(new GUIContent("Release date (Y/M/D)"), new GUIContent(AssetVersionData.ReleaseDate));
 
             GUILayout.Space(2.5f);
             EditorGUILayout.EndVertical();
@@ -221,103 +195,18 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.LabelField("Audio Clips", EditorStyles.boldLabel);
                 UtilEditor.DrawHorizontalGUILine();
 
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("playAudioState"));
+                EditorGUILayout.PropertyField(SettingsObj.Fp("playAudioState"));
+                EditorGUILayout.PropertyField(SettingsObj.Fp("clipAudioMixer"), new GUIContent("Default Clip Mixer"));
                 
-                EditorGUILayout.BeginHorizontal();
-                EditorGUI.BeginDisabledGroup(true);
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("sequencePrefab"));
-                EditorGUI.EndDisabledGroup();
-                GUI.backgroundColor = UtilEditor.Yellow;
-                if (GUILayout.Button("Edit", GUILayout.Width(55)))
-                {
-                    EditorGUIUtility.ShowObjectPicker<AudioPlayerSequence>(null, false, "t:GameObject", 10);
-                }
-            
-                if ((Event.current.commandName == "ObjectSelectorClosed" || Event.current.commandName == "ObjectSelectorUpdated") && EditorGUIUtility.GetObjectPickerControlID() == 10)
-                {
-                    if (EditorGUIUtility.GetObjectPickerObject() != null)
-                    {
-                        if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioPlayerSequence>() != null)
-                        {
-                            UtilEditor.SettingsObject.Fp("sequencePrefab").objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
-                            UtilEditor.SettingsObject.ApplyModifiedProperties();
-                            UtilEditor.SettingsObject.Update();
-                        }
-                        else
-                        {
-                            AmDebugLogger.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioSequence class attached.");
-                        }
-                    }
-                    else
-                    {
-                        UtilEditor.SettingsObject.Fp("sequencePrefab").objectReferenceValue = null;
-                        UtilEditor.SettingsObject.ApplyModifiedProperties();
-                        UtilEditor.SettingsObject.Update();
-                    }
-                }
-                GUI.backgroundColor = Color.white;
-                EditorGUILayout.EndHorizontal();
-              
-                
-                EditorGUILayout.BeginHorizontal();
-                EditorGUI.BeginDisabledGroup(true);
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("audioPrefab"));
-                EditorGUI.EndDisabledGroup();
-                GUI.backgroundColor = UtilEditor.Yellow;
-                if (GUILayout.Button("Edit", GUILayout.Width(55)))
-                {
-                    EditorGUIUtility.ShowObjectPicker<AudioPlayer>(null, false, "t:GameObject", 11);
-                }
-            
-                if ((Event.current.commandName == "ObjectSelectorClosed" || Event.current.commandName == "ObjectSelectorUpdated") && EditorGUIUtility.GetObjectPickerControlID() == 11)
-                {
-                    if (EditorGUIUtility.GetObjectPickerObject() != null)
-                    {
-                        if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioPlayer>() != null)
-                        {
-                            UtilEditor.SettingsObject.Fp("audioPrefab").objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
-                            UtilEditor.SettingsObject.ApplyModifiedProperties();
-                            UtilEditor.SettingsObject.Update();
-                        }
-                        else
-                        {
-                            AmDebugLogger.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioPlayer class attached.");
-                        }
-                    }
-                    else
-                    {
-                        UtilEditor.SettingsObject.Fp("audioPrefab").objectReferenceValue = null;
-                        UtilEditor.SettingsObject.ApplyModifiedProperties();
-                        UtilEditor.SettingsObject.Update();
-                    }
-                }
-                GUI.backgroundColor = Color.white;
-                EditorGUILayout.EndHorizontal();
-                
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("clipAudioMixer"), new GUIContent("Default Clip Mixer"));
-                
-                GUILayout.Space(12.5f);
-                
-                EditorGUILayout.LabelField("Music Tracks", EditorStyles.boldLabel);
-                UtilEditor.DrawHorizontalGUILine();
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("playMusicState"));
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("musicAudioMixer"), new GUIContent("Default Music Mixer"));
-                
-                GUILayout.Space(12.5f);
-                
-                EditorGUILayout.LabelField("Pooling", EditorStyles.boldLabel);
-                UtilEditor.DrawHorizontalGUILine();
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("audioPoolInitSize"));
-
                 GUILayout.Space(12.5f);
                 
                 EditorGUILayout.LabelField("Variance", EditorStyles.boldLabel);
                 UtilEditor.DrawHorizontalGUILine();
                     
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("volumeVarianceOffset"),
+                EditorGUILayout.PropertyField(SettingsObj.Fp("volumeVarianceOffset"),
                     new GUIContent("Volume Variance", "The amount of +/- from the default value to change the volume when using global variance."));
                 
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("pitchVarianceOffset"),
+                EditorGUILayout.PropertyField(SettingsObj.Fp("pitchVarianceOffset"),
                     new GUIContent("Pitch Variance",
                         "The amount of +/- from the default value to change the pitch when using global variance."));
                 
@@ -326,7 +215,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.LabelField("Dynamic Time", EditorStyles.boldLabel);
                 UtilEditor.DrawHorizontalGUILine();
                 
-                EditorGUILayout.PropertyField(UtilEditor.SettingsObject.Fp("dynamicDetectionOffset"),
+                EditorGUILayout.PropertyField(SettingsObj.Fp("dynamicDetectionOffset"),
                     new GUIContent("Dynamic Start Offset",
                         "The amount of samples reduced from the found start time when detecting the start time of a clip."));
                 
@@ -334,6 +223,106 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUI.indentLevel--;
             }
 
+            GUILayout.Space(2.5f);
+            EditorGUILayout.EndVertical();
+        }
+
+
+
+        private static void DrawPoolingOptions()
+        {
+            EditorGUILayout.BeginVertical("HelpBox");
+            GUILayout.Space(1.5f);
+            
+            PerUserSettings.ShowPoolingOptions = EditorGUILayout.Foldout(PerUserSettings.ShowPoolingOptions, "Object Pooling");
+
+            if (PerUserSettings.ShowPoolingOptions)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.BeginVertical("Box");
+                
+                EditorGUILayout.PropertyField(SettingsObj.Fp("audioPoolInitSize"));
+                
+                // Player Prefab [START] -----
+                EditorGUILayout.BeginHorizontal();
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.PropertyField(SettingsObj.Fp("playerPrefab"));
+                EditorGUI.EndDisabledGroup();
+                GUI.backgroundColor = UtilEditor.Yellow;
+                if (GUILayout.Button("Edit", GUILayout.Width(55)))
+                {
+                    EditorGUIUtility.ShowObjectPicker<AudioPlayer>(null, false, "t:GameObject", 10);
+                }
+            
+                if ((Event.current.commandName == "ObjectSelectorClosed" || Event.current.commandName == "ObjectSelectorUpdated") && EditorGUIUtility.GetObjectPickerControlID() == 10)
+                {
+                    if (EditorGUIUtility.GetObjectPickerObject() != null)
+                    {
+                        if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioPlayer>() != null)
+                        {
+                            SettingsObj.Fp("playerPrefab").objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
+                            SettingsObj.ApplyModifiedProperties();
+                            SettingsObj.Update();
+                        }
+                        else
+                        {
+                            AmDebugLogger.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioSequence class attached.");
+                        }
+                    }
+                    else
+                    {
+                        SettingsObj.Fp("sequencePrefab").objectReferenceValue = null;
+                        SettingsObj.ApplyModifiedProperties();
+                        SettingsObj.Update();
+                    }
+                }
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.EndHorizontal();
+                // Player Prefab [END] -----
+                
+                
+                // Source Instance Prefab [START] -----
+                EditorGUILayout.BeginHorizontal();
+                EditorGUI.BeginDisabledGroup(true);
+                EditorGUILayout.PropertyField(SettingsObj.Fp("sourceInstancePrefab"));
+                EditorGUI.EndDisabledGroup();
+                GUI.backgroundColor = UtilEditor.Yellow;
+                if (GUILayout.Button("Edit", GUILayout.Width(55)))
+                {
+                    EditorGUIUtility.ShowObjectPicker<AudioSourceInstance>(null, false, "t:GameObject", 11);
+                }
+            
+                if ((Event.current.commandName == "ObjectSelectorClosed" || Event.current.commandName == "ObjectSelectorUpdated") && EditorGUIUtility.GetObjectPickerControlID() == 11)
+                {
+                    if (EditorGUIUtility.GetObjectPickerObject() != null)
+                    {
+                        if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioSourceInstance>() != null)
+                        {
+                            SettingsObj.Fp("sourceInstancePrefab").objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
+                            SettingsObj.ApplyModifiedProperties();
+                            SettingsObj.Update();
+                        }
+                        else
+                        {
+                            AmDebugLogger.Warning($"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign did not have a AudioPlayer class attached.");
+                        }
+                    }
+                    else
+                    {
+                        SettingsObj.Fp("sourceInstancePrefab").objectReferenceValue = null;
+                        SettingsObj.ApplyModifiedProperties();
+                        SettingsObj.Update();
+                    }
+                }
+                GUI.backgroundColor = Color.white;
+                EditorGUILayout.EndHorizontal();
+                // Source Instance Prefab [END] -----
+                
+                
+                EditorGUILayout.EndVertical();
+                EditorGUI.indentLevel--;
+            }
+            
             GUILayout.Space(2.5f);
             EditorGUILayout.EndVertical();
         }
@@ -354,9 +343,9 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUI.indentLevel++;
                 EditorGUILayout.BeginVertical("Box");
 
-                PerUserSettings.VersionValidationAutoCheckOnLoad = EditorGUILayout.Toggle(new GUIContent("Update Check On Load",
+                CommonPerUserSettings.VersionValidationAutoCheckOnLoad = EditorGUILayout.Toggle(new GUIContent("Update Check On Load",
                         "Checks for any updates to the asset from the GitHub page when you load the project."),
-                    PerUserSettings.VersionValidationAutoCheckOnLoad);
+                    CommonPerUserSettings.VersionValidationAutoCheckOnLoad);
                 
                 PerUserSettings.ShowHelpBoxes = EditorGUILayout.Toggle(new GUIContent("Help Boxes",
                         "Show prompts under some buttons to help aid in understanding what does what?"),
@@ -365,10 +354,6 @@ namespace CarterGames.Assets.AudioManager.Editor
                 PerUserSettingsRuntime.ShowDebugLogs = EditorGUILayout.Toggle(
                     new GUIContent("Debug Logs", "Show log messages in the console for this asset?"),
                     PerUserSettingsRuntime.ShowDebugLogs);
-                
-                PerUserSettings.DeveloperDebugMode = EditorGUILayout.Toggle(
-                    new GUIContent("Dev Mode", "Toggle Developer mode, for debugging ONLY!"),
-                    PerUserSettings.DeveloperDebugMode);
 
                 if (GUILayout.Button("Reset Settings"))
                 {

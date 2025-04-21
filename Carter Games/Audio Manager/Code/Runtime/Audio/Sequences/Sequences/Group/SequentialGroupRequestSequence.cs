@@ -1,26 +1,27 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using CarterGames.Assets.Shared.Common;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
@@ -28,7 +29,7 @@ namespace CarterGames.Assets.AudioManager
     /// <summary>
     /// Handles a sequential clip player with all the clips playing one after the other.
     /// </summary>
-    public sealed class SequentialGroupRequestSequence : ISequenceHandler
+    public sealed class SequentialGroupRequestSequence : IPlayMethod
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
@@ -36,7 +37,7 @@ namespace CarterGames.Assets.AudioManager
         
         private readonly GroupData groupData;
         private readonly AudioClipSettings clipSettings;
-        private readonly AudioPlayerSequence playerSequence;
+        private readonly AudioPlayer player;
         private int currentIndex;
         private bool hasDelayed;
         private DelayEdit delayEdit;
@@ -48,12 +49,12 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Creates a sequential sequence with the entered data.
         /// </summary>
-        /// <param name="playerSequence">The sequence to use.</param>
+        /// <param name="player">The sequence to use.</param>
         /// <param name="groupData">The data to use.</param>
         /// <param name="clipSettings">The settings to apply.</param>
-        public SequentialGroupRequestSequence(AudioPlayerSequence playerSequence, GroupData groupData, AudioClipSettings clipSettings)
+        public SequentialGroupRequestSequence(AudioPlayer player, GroupData groupData, AudioClipSettings clipSettings)
         {
-            this.playerSequence = playerSequence;
+            this.player = player;
             this.groupData = groupData;
             this.clipSettings = clipSettings;
         }
@@ -61,7 +62,9 @@ namespace CarterGames.Assets.AudioManager
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
+
+        public bool IsSetup { get; }
+
         /// <summary>
         /// Sets up the sequence for use.
         /// </summary>
@@ -69,11 +72,13 @@ namespace CarterGames.Assets.AudioManager
         {
             currentIndex = 0;
             
-            playerSequence.Players[0].PlayerSequence = playerSequence;
-            playerSequence.Players[0].SetClip(AssetAccessor.GetAsset<AudioLibrary>().GetData(groupData.Clips[currentIndex]), clipSettings);
+            // player.Players[0].PlayMethod = player;
+            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(groupData.Clips[currentIndex], out var data)) return;
             
-            playerSequence.Players[0].Completed.Remove(OnClipCompleted);
-            playerSequence.Players[0].Completed.Add(OnClipCompleted);
+            player.Source.InitializePlayer(player, data, clipSettings);
+            
+            player.Source.Completed.Remove(OnClipCompleted);
+            player.Source.Completed.Add(OnClipCompleted);
         }
         
         
@@ -82,7 +87,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Play()
         {
-            playerSequence.Players[0].PlayPlayer();
+            player.Source.PlaySourceInstance();
         }
         
         
@@ -91,7 +96,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Pause()
         {
-            playerSequence.Players[0].PausePlayer();
+            player.Source.PauseSourceInstance();
         }
 
         
@@ -100,7 +105,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Resume()
         {
-            playerSequence.Players[0].ResumePlayer();
+            player.Source.ResumeSourceInstance();
         }
 
         
@@ -109,7 +114,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Stop()
         {
-            playerSequence.Players[0].StopPlayer();
+            player.Source.StopSourceInstance();
         }
 
         
@@ -120,12 +125,14 @@ namespace CarterGames.Assets.AudioManager
         {
             if (delayEdit != null)
             {
-                playerSequence.Players[0].EditParams.SetValue("delay", delayEdit);
+                player.Source.EditParams.SetValue("delay", delayEdit);
                 hasDelayed = false;
             }
             
             currentIndex = 0;
-            playerSequence.Players[0].SetClip(AssetAccessor.GetAsset<AudioLibrary>().GetData(groupData.Clips[currentIndex]));
+
+            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(groupData.Clips[currentIndex], out var data)) return;
+            player.Source.InitializePlayer(player, data);
         }
         
         
@@ -136,11 +143,11 @@ namespace CarterGames.Assets.AudioManager
         {
             currentIndex++;
 
-            if (!hasDelayed && playerSequence.Players[0].EditParams.HasKey("delay"))
+            if (!hasDelayed && player.Source.EditParams.HasKey("delay"))
             {
                 hasDelayed = true;
-                delayEdit = playerSequence.Players[0].EditParams.GetValue<DelayEdit>("delay");
-                playerSequence.Players[0].EditParams.RemoveValue("delay");
+                delayEdit = player.Source.EditParams.GetValue<DelayEdit>("delay");
+                player.Source.EditParams.RemoveValue("delay");
             }
             
             if (groupData.Clips.Count.Equals(currentIndex))
@@ -148,16 +155,17 @@ namespace CarterGames.Assets.AudioManager
                 // Complete Sequence....
                 if (delayEdit != null)
                 {
-                    playerSequence.Players[0].EditParams.SetValue("delay", delayEdit);
+                    player.Source.EditParams.SetValue("delay", delayEdit);
                     hasDelayed = false;
                     // Debug.Log("Reset Edit Removal");
                 }
                 
-                playerSequence.PlayerComplete();
+                player.PlayerComplete();
                 return;
             }
             
-            playerSequence.Players[0].SetClip(AssetAccessor.GetAsset<AudioLibrary>().GetData(groupData.Clips[currentIndex]));
+            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(groupData.Clips[currentIndex], out var data)) return;
+            player.Source.InitializePlayer(player, data);
             
             Play();
         }

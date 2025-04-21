@@ -1,26 +1,29 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using System;
+using System.Collections.Generic;
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -37,7 +40,6 @@ namespace CarterGames.Assets.AudioManager.Editor
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        private static EditModuleSearchProvider moduleSearchProvider;
         private SerializedProperty editModuleLookupProp;
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -82,28 +84,35 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             for (var i = 0; i < EditModuleLookupProp.arraySize; i++)
             {
-                if (EditModuleInspectors.Inspectors.ContainsKey(EditModuleLookupProp.GetIndex(i).Fpr("key").stringValue))
+                var type = Type.GetType(EditModuleLookupProp.GetIndex(i).Fpr("key").stringValue);
+                
+                if (type == null) continue;
+                
+                if (EditModuleInspectors.Inspectors.ContainsKey(type))
                 {
-                    EditModuleInspectors.Inspectors[EditModuleLookupProp.GetIndex(i).Fpr("key").stringValue]
-                        .DrawInspector(EditModuleLookupProp.serializedObject, i);
+                    EditModuleInspectors.Inspectors[type].DrawInspector(EditModuleLookupProp.serializedObject, i);
                 }
             }
+
+            GUILayout.Space(2.5f);
+            GUI.backgroundColor = EditorColors.PrimaryGreen;
             
-            if (GUILayout.Button("Add Edit Module", GUILayout.Height(25)))
+            if (GUILayout.Button("+ Add Edit Module", GUILayout.Height(25)))
             {
-                moduleSearchProvider ??= CreateInstance<EditModuleSearchProvider>();
-                        
-                EditModuleSearchProvider.ToExclude.Clear();
-                        
+                var used = new List<string>();
+                
                 for (var j = 0; j < serializedObject.Fp("editModuleSettings").Fpr("list").arraySize; j++)
                 {
-                    EditModuleSearchProvider.ToExclude.Add(serializedObject.Fp("editModuleSettings").Fpr("list").GetIndex(j).Fpr("key").stringValue.Replace("CarterGames.Assets.AudioManager.", string.Empty).Replace("Edit", string.Empty));
+                    used.Add(serializedObject.Fp("editModuleSettings").Fpr("list").GetIndex(j).Fpr("key").stringValue);
                 }
                 
-                EditModuleSearchProvider.OnSearchTreeSelectionMade.Clear();
-                EditModuleSearchProvider.OnSearchTreeSelectionMade.AddAnonymous("editModuleSelect", SelectClip);
-                SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), moduleSearchProvider);
+                SearchProviderInstancing.SearchProviderEditModule.SelectionMade.Clear();
+                SearchProviderInstancing.SearchProviderEditModule.SelectionMade.AddAnonymous("editModuleSelect", SelectClip);
+                
+                SearchProviderInstancing.SearchProviderEditModule.Open(used);
             }
+            
+            GUI.backgroundColor = Color.white;
             
             EditorGUI.EndDisabledGroup();
             
@@ -148,20 +157,20 @@ namespace CarterGames.Assets.AudioManager.Editor
         
         private void SelectClip(SearchTreeEntry treeEntry)
         {
-            LibrarySearchProvider.OnSearchTreeSelectionMade.RemoveAnonymous("editModuleSelect");
+            SearchProviderInstancing.SearchProviderLibrary.SelectionMade.RemoveAnonymous("editModuleSelect");
 
             var total = 0;
             
             for (var i = 0; i < EditModuleLookupProp.arraySize; i++)
             {
-                if (EditModuleLookupProp.GetIndex(i).Fpr("key").stringValue != treeEntry.userData.ToString()) continue;
+                if (EditModuleLookupProp.GetIndex(i).Fpr("key").stringValue != ((Type) treeEntry.userData).AssemblyQualifiedName) continue;
                 total++;
             }
 
             if (total > 0) return;
             
             EditModuleLookupProp.InsertIndex(EditModuleLookupProp.arraySize);
-            EditModuleLookupProp.GetIndex(EditModuleLookupProp.arraySize - 1).Fpr("key").stringValue = treeEntry.userData.ToString();
+            EditModuleLookupProp.GetIndex(EditModuleLookupProp.arraySize - 1).Fpr("key").stringValue = ((Type) treeEntry.userData).AssemblyQualifiedName;
             EditModuleLookupProp.GetIndex(EditModuleLookupProp.arraySize - 1).Fpr("value").Fpr("list").ClearArray();
                 
             serializedObject.ApplyModifiedProperties();

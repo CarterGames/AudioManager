@@ -1,32 +1,34 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using CarterGames.Assets.Shared.Common;
+
 namespace CarterGames.Assets.AudioManager
 {
     /// <summary>
     /// Handles a combined clip player with all the clips playing together.
     /// </summary>
-    public sealed class CombinedGroupRequestSequence : ISequenceHandler
+    public sealed class CombinedGroupRequestSequence : IPlayMethod
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
@@ -34,7 +36,7 @@ namespace CarterGames.Assets.AudioManager
         
         private readonly GroupData groupData;
         private readonly AudioClipSettings clipSettings;
-        private readonly AudioPlayerSequence playerSequence;
+        private readonly AudioPlayer player;
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Constructors
@@ -43,14 +45,16 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Creates a combined sequence with the entered data.
         /// </summary>
-        /// <param name="playerSequence">The sequence to use.</param>
+        /// <param name="player">The sequence to use.</param>
         /// <param name="groupData">The data to use.</param>
         /// <param name="clipSettings">The settings to apply.</param>
-        public CombinedGroupRequestSequence(AudioPlayerSequence playerSequence, GroupData groupData, AudioClipSettings clipSettings)
+        public CombinedGroupRequestSequence(AudioPlayer player, GroupData groupData, AudioClipSettings clipSettings)
         {
-            this.playerSequence = playerSequence;
+            this.player = player;
             this.groupData = groupData;
             this.clipSettings = clipSettings;
+            
+            Setup();
         }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -60,25 +64,25 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Sets up the sequence for use.
         /// </summary>
-        public void Setup()
+        private void Setup()
         {
-            if (playerSequence.Players.Count < groupData.Clips.Count)
+            if (player.AllSources.Count < groupData.Clips.Count)
             {
-                var totalRequired = groupData.Clips.Count - playerSequence.Players.Count;
+                var totalRequired = groupData.Clips.Count - player.AllSources.Count;
                 
                 for (var i = 0; i < totalRequired; i++)
                 {
-                    playerSequence.AssignNewPlayer();
+                    player.AssignNewInstance();
                 }
             }
 
-            for (var i = 0; i < playerSequence.Players.Count; i++)
+            for (var i = 0; i < player.AllSources.Count; i++)
             {
-                playerSequence.Players[i].PlayerSequence = playerSequence;
-                playerSequence.Players[i].SetClip(AssetAccessor.GetAsset<AudioLibrary>().GetData(groupData.Clips[i]), clipSettings);
+                if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(groupData.Clips[i], out var data)) continue;
+                player.AllSources[i].InitializePlayer(player, data, clipSettings);
                 
-                playerSequence.Players[i].Completed.Remove(playerSequence.PlayerComplete);
-                playerSequence.Players[i].Completed.Add(playerSequence.PlayerComplete);
+                player.AllSources[i].Completed.Remove(player.PlayerComplete);
+                player.AllSources[i].Completed.Add(player.PlayerComplete);
             }
         }
         
@@ -88,9 +92,9 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Play()
         {
-            foreach (var player in playerSequence.Players)
+            foreach (var sourceInstance in player.AllSources)
             {
-                player.PlayPlayer();
+                sourceInstance.PlaySourceInstance();
             }
         }
         
@@ -100,9 +104,9 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Pause()
         {
-            foreach (var player in playerSequence.Players)
+            foreach (var sourceInstance in player.AllSources)
             {
-                player.PausePlayer();
+                sourceInstance.PauseSourceInstance();
             }
         }
 
@@ -112,9 +116,9 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Resume()
         {
-            foreach (var player in playerSequence.Players)
+            foreach (var sourceInstance in player.AllSources)
             {
-                player.ResumePlayer();
+                sourceInstance.ResumeSourceInstance();
             }
         }
 
@@ -124,9 +128,9 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Stop()
         {
-            foreach (var player in playerSequence.Players)
+            foreach (var sourceInstance in player.AllSources)
             {
-                player.StopPlayer();
+                sourceInstance.StopSourceInstance();
             }
         }
         

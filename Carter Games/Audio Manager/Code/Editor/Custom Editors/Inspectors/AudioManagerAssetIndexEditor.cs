@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,6 +22,8 @@
  */
 
 using System.Collections.Generic;
+using CarterGames.Assets.Shared.Common;
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,7 +32,7 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// <summary>
     /// Handles the custom inspector for the Audio Manager asset index.
     /// </summary>
-    [CustomEditor(typeof(AssetIndex))]
+    [CustomEditor(typeof(DataAssetIndex))]
     public sealed class AudioManagerAssetIndexEditor : UnityEditor.Editor
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -60,10 +62,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         public override void OnInspectorGUI()
         {
             GUILayout.Space(12.5f);
-            UtilEditor.DrawHeaderWithTexture(UtilEditor.DataIcon);
-            GUILayout.Space(12.5f);
             
-            UtilEditor.DrawSoScriptSection((AssetIndex) target);
+            UtilEditor.DrawSoScriptSection((DataAssetIndex) target);
             GUILayout.Space(12.5f);
 
             DrawRequireReferencesSection();
@@ -124,13 +124,13 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.EndHorizontal();
             }
 
-            if (entryLookup.ContainsKey(typeof(SettingsAssetRuntime).FullName) && serializedObject.Fp("assets").Fpr("list").arraySize > 0)
+            if (entryLookup.ContainsKey(typeof(AmAssetSettings).FullName) && serializedObject.Fp("assets").Fpr("list").arraySize > 0)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Settings Reference: ", GUILayout.Width("Settings Reference:".Width()));
 
                 var hasLibRef = serializedObject.Fp("assets").Fpr("list")
-                    .GetIndex(entryLookup[typeof(SettingsAssetRuntime).FullName]).Fpr("value").arraySize > 0;
+                    .GetIndex(entryLookup[typeof(AmAssetSettings).FullName]).Fpr("value").arraySize > 0;
                 
                 GUI.contentColor = hasLibRef ? UtilEditor.Green : UtilEditor.Red;
                 EditorGUILayout.LabelField(hasLibRef ? "True" : "False");

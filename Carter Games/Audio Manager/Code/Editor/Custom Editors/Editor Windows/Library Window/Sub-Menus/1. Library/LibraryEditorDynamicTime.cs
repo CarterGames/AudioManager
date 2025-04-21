@@ -1,26 +1,27 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -43,7 +44,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        private static SerializedProperty ShowProp => property.Fpr("showDynamicTime");
+        private static SerializedProperty ShowProp => property.Fpr("dynamicStartTime");
         private static SerializedProperty ThresholdProp => property.Fpr("dynamicStartTime").Fpr("threshold");
         private static SerializedProperty OptionProp => property.Fpr("dynamicStartTime").Fpr("option");
         private static SerializedProperty TimeProp => property.Fpr("dynamicStartTime").Fpr("time");
@@ -59,24 +60,24 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <param name="propertyReference">The property to base off.</param>
         public static void DrawLibraryEditor(SerializedProperty propertyReference)
         {
-            EditorGUILayout.BeginVertical("HelpBox");
-            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginVertical(propertyReference.Fpr("value").Fpr("dynamicStartTime").isExpanded ? "HelpBox" : "Box");
             
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.Space();
+            EditorGUILayout.Space(1.5f);
             
             property = propertyReference.Fpr("value");
-            ShowProp.boolValue = EditorGUILayout.Foldout(ShowProp.boolValue, FoldoutLabel);
+            ShowProp.isExpanded = EditorGUILayout.Foldout(ShowProp.isExpanded, FoldoutLabel);
             
-            EditorGUILayout.Space();
-            
-            
-            if (ShowProp.boolValue)
+            if (ShowProp.isExpanded)
             {
-                EditorGUILayout.BeginVertical("Box");
                 EditorGUILayout.Space(1.5f);
                 
-                OptionProp.intValue = GUILayout.Toolbar(OptionProp.intValue, OptionLabels);
+                UtilEditor.DrawHorizontalGUILine();
+                
+                EditorGUILayout.BeginVertical();
+                EditorGUILayout.Space(1.5f);
+                
+                OptionProp.intValue = GUILayout.Toolbar(OptionProp.intValue, OptionLabels, GUILayout.Height(27.5f));
 
                 EditorGUILayout.Space();
                 
@@ -89,10 +90,11 @@ namespace CarterGames.Assets.AudioManager.Editor
                     DrawManualSection();
                 }
                 
-                EditorGUILayout.Space();
-                UtilEditor.DrawHorizontalGUILine();
+                EditorGUILayout.Space(2.5f);
 
+                EditorGUILayout.BeginVertical("HelpBox");
                 DrawWaveform();
+                EditorGUILayout.EndVertical();
                 
                 EditorGUILayout.Space(1.5f);
                 EditorGUILayout.EndVertical();
@@ -100,7 +102,8 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             EditorGUILayout.Space(1.5f);
             EditorGUILayout.EndVertical();
-            EditorGUILayout.EndVertical();
+            
+            EditorGUILayout.Space(ShowProp.isExpanded ? 3f : .5f);
             
             if (!EditorGUI.EndChangeCheck()) return;
             property.serializedObject.ApplyModifiedProperties();
@@ -113,8 +116,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         private static void DrawAutomaticSection()
         {
-            EditorGUILayout.PropertyField(ThresholdProp);
+            EditorGUILayout.BeginVertical("HelpBox");
+            EditorGUILayout.Space(1.5f);
             
+            EditorGUILayout.PropertyField(ThresholdProp);
+
+            GUI.backgroundColor = EditorColors.PastelGreen;
             if (GUILayout.Button("Estimate Start Time"))
             {
                 if (DynamicTimeDetector.TryDetectStartTime((AudioClip) ValueProp.objectReferenceValue, ThresholdProp.floatValue, out var time))
@@ -127,6 +134,10 @@ namespace CarterGames.Assets.AudioManager.Editor
                     Undo.RecordObject(property.serializedObject.targetObject, "Dynamic Time Estimated");
                 }
             }
+            GUI.backgroundColor = Color.white;
+            
+            EditorGUILayout.Space(1.5f);
+            EditorGUILayout.EndVertical();
         }
         
         
@@ -135,7 +146,13 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         private static void DrawManualSection()
         {
+            EditorGUILayout.BeginVertical("HelpBox");
+            EditorGUILayout.Space(1.5f);
+            
             EditorGUILayout.Slider(TimeProp, 0f, ((AudioClip) ValueProp.objectReferenceValue).length);
+            
+            EditorGUILayout.Space(1.5f);
+            EditorGUILayout.EndVertical();
         }
 
 
