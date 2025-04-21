@@ -78,7 +78,7 @@ namespace CarterGames.Assets.AudioManager
         public void Process(AudioSourceInstance source)
         {
             source.TargetPlayer.LoopInfo = this;
-            CurrentLoopCount = 0;
+            CurrentLoopCount = 1;
         }
 
         
@@ -89,6 +89,7 @@ namespace CarterGames.Assets.AudioManager
         public void Revert(AudioSourceInstance source)
         {
             source.TargetPlayer.LoopInfo = null;
+            CurrentLoopCount = 1;
         }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -104,7 +105,7 @@ namespace CarterGames.Assets.AudioManager
         {
             LoopCount = value;
             IgnoreDelayAfterFirstCall = ignoreDelayAfterFirst;
-            CurrentLoopCount = 0;
+            CurrentLoopCount = 1;
         }
     }
 }

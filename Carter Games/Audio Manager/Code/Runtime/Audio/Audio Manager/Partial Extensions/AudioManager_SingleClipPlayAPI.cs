@@ -39,6 +39,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer Play(string request, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, edits);
             instance.Play();
             return instance;
@@ -54,6 +56,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayFromTime(string request, float startTime, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new StartTimeEdit(startTime), edits);
             instance.Play();
             return instance;
@@ -69,6 +73,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayWithDelay(string request, float delay, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new DelayEdit(delay), edits);
             instance.Play();
             return instance;
@@ -84,6 +90,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayAtLocation(string request, Vector2 position, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new PositionEdit(position), edits);
             instance.Play();
             return instance;
@@ -99,6 +107,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayAtLocation(string request, Vector3 position, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new PositionEdit(position), edits);
             instance.Play();
             return instance;
@@ -115,6 +125,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayAtLocation(string request, Transform position, bool useLocalPosition, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new PositionEdit(position, useLocalPosition), edits);
             instance.Play();
             return instance;
@@ -131,6 +143,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer Play(string request, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new IEditModule[]
             {
                 new VolumeEdit(volume ?? 1f), 
@@ -153,6 +167,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayFromTime(string request, float startTime, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new IEditModule[] 
             {  
                 new VolumeEdit(volume ?? 1f), 
@@ -176,6 +192,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayWithDelay(string request, float delay, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new IEditModule[] 
             {  
                 new VolumeEdit(volume ?? 1f), 
@@ -199,6 +217,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayAtLocation(string request, Vector2 position, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new IEditModule[] 
             {  
                 new VolumeEdit(volume ?? 1f), 
@@ -222,6 +242,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayAtLocation(string request, Vector3 position, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new IEditModule[] 
             {  
                 new VolumeEdit(volume ?? 1f), 
@@ -246,6 +268,8 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayAtLocation(string request, Transform position, bool useLocalPosition, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
+            
             var instance = InternalPrepare(request, new IEditModule[] 
             {  
                 new VolumeEdit(volume ?? 1f), 

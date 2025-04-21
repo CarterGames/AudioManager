@@ -221,7 +221,15 @@ namespace CarterGames.Assets.AudioManager.Editor
                     }
                 }
 
-                if (GUILayout.Button(LibObj.Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue))
+                var toDisplay = new GUIContent(LibObj
+                    .Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue);
+
+                if (toDisplay.text.Length > 25)
+                {
+                    toDisplay.text = toDisplay.text.Substring(0, Mathf.Clamp(toDisplay.text.Length, 20, 35)) + "...";
+                }
+                
+                if (GUILayout.Button(toDisplay))
                 {
                     PerUserSettings.LastLibraryIndexShown = i;
                     

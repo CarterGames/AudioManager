@@ -144,8 +144,6 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                         starting = EditorGUILayout.FloatField("Starting Value:", starting);
                         offset = EditorGUILayout.FloatField("Offset:", offset);
-                        minVariance = EditorGUILayout.FloatField("Min:", minVariance);
-                        maxVariance = EditorGUILayout.FloatField("Max:", maxVariance);
                         
 
                         if (EditorGUI.EndChangeCheck())

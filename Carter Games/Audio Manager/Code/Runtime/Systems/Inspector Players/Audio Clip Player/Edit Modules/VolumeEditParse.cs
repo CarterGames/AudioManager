@@ -22,6 +22,7 @@
  */
 
 using CarterGames.Assets.Shared.Common.Serializiation;
+using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
 {
@@ -65,7 +66,7 @@ namespace CarterGames.Assets.AudioManager
                     
                     break;
             }
-
+            
             return volumeModule;
         }
     }

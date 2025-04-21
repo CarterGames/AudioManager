@@ -165,14 +165,12 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.LabelField("All References", EditorStyles.boldLabel);
             UtilEditor.DrawHorizontalGUILine();
-
-            EditorGUI.indentLevel++;
             
             EditorGUI.BeginDisabledGroup(Application.isPlaying);
-            EditorGUILayout.PropertyField(serializedObject.Fp("assets"));
-            EditorGUI.EndDisabledGroup();
-            
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(serializedObject.Fp("assets").Fpr("list"));
             EditorGUI.indentLevel--;
+            EditorGUI.EndDisabledGroup();
             
             GUILayout.Space(1.5f);
             EditorGUILayout.EndVertical();

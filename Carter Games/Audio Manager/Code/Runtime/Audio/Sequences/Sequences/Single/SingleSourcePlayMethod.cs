@@ -21,41 +21,32 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.AudioManager.Logging;
-using CarterGames.Assets.Shared.Common;
-
 namespace CarterGames.Assets.AudioManager
 {
     /// <summary>
     /// Handles a single clip player.
     /// </summary>
-    public sealed class SingleSourcePlayer : IPlayMethod
+    public sealed class SingleSourcePlayMethod : IPlayMethod
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        private readonly string request;
-        private readonly AudioClipSettings clipSettings;
         private readonly AudioPlayer player;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Constructors
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-        public SingleSourcePlayer(AudioPlayer player, AudioData requestData, AudioClipSettings clipSettings = null)
+        private SingleSourcePlayMethod(AudioPlayer player)
         {
-            request = requestData.id;
             this.player = player;
-
-            if (clipSettings == null) return;
-            this.clipSettings = clipSettings;
         }
         
         
-        public static SingleSourcePlayer InitializePlayMethod(AudioPlayer player, AudioData requestData)
+        public static SingleSourcePlayMethod InitializePlayMethod(AudioPlayer player, AudioData requestData)
         {
-            var playMethodHandler = new SingleSourcePlayer(player, requestData);
+            var playMethodHandler = new SingleSourcePlayMethod(player);
             
             player.Source.InitializePlayer(player, requestData);
             player.Source.Completed.Remove(player.PlayerComplete);
@@ -65,11 +56,11 @@ namespace CarterGames.Assets.AudioManager
         }
         
         
-        public static SingleSourcePlayer InitializePlayMethod(AudioPlayer player, AudioData requestData, AudioClipSettings clipSettings)
+        public static SingleSourcePlayMethod InitializePlayMethod(AudioPlayer player, AudioData requestData, AudioClipSettings clipSettings)
         {
-            var playMethodHandler = new SingleSourcePlayer(player, requestData, clipSettings);
+            var playMethodHandler = new SingleSourcePlayMethod(player);
             
-            player.Source.InitializePlayer(player, requestData);
+            player.Source.InitializePlayer(player, requestData, clipSettings);
             player.Source.Completed.Remove(player.PlayerComplete);
             player.Source.Completed.Add(player.PlayerComplete);
             
@@ -79,23 +70,6 @@ namespace CarterGames.Assets.AudioManager
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        public bool IsSetup { get; private set; }
-
-        /// <summary>
-        /// Sets up the sequence for use.
-        /// </summary>
-        public void Setup()
-        {
-            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(request, out var data)) return;
-
-            if (data == null) return;
-            
-
-
-            IsSetup = true;
-        }
-        
 
         /// <summary>
         /// Plays the sequence when called.

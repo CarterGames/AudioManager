@@ -148,6 +148,7 @@ namespace CarterGames.Assets.AudioManager
             targetPlayer = player;
             data = audioData;
             Source.clip = audioData.value;
+            Source.mute = AssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState == PlayState.PlayMuted;
 
             Source.volume = audioData.defaultSettings.Volume;
             Source.pitch = audioData.defaultSettings.Pitch;
@@ -208,7 +209,7 @@ namespace CarterGames.Assets.AudioManager
             }
             
             AssetAccessor.GetAsset<AmAssetSettings>().AudioStateChanged.Add(OnClipStateChanged);
-            RefreshVariance();
+            RefreshGlobalVariance();
             IsPrepared = true;
             State = AudioSourceState.Ready;
         }
@@ -292,10 +293,13 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Updates the variance of the clip for a fresh play. 
         /// </summary>
-        private void RefreshVariance()
+        private void RefreshGlobalVariance()
         {
-            if (!EditParams.TryGetValue<bool>("globalVariance", out var useVariance)) return;
-            if (!useVariance) return;
+            if (EditParams.TryGetValue<bool>("globalVariance", out var useVariance))
+            {
+                if (!useVariance) return;
+            }
+
             if (!AssetAccessor.GetAsset<AmAssetSettings>().UseGlobalVariance) return;
 
             var volVariance = new Variance(Source.volume,

@@ -40,7 +40,6 @@ namespace CarterGames.Assets.AudioManager
 
         [SerializeField] private AudioSourceInstance standardSource;
         [SerializeField] private List<AudioSourceInstance> additionalSources = new List<AudioSourceInstance>();
-        [SerializeField] private AudioSourceState state;
 
         private List<AudioSourceInstance> allSources;
         private IPlayMethod playMethod;
@@ -103,7 +102,10 @@ namespace CarterGames.Assets.AudioManager
         public bool IsPlaying => AllSources.Any(t => t.IsPlaying);
         
         
-        public bool RecycleOnComplete { get; set; }
+        /// <summary>
+        /// Defines if the player recycles to the pool again once complete.
+        /// </summary>
+        public bool RecycleOnComplete { get; private set; }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Events
@@ -175,7 +177,7 @@ namespace CarterGames.Assets.AudioManager
             if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(request, out var data)) return;
 
             RecycleOnComplete = true;
-            playMethod = SingleSourcePlayer.InitializePlayMethod(this, data, requestSettings);
+            playMethod = SingleSourcePlayMethod.InitializePlayMethod(this, data, requestSettings);
             
             IsInitialized = true;
         }

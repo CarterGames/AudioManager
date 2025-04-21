@@ -59,13 +59,13 @@ namespace CarterGames.Assets.AudioManager
         private readonly Dictionary<string, IInspectorPlayerParse> inspectorParsers =
             new Dictionary<string, IInspectorPlayerParse>()
             {
-                { "CarterGames.Assets.AudioManager.VolumeEdit", new VolumeEditParse() },
-                { "CarterGames.Assets.AudioManager.PitchEdit", new PitchEditParse() },
-                { "CarterGames.Assets.AudioManager.MixerEdit", new MixerEditParse() },
-                { "CarterGames.Assets.AudioManager.DelayEdit", new DelayEditParse() },
-                { "CarterGames.Assets.AudioManager.GlobalVarianceEdit", new GlobalVarianceEditParse() },
-                { "CarterGames.Assets.AudioManager.DynamicStartTimeEdit", new DynamicStartTimeEditParse() },
-                { "CarterGames.Assets.AudioManager.LoopEdit", new LoopEditParse() },
+                { typeof(VolumeEdit).AssemblyQualifiedName, new VolumeEditParse() },
+                { typeof(PitchEdit).AssemblyQualifiedName, new PitchEditParse() },
+                { typeof(MixerEdit).AssemblyQualifiedName, new MixerEditParse() },
+                { typeof(DelayEdit).AssemblyQualifiedName, new DelayEditParse() },
+                { typeof(GlobalVarianceEdit).AssemblyQualifiedName, new GlobalVarianceEditParse() },
+                { typeof(DynamicStartTimeEdit).AssemblyQualifiedName, new DynamicStartTimeEditParse() },
+                { typeof(LoopEdit).AssemblyQualifiedName, new LoopEditParse() },
             };
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -130,6 +130,7 @@ namespace CarterGames.Assets.AudioManager
         public void Play()
         {
             if (isPlaying) return;
+            if (Player == null) return;
             
             Player.Play();
             

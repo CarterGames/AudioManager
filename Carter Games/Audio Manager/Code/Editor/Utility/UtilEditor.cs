@@ -42,7 +42,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
         // Paths
         /* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        public const string SettingsLocationPath = "Project/Carter Games/Audio Manager";
+        public const string SettingsLocationPath = "Project/Carter Games/Assets/Audio Manager";
         
 
         // Default Names

@@ -39,6 +39,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroup(string request, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, edits);
         }
         
@@ -52,6 +53,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupWithDelay(string request, float delay, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new DelayEdit(delay), edits);
         }
 
@@ -64,6 +66,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string request, Vector2 position, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new PositionEdit(position), edits);
         }
         
@@ -77,6 +80,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string request, Vector3 position, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new PositionEdit(position), edits);
         }
         
@@ -91,6 +95,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string request, Transform position, bool useLocalPosition, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new PositionEdit(position, useLocalPosition), edits);
         }
         
@@ -105,6 +110,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroup(string request, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new IEditModule[] { new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f) }, edits);
         }
         
@@ -120,6 +126,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupWithDelay(string request, float delay, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new IEditModule[]
             { 
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),
@@ -139,6 +146,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string request, Vector2 position, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new IEditModule[]
             {
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),
@@ -158,6 +166,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string request, Vector3 position, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new IEditModule[]
             {
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),
@@ -178,6 +187,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string request, Transform position, bool useLocalPosition, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, new IEditModule[]
             {
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),
@@ -196,6 +206,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroup(string[] request, GroupPlayMode playMode, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, edits);
         }
         
@@ -210,8 +221,10 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupWithDelay(string[] request, GroupPlayMode playMode, float delay, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new DelayEdit(delay), edits);
         }
+        
 
         /// <summary>
         /// Plays the audio clip requested.
@@ -223,6 +236,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string[] request, GroupPlayMode playMode, Vector2 position, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new PositionEdit(position), edits);
         }
         
@@ -237,6 +251,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string[] request, GroupPlayMode playMode, Vector3 position, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new PositionEdit(position), edits);
         }
         
@@ -252,6 +267,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string[] request, GroupPlayMode playMode, Transform position, bool useLocalPosition, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new PositionEdit(position, useLocalPosition), edits);
         }
         
@@ -267,6 +283,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroup(string[] request, GroupPlayMode playMode, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new IEditModule[] { new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f) }, edits);
         }
         
@@ -283,6 +300,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupWithDelay(string[] request, GroupPlayMode playMode, float delay, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new IEditModule[]
             { 
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),
@@ -303,6 +321,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string[] request, GroupPlayMode playMode, Vector2 position, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new IEditModule[]
             {
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),
@@ -323,6 +342,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string[] request, GroupPlayMode playMode, Vector3 position, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new IEditModule[]
             {
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),
@@ -344,6 +364,7 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The player that has been set & started.</returns>
         public static AudioPlayer PlayGroupAtLocation(string[] request, GroupPlayMode playMode, Transform position, bool useLocalPosition, float? volume = 1f, float? pitch = 1f, params IEditModule[] edits)
         {
+            if (Settings.PlayAudioState == PlayState.Disabled) return null;
             return PlayGroupBase(request, playMode, new IEditModule[]
             {
                 new VolumeEdit(volume ?? 1f), new PitchEdit(pitch ?? 1f),

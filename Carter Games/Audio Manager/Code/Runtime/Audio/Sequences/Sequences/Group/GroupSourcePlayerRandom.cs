@@ -36,7 +36,6 @@ namespace CarterGames.Assets.AudioManager
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
         private readonly GroupData groupData;
-        private readonly AudioClipSettings clipSettings;
         private readonly AudioPlayer player;
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -48,19 +47,17 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         /// <param name="player">The sequence to use.</param>
         /// <param name="groupData">The data to use.</param>
-        /// <param name="clipSettings">The settings to apply.</param>
-        public GroupSourcePlayerRandom(AudioPlayer player, GroupData groupData, AudioClipSettings clipSettings)
+        private GroupSourcePlayerRandom(AudioPlayer player, GroupData groupData)
         {
             this.player = player;
             this.groupData = groupData;
-            this.clipSettings = clipSettings;
         }
 
 
         public static GroupSourcePlayerRandom InitializePlayMethod(AudioPlayer player, GroupData groupData,
             AudioClipSettings clipSettings = null)
         {
-            var playMethodHandler = new GroupSourcePlayerRandom(player, groupData, clipSettings);
+            var playMethodHandler = new GroupSourcePlayerRandom(player, groupData);
             
             // Random - play 1 clip - when looping play another random.
             var clip = groupData.Clips[Random.Range(0, groupData.Clips.Count - 1)];

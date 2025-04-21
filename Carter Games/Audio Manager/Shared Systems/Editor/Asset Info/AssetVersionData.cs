@@ -46,6 +46,6 @@ namespace CarterGames.Assets.Shared.PerProject.Editor
         /// <remarks>
         /// Asset owner is in the UK, so its D/M/Y format.
         /// </remarks>
-        public static string ReleaseDate => "2025/03/??";
+        public static string ReleaseDate => "2025/04/21";
     }
 }

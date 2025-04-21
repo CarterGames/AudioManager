@@ -36,7 +36,6 @@ namespace CarterGames.Assets.AudioManager
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         private readonly GroupData groupData;
-        private readonly AudioClipSettings clipSettings;
         private readonly AudioPlayer player;
         private int currentIndex;
         private bool hasDelayed;
@@ -56,20 +55,7 @@ namespace CarterGames.Assets.AudioManager
         {
             this.player = player;
             this.groupData = groupData;
-            this.clipSettings = clipSettings;
-        }
-        
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Methods
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        public bool IsSetup { get; }
-
-        /// <summary>
-        /// Sets up the sequence for use.
-        /// </summary>
-        public void Setup()
-        {
+            
             currentIndex = 0;
             
             // player.Players[0].PlayMethod = player;
@@ -81,6 +67,9 @@ namespace CarterGames.Assets.AudioManager
             player.Source.Completed.Add(OnClipCompleted);
         }
         
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Methods
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
         /// Plays the sequence when called.

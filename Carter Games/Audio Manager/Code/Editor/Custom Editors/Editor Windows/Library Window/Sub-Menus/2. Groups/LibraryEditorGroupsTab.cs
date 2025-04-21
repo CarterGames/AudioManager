@@ -235,7 +235,15 @@ namespace CarterGames.Assets.AudioManager.Editor
                     }
                 }
                 
-                if (GUILayout.Button($"{LibAsset.GroupsLookup[key].GroupName} ({LibAsset.GroupsLookup[key].Clips.Count} {suffix})"))
+                var toDisplay = new GUIContent(LibAsset.GroupsLookup[key].GroupName);
+
+                if (toDisplay.text.Length > 25)
+                {
+                    toDisplay.text = toDisplay.text.Substring(0, 22) + "...";
+                }
+                
+                
+                if (GUILayout.Button($"{toDisplay.text} ({LibAsset.GroupsLookup[key].Clips.Count} {suffix})"))
                 {
                     PerUserSettings.LastLibraryGroupEntry = LibAsset.GroupsLookup.Keys.ToList().IndexOf(key);
                     SelectedProperty = GroupsDictionary.GetIndex(PerUserSettings.LastLibraryGroupEntry);

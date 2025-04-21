@@ -203,6 +203,8 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUILayout.LabelField("Variance", EditorStyles.boldLabel);
                 UtilEditor.DrawHorizontalGUILine();
                     
+                EditorGUILayout.PropertyField(SettingsObj.Fp("useGlobalVariance"));
+                
                 EditorGUILayout.PropertyField(SettingsObj.Fp("volumeVarianceOffset"),
                     new GUIContent("Volume Variance", "The amount of +/- from the default value to change the volume when using global variance."));
                 
