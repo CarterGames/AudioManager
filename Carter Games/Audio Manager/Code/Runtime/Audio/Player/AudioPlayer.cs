@@ -339,6 +339,7 @@ namespace CarterGames.Assets.AudioManager
         {
             foreach (var sourceInstance in additionalSources)
             {
+                sourceInstance.ResetSourceInstance(true);
                 AudioPool.Return(sourceInstance);
             }
             
@@ -347,8 +348,10 @@ namespace CarterGames.Assets.AudioManager
             {
                 Source
             };
-            
+
+            standardSource.ResetSourceInstance(true);
             AudioPool.Return(this);
+            IsInitialized = false;
         }
     }
 }

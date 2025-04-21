@@ -67,21 +67,7 @@ namespace CarterGames.Assets.AudioManager
                 { typeof(DynamicStartTimeEdit).AssemblyQualifiedName, new DynamicStartTimeEditParse() },
                 { typeof(LoopEdit).AssemblyQualifiedName, new LoopEditParse() },
             };
-
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Properties
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        private AudioPlayer Player
-        {
-            get
-            {
-                if (player != null) return player;
-                player = SetupSequence();
-                return player;
-            }
-        }
-
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Unity Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -102,7 +88,6 @@ namespace CarterGames.Assets.AudioManager
         /// <returns>The setup sequence.</returns>
         private AudioPlayer SetupSequence()
         {
-            AudioPlayer player;
             var modules = new List<IEditModule>();
 
             foreach (var settings in editModuleSettings)
@@ -129,14 +114,12 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Play()
         {
-            if (isPlaying) return;
-            if (Player == null) return;
+            player = SetupSequence();
+            player.Play();
             
-            Player.Play();
-            
-            Player.Started.Add(OnSequenceStarted);
-            Player.Looped.Add(OnSequenceLooped);
-            Player.Completed.Add(OnSequenceCompleted);
+            player.Started.Add(OnSequenceStarted);
+            player.Looped.Add(OnSequenceLooped);
+            player.Completed.Add(OnSequenceCompleted);
 
             isPlaying = true;
         }
@@ -148,7 +131,7 @@ namespace CarterGames.Assets.AudioManager
         public void Pause()
         {
             if (!isPlaying) return;
-            Player.Pause();
+            player.Pause();
             isPlaying = false;
         }
         
@@ -159,7 +142,7 @@ namespace CarterGames.Assets.AudioManager
         public void Resume()
         {
             if (isPlaying) return;
-            Player.Resume();
+            player.Resume();
             isPlaying = true;
         }
         
@@ -170,7 +153,7 @@ namespace CarterGames.Assets.AudioManager
         public void Stop()
         {
             if (!isPlaying) return;
-            Player.Stop();
+            player.Stop();
             isPlaying = false;
         }
         
@@ -199,7 +182,7 @@ namespace CarterGames.Assets.AudioManager
         private void OnSequenceCompleted()
         {
             onCompleted?.Invoke();
-            Player.Completed.Remove(OnSequenceCompleted);
+            player = null;
             isPlaying = false;
         }
     }

@@ -40,18 +40,13 @@ namespace CarterGames.Assets.AudioManager
         }
         
         
-        private static AudioPlayer PrepareGroupBase(string[] groupRef, GroupPlayMode playMode, IEditModule[] edits)
+        private static AudioPlayer PrepareGroupBase(string request, IEditModule methodEdit, IEditModule[] edits)
         {
-            return PlayGroupBase(groupRef, playMode, edits, false);
-        }
-        
-        private static AudioPlayer PlayGroupBase(string request, IEditModule methodEdit, IEditModule[] edits)
-        {
-            return PlayGroupBase(request, edits.Concat(new IEditModule[] { methodEdit }).ToArray());
+            return PrepareGroupBase(request, edits.Concat(new IEditModule[] { methodEdit }).ToArray());
         }
         
         
-        private static AudioPlayer PlayGroupBase(string request, IEnumerable<IEditModule> methodEdit, params IEditModule[] edits)
+        private static AudioPlayer PrepareGroupBase(string request, IEnumerable<IEditModule> methodEdit, params IEditModule[] edits)
         {
             return InternalPrepareGroup(request, edits.Concat(methodEdit).ToArray());
         }
@@ -75,19 +70,19 @@ namespace CarterGames.Assets.AudioManager
         }
         
         
-        private static AudioPlayer PlayGroupBase(string[] request, GroupPlayMode playMode, IEditModule methodEdit, IEditModule[] edits, bool autoPlay = true)
+        private static AudioPlayer PrepareGroupBase(string[] request, GroupPlayMode playMode, IEditModule methodEdit, IEditModule[] edits)
         {
-            return PlayGroupBase(request, playMode, edits.Concat(new IEditModule[] { methodEdit }).ToArray(), autoPlay);
+            return PrepareGroupBase(request, playMode, edits.Concat(new IEditModule[] { methodEdit }).ToArray());
         }
         
         
-        private static AudioPlayer PlayGroupBase(string[] request, GroupPlayMode playMode, IEditModule[] methodEdit, IEditModule[] edits, bool autoPlay = true)
+        private static AudioPlayer PrepareGroupBase(string[] request, GroupPlayMode playMode, IEditModule[] methodEdit, IEditModule[] edits)
         {
-            return PlayGroupBase(request, playMode, edits.Concat(methodEdit).ToArray(), autoPlay);
+            return PrepareGroupBase(request, playMode, edits.Concat(methodEdit).ToArray());
         }
         
         
-        private static AudioPlayer PlayGroupBase(string[] request, GroupPlayMode playMode, IEditModule[] edits, bool autoPlay = true)
+        private static AudioPlayer PrepareGroupBase(string[] request, GroupPlayMode playMode, IEditModule[] edits)
         {
             // Checks to see if the audio manager can actually play audio.
             // if not, do nothing as it won't be heard...
@@ -101,12 +96,6 @@ namespace CarterGames.Assets.AudioManager
             var sequence = AudioPool.AssignPlayer();
 
             sequence.InitializeGroup(request, playMode, clipSettings);
-
-            if (autoPlay)
-            {
-                sequence.Play();
-            }
-            
             return sequence;
         }
         

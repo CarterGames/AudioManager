@@ -34,6 +34,12 @@
                     }
                 }
             }
+            // Adjusts for delay (+ Time) if not adjusted by loop edits.
+            /* ────────────────────────────────────────────────────────────────────────────────────────────────────── */
+            else if (audioInstance.EditParams.TryGetValue<DelayEdit>("delay", out var delayModule))
+            {
+                time += delayModule.Delay;
+            }
 
             return time;
         }
