@@ -45,7 +45,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <summary>
         /// Gets if the latest version is this version.
         /// </summary>
-        public static bool IsLatestVersion => Versions.Data.VersionNumber == new VersionNumber(VersionInfo.ProjectVersionNumber);
+        public static bool IsLatestVersion => Versions.Data.VersionNumber.Equals(new VersionNumber(VersionInfo.ProjectVersionNumber));
         
         
         /// <summary>
