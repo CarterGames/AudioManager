@@ -1,26 +1,27 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -46,6 +47,9 @@ namespace CarterGames.Assets.AudioManager.Editor
                 { "enabled", "True" },
                 { "useDynamicStartTime", "True" },
             };
+        
+        
+        public override Type EditModule => typeof(DynamicStartTimeEdit);
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
@@ -62,7 +66,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             EditorGUILayout.BeginVertical("HelpBox");
 
-            DrawDropDown(targetObject, index, "Dynamic Start Time Edit");
+            DrawDropDown("Dynamic Start Time Edit");
 
             GUILayout.Space(2.5f);
 
@@ -72,19 +76,18 @@ namespace CarterGames.Assets.AudioManager.Editor
                 return;
             }
 
-            if (bool.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "showModule")))
+            if (bool.Parse(GetValue("showModule")))
             {
                 UtilEditor.DrawHorizontalGUILine();
 
                 EditorGUI.BeginChangeCheck();
 
                 var useDynamicStartTime = EditorGUILayout.Toggle("Use Dynamic Start Time:",
-                    bool.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "useDynamicStartTime")));
+                    bool.Parse(GetValue("useDynamicStartTime")));
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    EditModuleInspectorHelper.SetValue(targetObject, index, "useDynamicStartTime",
-                        useDynamicStartTime.ToString());
+                    SetValue("useDynamicStartTime", useDynamicStartTime.ToString());
                 }
             }
 

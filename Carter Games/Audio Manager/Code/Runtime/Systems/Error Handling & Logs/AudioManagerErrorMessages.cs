@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -42,22 +42,6 @@ namespace CarterGames.Assets.AudioManager
                 $"{AudioManagerErrorCode.AudioDisabled}\nAudio is disabled via the play state. so the call was cancelled."
             },
             {
-                AudioManagerErrorCode.MusicDisabled,
-                $"{AudioManagerErrorCode.MusicDisabled}\nMusic is disabled via the play state. so the call was cancelled."
-            },
-            {
-                AudioManagerErrorCode.TrackListCannotBeFound,
-                $"{AudioManagerErrorCode.TrackListCannotBeFound}\nThe track list was not found in the library, so it couldn't be played."
-            }, 
-            {
-                AudioManagerErrorCode.TransitionDataParameterNotFound,
-                $"{AudioManagerErrorCode.TransitionDataParameterNotFound}\nA parameter needed for the transition to function was not found."
-            },
-            {
-                AudioManagerErrorCode.MusicPlayerNotInitialized,
-                $"{AudioManagerErrorCode.MusicPlayerNotInitialized}\nNot music player was assigned, likely null. so the call made cannot be completed."
-            },
-            {
                 AudioManagerErrorCode.PrefabNotValid,
                 $"{AudioManagerErrorCode.PrefabNotValid}\nThe prefab you tried to assign was not a valid type/setup for the field."
             },
@@ -72,10 +56,6 @@ namespace CarterGames.Assets.AudioManager
             {
                 AudioManagerErrorCode.StructElementNameAlreadyExists,
                 $"{AudioManagerErrorCode.StructElementNameAlreadyExists}\nThere was another entry in the struct with the same name."
-            },
-            {
-                AudioManagerErrorCode.MusicPlaylistNotSet,
-                $"{AudioManagerErrorCode.MusicPlaylistNotSet}\nYou need to set the playlist before trying to transition it. Use MusicManager.SetPlaylist() to assign it if you are not using MusicManager.Play()."
             },
         };
 
@@ -103,6 +83,17 @@ namespace CarterGames.Assets.AudioManager
         {
             if (!HasMessage(errorCode)) return $"{errorCode}";
             return MessagesLookup[errorCode];
+        }
+
+
+        public static string CodeToMessage(this AudioManagerErrorCode errorCode)
+        {
+            if (HasMessage(errorCode))
+            {
+                return GetMessage(errorCode);
+            }
+
+            return errorCode.ToString();
         }
     }
 }

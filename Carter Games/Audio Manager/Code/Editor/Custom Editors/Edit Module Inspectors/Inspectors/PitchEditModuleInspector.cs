@@ -1,26 +1,27 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -61,6 +62,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             { "varianceEditValue", "[1.0, 0.1, 0.0, 1.0]" },
         };
         
+        public override Type EditModule => typeof(PitchEdit);
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -76,7 +79,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.BeginVertical("HelpBox");
 
-            DrawDropDown(targetObject, index, "Pitch Edit");
+            DrawDropDown("Pitch Edit");
             
             GUILayout.Space(2.5f);
             
@@ -86,24 +89,24 @@ namespace CarterGames.Assets.AudioManager.Editor
                 return;
             }
             
-            if (bool.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "showModule")))
+            if (bool.Parse(GetValue("showModule")))
             {
                 UtilEditor.DrawHorizontalGUILine();
                 
-                EditModuleInspectorHelper.SetValue(targetObject, index, "moduleMode", GUILayout.Toolbar(int.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "moduleMode")), Options).ToString());
+                SetValue("moduleMode", GUILayout.Toolbar(int.Parse(GetValue("moduleMode")), Options).ToString());
 
-                switch (int.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "moduleMode")))
+                switch (int.Parse(GetValue("moduleMode")))
                 {
                     case 0:
                         
-                        EditModuleInspectorHelper.SetValue(targetObject, index, "normalEditValue",
-                            EditorGUILayout.Slider("Pitch:", float.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "normalEditValue")),-3f,3f).ToString());
+                        SetValue("normalEditValue",
+                            EditorGUILayout.Slider("Pitch:", float.Parse(GetValue("normalEditValue")),-3f,3f).ToString());
                         
                         break;
                     case 1:
                         
-                        var min = float.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "rangeEditValue").Split(',')[0].Replace("[", string.Empty));
-                        var max = float.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "rangeEditValue").Split(',')[1].Replace("]", string.Empty));
+                        var min = float.Parse(GetValue("rangeEditValue").Split(',')[0].Replace("[", string.Empty));
+                        var max = float.Parse(GetValue("rangeEditValue").Split(',')[1].Replace("]", string.Empty));
 
                         EditorGUILayout.BeginHorizontal();
                         EditorGUILayout.LabelField("Min:", GUILayout.Width(65));
@@ -125,24 +128,22 @@ namespace CarterGames.Assets.AudioManager.Editor
                             min = Mathf.Clamp(min, -3f, max);
                             max = Mathf.Clamp(max, min > -3f ? min : -3f, 3f);
                             
-                            EditModuleInspectorHelper.SetValue(targetObject, index, "rangeEditValue", $"[{min},{max}]");
+                            SetValue("rangeEditValue", $"[{min},{max}]");
                         }
                         
                         break;
                     
                     case 2:
 
-                        var starting = float.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "varianceEditValue").Split(',')[0].Replace("[", string.Empty));
-                        var offset = float.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "varianceEditValue").Split(',')[1]);
-                        var minVariance = float.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "varianceEditValue").Split(',')[2]);
-                        var maxVariance = float.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "varianceEditValue").Split(',')[3].Replace("]", string.Empty));
+                        var starting = float.Parse(GetValue("varianceEditValue").Split(',')[0].Replace("[", string.Empty));
+                        var offset = float.Parse(GetValue("varianceEditValue").Split(',')[1]);
+                        var minVariance = float.Parse(GetValue("varianceEditValue").Split(',')[2]);
+                        var maxVariance = float.Parse(GetValue("varianceEditValue").Split(',')[3].Replace("]", string.Empty));
                         
                         EditorGUI.BeginChangeCheck();
 
                         starting = EditorGUILayout.FloatField("Starting Value:", starting);
                         offset = EditorGUILayout.FloatField("Offset:", offset);
-                        minVariance = EditorGUILayout.FloatField("Min:", minVariance);
-                        maxVariance = EditorGUILayout.FloatField("Max:", maxVariance);
                         
 
                         if (EditorGUI.EndChangeCheck())
@@ -152,7 +153,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                             minVariance = Mathf.Clamp(minVariance, -3f, maxVariance);
                             maxVariance = Mathf.Clamp(maxVariance, minVariance > -3f ? minVariance : -3f, 3f);
                             
-                            EditModuleInspectorHelper.SetValue(targetObject, index, "varianceEditValue", $"[{starting},{offset},{minVariance},{maxVariance}]");
+                            SetValue("varianceEditValue", $"[{starting},{offset},{minVariance},{maxVariance}]");
                         }
                         
                         break;

@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,6 +22,7 @@
  */
 
 using CarterGames.Assets.AudioManager.Logging;
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,28 +31,14 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// <summary>
     /// Handles the custom editor for the asset settings object.
     /// </summary>
-    [CustomEditor(typeof(SettingsAssetRuntime))]
+    [CustomEditor(typeof(AmAssetSettings))]
     public sealed class AudioManagerSettingsEditor : UnityEditor.Editor
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        private SerializedProperty canPlayAudio;
-        private SerializedProperty audioPrefabProp;
-        private SerializedProperty clipAudioMixerProp;
-        
-        private SerializedProperty canPlayMusic;
-        private SerializedProperty sequencePrefabProp;
-        private SerializedProperty musicAudioMixerProp;
-
         private bool debugProp;
-        private SerializedProperty audioPoolInitSizeProp;
-        private SerializedProperty useGlobalVarianceProp;
-        private SerializedProperty volumeVarianceOffset;
-        private SerializedProperty pitchVarianceOffset;
-        private SerializedProperty dynamicDetectionOffset;
-
         private static Color defaultGUIBackground;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -69,15 +56,11 @@ namespace CarterGames.Assets.AudioManager.Editor
             Initialize();
             
             GUILayout.Space(12.5f);
-            UtilEditor.DrawHeaderWithTexture(UtilEditor.CogIcon);
-            GUILayout.Space(12.5f);
             
-            UtilEditor.DrawSoScriptSection((SettingsAssetRuntime) target);
+            UtilEditor.DrawSoScriptSection((AmAssetSettings) target);
             
             GUILayout.Space(1.5f);
             DrawAudioOptions();
-            GUILayout.Space(1.5f);
-            DrawMusicOptions();
             GUILayout.Space(1.5f);
             DrawExtraSettings();
             GUILayout.Space(1.5f);
@@ -99,25 +82,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         
         private void Initialize()
         {
-            canPlayAudio ??= serializedObject.Fp("playAudioState");
-            audioPrefabProp ??= serializedObject.Fp("audioPrefab");
-            clipAudioMixerProp ??= serializedObject.Fp("clipAudioMixer");
-            
-            canPlayMusic ??= serializedObject.Fp("playMusicState");
-            sequencePrefabProp ??= serializedObject.Fp("sequencePrefab");
-            musicAudioMixerProp ??= serializedObject.Fp("musicAudioMixer");
-            
             debugProp = PerUserSettingsRuntime.ShowDebugLogs;
-
-            audioPoolInitSizeProp ??= serializedObject.Fp("audioPoolInitSize");
-            useGlobalVarianceProp ??= serializedObject.Fp("useGlobalVariance");
-            volumeVarianceOffset ??= serializedObject.Fp("volumeVarianceOffset");
-            pitchVarianceOffset ??= serializedObject.Fp("pitchVarianceOffset");
-
-            dynamicDetectionOffset ??= serializedObject.Fp("dynamicDetectionOffset");
-
             defaultGUIBackground = GUI.backgroundColor;
-            
             AudioManagerEditorEvents.OnSettingsReset.Add(Repaint);
         }
         
@@ -137,7 +103,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                         "Are you sure you want to reset the asset settings?\n\nNote this will not reset any editor only settings, just the prefabs & runtime settings",
                         "Reset", "Cancel"))
                 {
-                    UtilEditor.RuntimeSettings.ResetSettings();
+                    ScriptableRef.GetAssetDef<AmAssetSettings>().AssetRef.ResetSettings();
 
                     GameObject audioPrefab = null;
 
@@ -163,33 +129,33 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             EditorGUI.BeginDisabledGroup(true);
             
-            EditorGUILayout.PropertyField(canPlayAudio);
+            EditorGUILayout.PropertyField(serializedObject.Fp("playAudioState"));
 
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(audioPrefabProp);
+            EditorGUILayout.PropertyField(serializedObject.Fp("playerPrefab"));
 
             GUI.backgroundColor = UtilEditor.Yellow;
             EditorGUI.EndDisabledGroup();
             
             if (GUILayout.Button("Edit", GUILayout.Width(55)))
             {
-                 EditorGUIUtility.ShowObjectPicker<AudioPlayer>(null, false, "t:GameObject", 0);
+                 EditorGUIUtility.ShowObjectPicker<AudioSourceInstance>(null, false, "t:GameObject", 0);
             }
             
             if ((Event.current.commandName == "ObjectSelectorClosed" || Event.current.commandName == "ObjectSelectorUpdated") && EditorGUIUtility.GetObjectPickerControlID() == 0)
             {
                 if (EditorGUIUtility.GetObjectPickerObject() != null)
                 {
-                    if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioPlayer>() != null)
+                    if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioSourceInstance>() != null)
                     {
-                        audioPrefabProp.objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
+                        serializedObject.Fp("playerPrefab").objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
                         serializedObject.ApplyModifiedProperties();
                         serializedObject.Update();
                     }
                 }
                 else
                 {
-                    musicAudioMixerProp.objectReferenceValue = null;
+                    serializedObject.Fp("playerPrefab").objectReferenceValue = null;
                     serializedObject.ApplyModifiedProperties();
                     serializedObject.Update();
                 }
@@ -201,30 +167,30 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUI.BeginDisabledGroup(true);
             
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PropertyField(sequencePrefabProp);
+            EditorGUILayout.PropertyField(serializedObject.Fp("sourceInstancePrefab"));
 
             GUI.backgroundColor = UtilEditor.Yellow;
             EditorGUI.EndDisabledGroup();
             
             if (GUILayout.Button("Edit", GUILayout.Width(55)))
             {
-                EditorGUIUtility.ShowObjectPicker<AudioPlayerSequence>(null, false, "t:GameObject", 1);
+                EditorGUIUtility.ShowObjectPicker<AudioPlayer>(null, false, "t:GameObject", 1);
             }
             
             if ((Event.current.commandName == "ObjectSelectorClosed" || Event.current.commandName == "ObjectSelectorUpdated") && EditorGUIUtility.GetObjectPickerControlID() == 1)
             {
                 if (EditorGUIUtility.GetObjectPickerObject() != null)
                 {
-                    if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioPlayerSequence>() != null)
+                    if (((GameObject)EditorGUIUtility.GetObjectPickerObject()).GetComponent<AudioPlayer>() != null)
                     {
-                        sequencePrefabProp.objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
+                        serializedObject.Fp("sourceInstancePrefab").objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
                         serializedObject.ApplyModifiedProperties();
                         serializedObject.Update();
                     }
                 }
                 else
                 {
-                    musicAudioMixerProp.objectReferenceValue = null;
+                    serializedObject.Fp("sourceInstancePrefab").objectReferenceValue = null;
                     serializedObject.ApplyModifiedProperties();
                     serializedObject.Update();
                 }
@@ -233,25 +199,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             GUI.backgroundColor = Color.white;   
             EditorGUILayout.EndHorizontal();
             
-            EditorGUILayout.PropertyField(clipAudioMixerProp);
-            
-            GUILayout.Space(2.5f);
-            EditorGUILayout.EndVertical();
-        }
-        
-        
-        
-        private void DrawMusicOptions()
-        {
-            EditorGUILayout.BeginVertical("HelpBox");
-            GUILayout.Space(1.5f);
-            
-            EditorGUILayout.LabelField("Music Track Options", EditorStyles.boldLabel);
-
-            EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.PropertyField(canPlayMusic);
-            EditorGUI.EndDisabledGroup();
-            EditorGUILayout.PropertyField(musicAudioMixerProp);
+            EditorGUILayout.PropertyField(serializedObject.Fp("clipAudioMixer"));
             
             GUILayout.Space(2.5f);
             EditorGUILayout.EndVertical();
@@ -269,13 +217,13 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.Toggle(new GUIContent("Show Debug Logs"), debugProp);
 
-            EditorGUILayout.PropertyField(audioPoolInitSizeProp);
-            EditorGUILayout.PropertyField(useGlobalVarianceProp);
+            EditorGUILayout.PropertyField(serializedObject.Fp("audioPoolInitSize"));
+            EditorGUILayout.PropertyField(serializedObject.Fp("useGlobalVariance"));
             
-            EditorGUILayout.PropertyField(volumeVarianceOffset);
-            EditorGUILayout.PropertyField(pitchVarianceOffset);
+            EditorGUILayout.PropertyField(serializedObject.Fp("volumeVarianceOffset"));
+            EditorGUILayout.PropertyField(serializedObject.Fp("pitchVarianceOffset"));
             
-            EditorGUILayout.PropertyField(dynamicDetectionOffset);
+            EditorGUILayout.PropertyField(serializedObject.Fp("dynamicDetectionOffset"));
 
             EditorGUI.EndDisabledGroup();
             

@@ -1,6 +1,6 @@
 {
   "name": "games.carter.audiomanager",
-  "version": "3.0.7",
+  "version": "3.1.0",
   "displayName": "Audio Manager",
   "description": "A free audio/sound management system for Unity with automatic library management & more!",
   "unity": "2020.3",

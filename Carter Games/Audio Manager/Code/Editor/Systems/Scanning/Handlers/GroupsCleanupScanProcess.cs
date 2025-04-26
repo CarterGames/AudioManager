@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,6 +22,7 @@
  */
 
 using System.Collections.Generic;
+using CarterGames.Assets.Shared.Common.Editor;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
@@ -63,11 +64,11 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             ToClear.Clear();
             
-            foreach (var group in UtilEditor.Library.Groups)
+            foreach (var group in ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.Groups)
             {
                 foreach (var clipId in group.Clips)
                 {
-                    if (UtilEditor.Library.LibraryLookup.ContainsKey(clipId)) continue;
+                    if (ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.LibraryLookup.ContainsKey(clipId)) continue;
                     
                     if (ToClear.ContainsKey(group.GroupName))
                     {
@@ -93,7 +94,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             if (ToClear.Count <= 0) return;
 
-            var groupsLookup = UtilEditor.LibraryObject.Fp("groups").Fpr("list");
+            var groupsLookup = ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef.Fp("groups").Fpr("list");
             
             foreach (var groupDataToClear in ToClear)
             {
@@ -106,8 +107,8 @@ namespace CarterGames.Assets.AudioManager.Editor
                             if (groupsLookup.GetIndex(i).Fpr("value").Fpr("clipNames").GetIndex(j).stringValue != clipIdToRemove) continue;
                             groupsLookup.GetIndex(i).Fpr("value").Fpr("clipNames").DeleteIndex(j);
                             
-                            UtilEditor.LibraryObject.ApplyModifiedProperties();
-                            UtilEditor.LibraryObject.Update();
+                            ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef.ApplyModifiedProperties();
+                            ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef.Update();
                             
                             goto NextToClear;
                         }

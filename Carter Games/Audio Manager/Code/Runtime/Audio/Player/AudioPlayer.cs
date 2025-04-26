@@ -1,401 +1,357 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
-using System.Collections;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using CarterGames.Common;
+using CarterGames.Assets.Shared.Common;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
 {
     /// <summary>
-    /// Handles playing audio from the audio library.
+    /// Handles one or many audio players for a request to be fulfilled.
     /// </summary>
-    [RequireComponent(typeof(AudioSource))]
     public sealed class AudioPlayer : MonoBehaviour
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        private AudioSource source;
-        private AudioClipSettings settings;
-        private AudioData data;
-        private Coroutine playerRoutine;
+
+        [SerializeField] private AudioSourceInstance standardSource;
+        [SerializeField] private List<AudioSourceInstance> additionalSources = new List<AudioSourceInstance>();
+
+        private List<AudioSourceInstance> allSources;
+        private IPlayMethod playMethod;
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// The audio source for the player.
+        /// Gets/Sets if the player is initialized.
         /// </summary>
-        public AudioSource PlayerSource => source ??= GetComponent<AudioSource>();
-
-
-        /// <summary>
-        /// Gets if the player has been prepared or not. 
-        /// </summary>
-        public bool IsPrepared { get; private set; }
-
-
-        /// <summary>
-        /// Gets if the player is playing a clip currently.
-        /// </summary>
-        public bool IsPlaying => PlayerSource.isPlaying;
+        private bool IsInitialized { get; set; }
         
         
         /// <summary>
-        /// Gets the parameters for the player.
+        /// Gets the default audio player source.
         /// </summary>
-        public EditParameters EditParams { get; private set; } = new EditParameters();
-
-
-        /// <summary>
-        /// Gets the time remaining on the player.
-        /// </summary>
-        private float ClipTimeRemaining
-        {
-            get
-            {
-                var time = 0f;
-            
-                if (EditParams.TryGetValue<bool>("dynamicTime", out var useDynamicTime))
-                {
-                    time += data.value.length - (useDynamicTime ? data.dynamicStartTime.time : 0);
-                }
-                else
-                {
-                    time += data.value.length;
-                }
-
-                if (EditParams.TryGetValue<DelayEdit>("delay", out var delayModule))
-                {
-                    time += delayModule.Delay;
-                }
-                
-                if (EditParams.TryGetValue<LoopEdit>("loop", out var loop))
-                {
-                    if (loop.ShouldLoopWithDelays)
-                    {
-                        time += delayModule.Delay;
-                    }
-                    else
-                    {
-                        time -= delayModule.Delay;
-                    }
-                }
-
-                return time;
-            }
-        }
+        public AudioSourceInstance Source => standardSource;
         
         
         /// <summary>
-        /// Gets/Sets the sequence the player is attached to.
+        /// Gets all the additional audio players assigned to this sequence.
         /// </summary>
-        public AudioPlayerSequence PlayerSequence { get; set; }
+        public List<AudioSourceInstance> AdditionalSources => additionalSources;
         
+        
+        /// <summary>
+        /// Gets all the additional audio players assigned to this sequence.
+        /// </summary>
+        public List<AudioSourceInstance> AllSources => allSources;
+        
+        
+        /// <summary>
+        /// Gets the loop edit info for this sequence to use.
+        /// </summary>
+        public LoopEdit LoopInfo { get; set; }
+        
+        
+        /// <summary>
+        /// Gets the number of completed players in the sequence.
+        /// </summary>
+        private int PlayersCompleted { get; set; }
+        
+        
+        /// <summary>
+        /// Gets if the sequence is a looping sequence or not.
+        /// </summary>
+        private bool IsLooped => LoopInfo != null;
+        
+        
+        /// <summary>
+        /// Gets if the sequence has completed its loop or not.
+        /// </summary>
+        private bool IsLoopCompleted => !LoopInfo.IsInfiniteLoop && LoopInfo.CurrentLoopCount.Equals(LoopInfo.LoopCount);
+
+
+        /// <summary>
+        /// Returns if any audio is currently being played from this sequence.
+        /// </summary>
+        public bool IsPlaying => AllSources.Any(t => t.IsPlaying);
+        
+        
+        /// <summary>
+        /// Defines if the player recycles to the pool again once complete.
+        /// </summary>
+        public bool RecycleOnComplete { get; private set; }
+
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Events
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
+
         /// <summary>
-        /// Raises when the clip has started playing.
+        /// Raises when the sequence has started playing.
         /// </summary>
         public readonly Evt Started = new Evt();
         
         
         /// <summary>
-        /// Raises when the clip has started paused.
+        /// Raises when the sequence has looped.
         /// </summary>
-        public readonly Evt Paused = new Evt();
+        public readonly Evt Looped = new Evt();
         
         
         /// <summary>
-        /// Raises when the clip has started resumed.
+        /// Raises when the sequence has completed playing.
         /// </summary>
-        public readonly Evt Resumed = new Evt();
+        public readonly Evt Completed = new Evt();
         
         
         /// <summary>
-        /// Raises when the clip has started stopped.
+        /// Raises when the sequence has stopped playing.
         /// </summary>
         public readonly Evt Stopped = new Evt();
         
         
         /// <summary>
-        /// Raises when the clip has completed playing.
+        /// Raises when the sequence has been paused.
         /// </summary>
-        public readonly Evt Completed = new Evt();
-
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Unity Methods
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+        public readonly Evt Paused = new Evt();
         
-        private void OnEnable()
-        {
-            AssetAccessor.GetAsset<SettingsAssetRuntime>().AudioStateChanged.Add(OnClipStateChanged);
-        }
-
-
-        private void OnDestroy()
-        {
-            AssetAccessor.GetAsset<SettingsAssetRuntime>().AudioStateChanged.Remove(OnClipStateChanged);
-        }
-
+        
+        /// <summary>
+        /// Raises when the sequence has been resumed.
+        /// </summary>
+        public readonly Evt Resumed = new Evt();
+        
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Sets the clip in the player to the data entered.
+        /// Assigns a new audio player from the pool to this sequence when called.
         /// </summary>
-        /// <param name="clip">The data to play from.</param>
-        public void SetClip(AudioData clip)
+        public void AssignNewInstance()
         {
-            data = clip;
-            PlayerSource.clip = clip.value;
+            var player = AudioPool.AssignSource();
+            additionalSources.Add(player);
+            player.transform.SetParent(transform);
+            AllSources.Add(player);
+        }
+
+
+        /// <summary>
+        /// Initializes the sequence when called.
+        /// </summary>
+        public void Initialize(string request, AudioClipSettings requestSettings)
+        {
+            if (IsInitialized) return;
+
+            allSources = new List<AudioSourceInstance>()
+            {
+                standardSource
+            };
             
-            PreparePlayer();
+            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(request, out var data)) return;
+
+            RecycleOnComplete = true;
+            playMethod = SingleSourcePlayMethod.InitializePlayMethod(this, data, requestSettings);
+            
+            IsInitialized = true;
         }
         
-
-        /// <summary>
-        /// Sets the clip in the player to the data entered.
-        /// </summary>
-        /// <param name="clip">The data to play from.</param>
-        /// <param name="clipSettings">The settings to apply to the clip.</param>
-        public void SetClip(AudioData clip, AudioClipSettings clipSettings)
-        {
-            data = clip;
-            PlayerSource.clip = clip.value;
-            settings = clipSettings;
-            
-            settings.ProcessEdits(this);
-
-            if (PlayerSource.outputAudioMixerGroup == null)
-            {
-                PlayerSource.outputAudioMixerGroup = AssetAccessor.GetAsset<SettingsAssetRuntime>().ClipAudioMixer;
-            }
-
-            PreparePlayer();
-        }
-
-
-        /// <summary>
-        /// Prepares the player for use, but doesn't play the audio source just yet.
-        /// </summary>
-        private void PreparePlayer()
-        {
-            if (AssetAccessor.GetAsset<SettingsAssetRuntime>().PlayAudioState == PlayState.Disabled) return;
-            
-            if (IsPrepared) return;
-            IsPrepared = true;
-                
-            if (EditParams.TryGetValue("dynamicTime", out bool useDynamicTime))
-            {
-                if (useDynamicTime)
-                {
-                    PlayerSource.time = data.dynamicStartTime.time;
-                }
-            }
-            
-            if (PlayerSource.outputAudioMixerGroup == null)
-            {
-                PlayerSource.outputAudioMixerGroup = AssetAccessor.GetAsset<SettingsAssetRuntime>().ClipAudioMixer;
-            }
-            
-            PlayerSequence.Completed.Remove(OnSequenceComplete);
-            PlayerSequence.Completed.Add(OnSequenceComplete);
-            
-            AssetAccessor.GetAsset<SettingsAssetRuntime>().AudioStateChanged.Add(OnClipStateChanged);
-            
-            UpdateVariance();
-        }
-
-
-        /// <summary>
-        /// Plays the player when called.
-        /// </summary>
-        public void PlayPlayer()
-        {
-            PreparePlayer();
-            
-            if (!gameObject.activeSelf)
-            {
-                gameObject.SetActive(true);
-            }
         
-            Play();
+        /// <summary>
+        /// Initializes the sequence when called.
+        /// </summary>
+        public void InitializeGroup(string request, AudioClipSettings requestSettings)
+        {
+            if (IsInitialized) return;
+
+            var data = AssetAccessor.GetAsset<AudioLibrary>().GetGroup(request);
+
+            if (data == null) return;
+
+            allSources = new List<AudioSourceInstance>()
+            {
+                standardSource
+            };
+
+            RecycleOnComplete = true;
+            
+            switch (data.PlayMode)
+            {
+                case GroupPlayMode.Random:
+                    playMethod = GroupSourcePlayerRandom.InitializePlayMethod(this, data, requestSettings);
+                    break;
+                case GroupPlayMode.Sequential:
+                    playMethod = new SequentialGroupRequestSequence(this, data, requestSettings);
+                    break;
+                case GroupPlayMode.Combined:
+                    playMethod = new CombinedGroupRequestSequence(this, data, requestSettings);
+                    break;
+            }
+            
+            IsInitialized = true;
+        }
+
+
+        public void InitializeGroup(IEnumerable<string> request, GroupPlayMode playMode, AudioClipSettings requestSettings = null)
+        {
+            if (IsInitialized) return;
+
+            var data = new GroupData(Guid.NewGuid().ToString(), request, playMode);
+
+            RecycleOnComplete = true;
+            
+            switch (data.PlayMode)
+            {
+                case GroupPlayMode.Random:
+                    playMethod = GroupSourcePlayerRandom.InitializePlayMethod(this, data, requestSettings);
+                    break;
+                case GroupPlayMode.Sequential:
+                    playMethod = new SequentialGroupRequestSequence(this, data, requestSettings);
+                    break;
+                case GroupPlayMode.Combined:
+                    playMethod = new CombinedGroupRequestSequence(this, data, requestSettings);
+                    break;
+            }
+            
+            IsInitialized = true;
+        }
+
+
+        /// <summary>
+        /// Plays the sequence when called.
+        /// </summary>
+        public void Play()
+        {
             Started.Raise();
-            playerRoutine = StartCoroutine(Co_ClipRuntimeRoutine());
-        }
-
-
-        private void Play()
-        {
-            StartCoroutine(Co_PlayHandler());
+            gameObject.SetActive(true);
+            PlayersCompleted = 0;
+            playMethod.Play();
         }
 
 
         /// <summary>
-        /// Pauses the player when called.
+        /// Pauses the sequence when called.
         /// </summary>
-        public void PausePlayer()
+        public void Pause()
         {
-            if (playerRoutine != null)
-            {
-                StopCoroutine(playerRoutine);
-            }
-            
+            playMethod.Pause();
             Paused.Raise();
         }
-
-
+        
+        
         /// <summary>
-        /// Resumes the player when called.
+        /// Resumes the sequence when called.
         /// </summary>
-        public void ResumePlayer()
+        public void Resume()
         {
-            playerRoutine = StartCoroutine(Co_ClipRuntimeRoutine());
+            playMethod.Resume();
             Resumed.Raise();
         }
         
 
         /// <summary>
-        /// Stops the player when called.
+        /// Stops the sequence when called.
         /// </summary>
-        public void StopPlayer()
+        public void Stop()
         {
-            if (!IsPlaying) return;
-            PlayerSource.Stop();
+            playMethod.Stop();
             Stopped.Raise();
         }
 
 
         /// <summary>
-        /// Resets the player when called.
+        /// Runs when a player in the sequence is complete.
         /// </summary>
-        /// <param name="revertEdits"></param>
-        public void ResetPlayer(bool revertEdits = true)
+        public void PlayerComplete()
         {
-            if (revertEdits)
-            {
-                settings.RevertEdits(this);
-            }
-        }
-        
-        
-        /// <summary>
-        /// Updates the variance of the clip for a fresh play. 
-        /// </summary>
-        private void UpdateVariance()
-        {
-            if (!EditParams.TryGetValue<bool>("globalVariance", out var useVariance)) return;
-            if (!useVariance) return;
-            if (!AssetAccessor.GetAsset<SettingsAssetRuntime>().UseGlobalVariance) return;
+            PlayersCompleted++;
 
-            var volVariance = new Variance(PlayerSource.volume,
-                AssetAccessor.GetAsset<SettingsAssetRuntime>().VariantVolume);
+            if (!PlayersCompleted.Equals(AllSources.Count)) return;
             
-            var pitchVariance = new Variance(PlayerSource.pitch,
-                AssetAccessor.GetAsset<SettingsAssetRuntime>().VariantPitch);
-
-            PlayerSource.volume = volVariance.GetVariance();
-            PlayerSource.pitch = pitchVariance.GetVariance();
-        }
-
-
-        /// <summary>
-        /// Processes the edits when the clip loops to have it play differently to before.
-        /// </summary>
-        public void ProcessLoopEdits()
-        {
-            foreach (var edit in settings.Edits.Where(t => t.Value.ProcessOnLoop))
+            if (IsLooped)
             {
-                edit.Value.Process(this);
+                Loop();
+                return;
             }
-        }
-
-
-        /// <summary>
-        /// Runs when the clip has completed playing.
-        /// </summary>
-        private void OnClipCompleted()
-        {
-            // Debug.LogError("Completed");
+                
+            PlayersCompleted = 0;
             Completed.Raise();
+
+            if (!RecycleOnComplete) return;
+
+            ReturnPlayerToPool();
         }
 
 
         /// <summary>
-        /// Runs when the sequence this player is attached to is completed.
+        /// Runs when the sequence is called to loop.
         /// </summary>
-        private void OnSequenceComplete()
+        private void Loop()
         {
-            IsPrepared = false;
-            EditParams.ClearAllParams();
-            gameObject.SetActive(false);
-        }
+            if (!PlayersCompleted.Equals(AllSources.Count)) return;
+            
+            LoopInfo.CurrentLoopCount++;
 
-
-        /// <summary>
-        /// Runs when the play state is changed for audio clips in the asset. 
-        /// </summary>
-        private void OnClipStateChanged()
-        {
-            PlayerSource.mute = AssetAccessor.GetAsset<SettingsAssetRuntime>().PlayAudioState == PlayState.PlayMuted;
-        }
-        
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Coroutines
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        /// <summary>
-        /// Runs a loop while the clip is playing only.
-        /// </summary>
-        private IEnumerator Co_ClipRuntimeRoutine()
-        {
-            yield return new WaitForSecondsRealtime(ClipTimeRemaining);
-            // Debug.LogError(ClipTimeRemaining);
-            OnClipCompleted();
-        }
-
-
-        private IEnumerator Co_PlayHandler()
-        {
-            if (EditParams.TryGetValue("delay", out DelayEdit edit))
+            if (IsLoopCompleted)
             {
-                // Debug.LogError("Delayed");
-                yield return new WaitForSeconds(edit.Delay);
-                // Debug.LogError("Delay Completed");
-                PlayerSource.Play();
-                yield break;
+                Completed.Raise();
+                return;
             }
 
-            // Debug.LogError("Played Normal");
-            PlayerSource.Play();
+            foreach (var player in AllSources)
+            {
+                player.ProcessLoopEdits();
+            }
+            
+            playMethod.OnLoop();
+            Looped.Raise();
+            Play();
+        }
+
+
+        private void ReturnPlayerToPool()
+        {
+            foreach (var sourceInstance in additionalSources)
+            {
+                sourceInstance.ResetSourceInstance(true);
+                AudioPool.Return(sourceInstance);
+            }
+            
+            additionalSources.Clear();
+            allSources = new List<AudioSourceInstance>()
+            {
+                Source
+            };
+
+            standardSource.ResetSourceInstance(true);
+            AudioPool.Return(this);
+            IsInitialized = false;
         }
     }
 }

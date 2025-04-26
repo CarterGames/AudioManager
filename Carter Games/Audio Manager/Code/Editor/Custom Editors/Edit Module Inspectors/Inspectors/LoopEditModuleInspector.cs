@@ -1,26 +1,27 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
 using CarterGames.Assets.AudioManager.Logging;
 using UnityEditor;
@@ -44,6 +45,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             "X Times", "Infinite"
         };
+        
+        public override Type EditModule => typeof(LoopEdit);
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
@@ -77,7 +80,7 @@ namespace CarterGames.Assets.AudioManager.Editor
 
             EditorGUILayout.BeginVertical("HelpBox");
 
-            DrawDropDown(targetObject, index, "Loop Edit");
+            DrawDropDown("Loop Edit");
 
             GUILayout.Space(2.5f);
 
@@ -87,25 +90,25 @@ namespace CarterGames.Assets.AudioManager.Editor
                 return;
             }
 
-            if (bool.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "showModule")))
+            if (bool.Parse(GetValue("showModule")))
             {
                 UtilEditor.DrawHorizontalGUILine();
 
-                EditModuleInspectorHelper.SetValue(targetObject, index, "moduleMode", GUILayout.Toolbar(int.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "moduleMode")), Options).ToString());
+                SetValue("moduleMode", GUILayout.Toolbar(int.Parse(GetValue("moduleMode")), Options).ToString());
                 
-                switch (int.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "moduleMode")))
+                switch (int.Parse(GetValue("moduleMode")))
                 {
                     case 0:
 
                         EditorGUI.BeginChangeCheck();
                         
-                        if (int.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "loopCount")) < 0f)
+                        if (int.Parse(GetValue("loopCount")) < 0f)
                         {
-                            EditModuleInspectorHelper.SetValue(targetObject, index, "loopCount", "0");
+                            SetValue("loopCount", "0");
                         }
                         
                         var loopCount = EditorGUILayout.IntField("Times To Loop:",
-                            int.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "loopCount")));
+                            int.Parse(GetValue("loopCount")));
 
                         if (EditorGUI.EndChangeCheck())
                         {
@@ -115,15 +118,15 @@ namespace CarterGames.Assets.AudioManager.Editor
                                 AmDebugLogger.Warning($"{AudioManagerErrorCode.InvalidAudioClipInspectorInput}\nLoop count cannot have a value below 0 when using x times mode.");
                             }
                             
-                            EditModuleInspectorHelper.SetValue(targetObject, index, "loopCount", loopCount.ToString());
+                            SetValue("loopCount", loopCount.ToString());
                         }
                         
                         break;
                     case 1:
 
-                        if (int.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "loopCount")) > 0)
+                        if (int.Parse(GetValue("loopCount")) > 0)
                         {
-                            EditModuleInspectorHelper.SetValue(targetObject, index, "loopCount", "-1");
+                            SetValue("loopCount", "-1");
                         }
                         
                         break;
@@ -133,11 +136,11 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUI.BeginChangeCheck();
                         
                 var delayAfterFirst = EditorGUILayout.Toggle("Use delay on repeats:",
-                    bool.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "ignoreDelayAfterFirst")));
+                    bool.Parse(GetValue("ignoreDelayAfterFirst")));
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    EditModuleInspectorHelper.SetValue(targetObject, index, "ignoreDelayAfterFirst", delayAfterFirst.ToString());
+                    SetValue("ignoreDelayAfterFirst", delayAfterFirst.ToString());
                 }
             }
 

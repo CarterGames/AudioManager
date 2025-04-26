@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,6 +22,7 @@
  */
 
 using System;
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -35,10 +36,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        private const string UniqueIdId = "CarterGames_AudioManager_Editor_UUID";
-
-        private static readonly string AutoValidationAutoCheckId = $"{UniqueId}_CarterGames_AudioManager_Editor_AutoVersionCheck";
+        
         private static readonly string DeveloperDebugModeId = $"{UniqueId}_CarterGames_AudioManager_Editor_Developer_DebugMode";
         
         private static readonly string ScannerInitializedId = $"{UniqueId}_CarterGames_AudioManager_Editor_Scanner_Initialized";
@@ -48,6 +46,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         private static readonly string EditorOptionsId = $"{UniqueId}_CarterGames_AudioManager_EditorSettings_ShowEditorOptions";
         private static readonly string HelpBoxesId = $"{UniqueId}_CarterGames_AudioManager_EditorSettings_ShowHelpBoxes";
         private static readonly string AudioOptionsId = $"{UniqueId}_CarterGames_AudioManager_EditorSettings_ShowAudioOptions";
+        private static readonly string PoolingOptionsId = $"{UniqueId}_CarterGames_AudioManager_EditorSettings_ShowPoolingOptions";
         
         private static readonly string EditorTabPositionId = $"{UniqueId}_CarterGames_AudioManager_EditorWindow_EditorTabPos";
         
@@ -70,21 +69,11 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
+
         /// <summary>
         /// The unique if for the assets settings to be per project...
         /// </summary>
-        private static string UniqueId => (string)GetOrCreateValue<string>(UniqueIdId, SettingType.PlayerPref, Guid.NewGuid().ToString());
-
-
-        /// <summary>
-        /// Has the scanner been initialized.
-        /// </summary>
-        public static bool VersionValidationAutoCheckOnLoad
-        {
-            get => (bool) GetOrCreateValue<bool>(AutoValidationAutoCheckId, SettingType.EditorPref);
-            set => SetValue<bool>(AutoValidationAutoCheckId, SettingType.EditorPref, value);
-        }
+        private static string UniqueId => CommonPerUserSettings.UniqueId;
         
         
         /// <summary>
@@ -92,8 +81,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool DeveloperDebugMode
         {
-            get => (bool) GetOrCreateValue<bool>(DeveloperDebugModeId, SettingType.EditorPref);
-            set => SetValue<bool>(DeveloperDebugModeId, SettingType.EditorPref, value);
+            get => (bool) GetOrCreateValue<bool>(DeveloperDebugModeId, PerUserSettingType.EditorPref);
+            set => SetValue<bool>(DeveloperDebugModeId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -102,8 +91,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool ScannerInitialized
         {
-            get => (bool) GetOrCreateValue<bool>(ScannerInitializedId, SettingType.SessionState);
-            set => SetValue<bool>(ScannerInitializedId, SettingType.SessionState, value);
+            get => (bool) GetOrCreateValue<bool>(ScannerInitializedId, PerUserSettingType.SessionState);
+            set => SetValue<bool>(ScannerInitializedId, PerUserSettingType.SessionState, value);
         }
         
         
@@ -112,8 +101,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool ScannerHasNewAudioClip
         {
-            get => (bool) GetOrCreateValue<bool>(ScannerHasNewAudioClipId, SettingType.EditorPref);
-            set => SetValue<bool>(ScannerHasNewAudioClipId, SettingType.EditorPref, value);
+            get => (bool) GetOrCreateValue<bool>(ScannerHasNewAudioClipId, PerUserSettingType.EditorPref);
+            set => SetValue<bool>(ScannerHasNewAudioClipId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -122,8 +111,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool ScannerHasScanned
         {
-            get => (bool) GetOrCreateValue<bool>(ScannerHasScannedProjectId, SettingType.EditorPref);
-            set => SetValue<bool>(ScannerHasScannedProjectId, SettingType.EditorPref, value);
+            get => (bool) GetOrCreateValue<bool>(ScannerHasScannedProjectId, PerUserSettingType.EditorPref);
+            set => SetValue<bool>(ScannerHasScannedProjectId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -132,8 +121,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static int EditorTabPosition 
         {
-            get => (int) GetOrCreateValue<int>(EditorTabPositionId, SettingType.EditorPref);
-            set => SetValue<int>(EditorTabPositionId, SettingType.EditorPref, value);
+            get => (int) GetOrCreateValue<int>(EditorTabPositionId, PerUserSettingType.EditorPref);
+            set => SetValue<int>(EditorTabPositionId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -142,8 +131,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool ShowEditorOptions
         {
-            get => (bool) GetOrCreateValue<bool>(EditorOptionsId, SettingType.EditorPref);
-            set => SetValue<bool>(EditorOptionsId, SettingType.EditorPref, value);
+            get => (bool) GetOrCreateValue<bool>(EditorOptionsId, PerUserSettingType.EditorPref);
+            set => SetValue<bool>(EditorOptionsId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -152,8 +141,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool ShowHelpBoxes
         {
-            get => (bool) GetOrCreateValue<bool>(HelpBoxesId, SettingType.EditorPref);
-            set => SetValue<bool>(HelpBoxesId, SettingType.EditorPref, value);
+            get => (bool) GetOrCreateValue<bool>(HelpBoxesId, PerUserSettingType.EditorPref);
+            set => SetValue<bool>(HelpBoxesId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -162,8 +151,18 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static bool ShowAudioOptions
         {
-            get => (bool) GetOrCreateValue<bool>(AudioOptionsId, SettingType.EditorPref);
-            set => SetValue<bool>(AudioOptionsId, SettingType.EditorPref, value);
+            get => (bool) GetOrCreateValue<bool>(AudioOptionsId, PerUserSettingType.EditorPref);
+            set => SetValue<bool>(AudioOptionsId, PerUserSettingType.EditorPref, value);
+        }
+        
+        
+        /// <summary>
+        /// Defines if the pooling options dropdown show in the settings provider.
+        /// </summary>
+        public static bool ShowPoolingOptions
+        {
+            get => (bool) GetOrCreateValue<bool>(PoolingOptionsId, PerUserSettingType.EditorPref);
+            set => SetValue<bool>(PoolingOptionsId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -172,8 +171,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static int LastLibraryIndexShown
         {
-            get => (int) GetOrCreateValue<int>(LastLibraryEntryId, SettingType.EditorPref, -1);
-            set => SetValue<int>(LastLibraryEntryId, SettingType.EditorPref, value);
+            get => (int) GetOrCreateValue<int>(LastLibraryEntryId, PerUserSettingType.EditorPref, -1);
+            set => SetValue<int>(LastLibraryEntryId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -182,8 +181,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 LibBtnScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(LibBtnScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(LibBtnScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(LibBtnScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(LibBtnScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -192,8 +191,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 LibScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(LibScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(LibScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(LibScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(LibScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -202,8 +201,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static int LastLibraryGroupEntry
         {
-            get => (int) GetOrCreateValue<int>(LastLibraryGroupEntryId, SettingType.EditorPref, -1);
-            set => SetValue<int>(LastLibraryGroupEntryId, SettingType.EditorPref, value);
+            get => (int) GetOrCreateValue<int>(LastLibraryGroupEntryId, PerUserSettingType.EditorPref, -1);
+            set => SetValue<int>(LastLibraryGroupEntryId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -212,8 +211,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 GroupBtnScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(GroupBtnScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(GroupBtnScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(GroupBtnScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(GroupBtnScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -222,8 +221,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 GroupScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(GroupScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(GroupScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(GroupScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(GroupScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -232,8 +231,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static int LastLibMixerEntry
         {
-            get => (int) GetOrCreateValue<int>(LastLibMixerEntryId, SettingType.EditorPref, -1);
-            set => SetValue<int>(LastLibMixerEntryId, SettingType.EditorPref, value);
+            get => (int) GetOrCreateValue<int>(LastLibMixerEntryId, PerUserSettingType.EditorPref, -1);
+            set => SetValue<int>(LastLibMixerEntryId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -242,8 +241,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 MixerBtnScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(MixerBtnScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(MixerBtnScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(MixerBtnScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(MixerBtnScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -252,8 +251,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 MixerScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(MixerScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(MixerScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(MixerScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(MixerScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -262,8 +261,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static int LastLibMusicEntry
         {
-            get => (int) GetOrCreateValue<int>(LastLibMusicEntryId, SettingType.EditorPref, -1);
-            set => SetValue<int>(LastLibMusicEntryId, SettingType.EditorPref, value);
+            get => (int) GetOrCreateValue<int>(LastLibMusicEntryId, PerUserSettingType.EditorPref, -1);
+            set => SetValue<int>(LastLibMusicEntryId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -272,8 +271,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 MusicBtnScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(MusicBtnScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(MusicBtnScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(MusicBtnScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(MusicBtnScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         
@@ -282,207 +281,23 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static Vector2 MusicScrollRectPos
         {
-            get => (Vector2) GetOrCreateValue<Vector2>(MusicScrollRectPosId, SettingType.EditorPref);
-            set => SetValue<Vector2>(MusicScrollRectPosId, SettingType.EditorPref, value);
+            get => (Vector2) GetOrCreateValue<Vector2>(MusicScrollRectPosId, PerUserSettingType.EditorPref);
+            set => SetValue<Vector2>(MusicScrollRectPosId, PerUserSettingType.EditorPref, value);
         }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-        private static object GetOrCreateValue<T>(string key, SettingType type, object defaultValue = null)
+        private static object GetOrCreateValue<T>(string key, PerUserSettingType type, object defaultValue = null)
         {
-            switch (type)
-            {
-                case SettingType.EditorPref:
-
-                    if (EditorPrefs.HasKey(key))
-                    {
-                        switch (typeof(T))
-                        {
-                            case var x when x == typeof(bool):
-                                return EditorPrefs.GetBool(key);
-                            case var x when x == typeof(int):
-                                return EditorPrefs.GetInt(key);
-                            case var x when x == typeof(float):
-                                return EditorPrefs.GetFloat(key);
-                            case var x when x == typeof(string):
-                                return EditorPrefs.GetString(key);
-                            case var x when x == typeof(Vector2):
-                                return JsonUtility.FromJson<Vector2>(EditorPrefs.GetString(key));
-                            default:
-                                return null;
-                        }
-                    }
-
-                    switch (typeof(T))
-                    {
-                        case var x when x == typeof(bool):
-                            EditorPrefs.SetBool(key, defaultValue == null ? false : (bool)defaultValue);
-                            return EditorPrefs.GetBool(key);
-                        case var x when x == typeof(int):
-                            EditorPrefs.SetInt(key, defaultValue == null ? 0 : (int)defaultValue);
-                            return EditorPrefs.GetInt(key);
-                        case var x when x == typeof(float):
-                            EditorPrefs.SetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
-                            return EditorPrefs.GetFloat(key);
-                        case var x when x == typeof(string):
-                            EditorPrefs.SetString(key, (string)defaultValue);
-                            return EditorPrefs.GetString(key);
-                        case var x when x == typeof(Vector2):
-                            EditorPrefs.SetString(key,
-                                defaultValue == null
-                                    ? JsonUtility.ToJson(Vector2.zero)
-                                    : JsonUtility.ToJson(defaultValue));
-                            return JsonUtility.FromJson<Vector2>(EditorPrefs.GetString(key));
-                        default:
-                            return null;
-                    }
-                    
-                case SettingType.PlayerPref:
-                    
-                    if (PlayerPrefs.HasKey(key))
-                    {
-                        switch (typeof(T))
-                        {
-                            case var x when x == typeof(bool):
-                                return PlayerPrefs.GetInt(key) == 1;
-                            case var x when x == typeof(int):
-                                return PlayerPrefs.GetInt(key);
-                            case var x when x == typeof(float):
-                                return PlayerPrefs.GetFloat(key);
-                            case var x when x == typeof(string):
-                                return PlayerPrefs.GetString(key);
-                            case var x when x == typeof(Vector2):
-                                return JsonUtility.FromJson<Vector2>(PlayerPrefs.GetString(key));
-                            default:
-                                return null;
-                        }
-                    }
-
-                    switch (typeof(T))
-                    {
-                        case var x when x == typeof(bool):
-                            PlayerPrefs.SetInt(key,
-                                defaultValue == null ? 0 : defaultValue.ToString().ToLower() == "true" ? 1 : 0);
-                            return PlayerPrefs.GetInt(key) == 1;
-                        case var x when x == typeof(int):
-                            PlayerPrefs.SetInt(key, defaultValue == null ? 0 : (int)defaultValue);
-                            return PlayerPrefs.GetInt(key);
-                        case var x when x == typeof(float):
-                            PlayerPrefs.SetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
-                            return PlayerPrefs.GetFloat(key);
-                        case var x when x == typeof(string):
-                            PlayerPrefs.SetString(key, (string)defaultValue);
-                            return PlayerPrefs.GetString(key);
-                        case var x when x == typeof(Vector2):
-                            PlayerPrefs.SetString(key,
-                                defaultValue == null
-                                    ? JsonUtility.ToJson(Vector2.zero)
-                                    : JsonUtility.ToJson(defaultValue));
-                            return JsonUtility.FromJson<Vector2>(PlayerPrefs.GetString(key));
-                        default:
-                            return null;
-                    }
-                    
-                case SettingType.SessionState:
-
-                    switch (typeof(T))
-                    {
-                        case var x when x == typeof(bool):
-                            return SessionState.GetBool(key, defaultValue == null ? false : (bool)defaultValue);
-                        case var x when x == typeof(int):
-                            return SessionState.GetInt(key, defaultValue == null ? 0 : (int)defaultValue);
-                        case var x when x == typeof(float):
-                            return SessionState.GetFloat(key, defaultValue == null ? 0 : (float)defaultValue);
-                        case var x when x == typeof(string):
-                            return SessionState.GetString(key, (string)defaultValue);
-                        case var x when x == typeof(Vector2):
-                            return JsonUtility.FromJson<Vector2>(SessionState.GetString(key,
-                                JsonUtility.ToJson(defaultValue)));
-                        default:
-                            return null;
-                    }
-                    
-                default:
-                    return null;
-            }
+            return PerUserSettingsEditor.GetOrCreateValue<T>(key, type, defaultValue);
         }
 
 
-        private static void SetValue<T>(string key, SettingType type, object value)
+        private static void SetValue<T>(string key, PerUserSettingType type, object value)
         {
-            switch (type)
-            {
-                case SettingType.EditorPref:
-                    
-                    switch (typeof(T))
-                    {
-                        case var x when x == typeof(bool):
-                            EditorPrefs.SetBool(key, (bool)value);
-                            break;
-                        case var x when x == typeof(int):
-                            EditorPrefs.SetInt(key, (int)value);
-                            break;
-                        case var x when x == typeof(float):
-                            EditorPrefs.SetFloat(key, (float)value);
-                            break;
-                        case var x when x == typeof(string):
-                            EditorPrefs.SetString(key, (string)value);
-                            break;
-                        case var x when x == typeof(Vector2):
-                            EditorPrefs.SetString(key, JsonUtility.ToJson(value));
-                            break;
-                    }
-                    
-                    break;
-                case SettingType.PlayerPref:
-                    
-                    switch (typeof(T))
-                    {
-                        case var x when x == typeof(bool):
-                            PlayerPrefs.SetInt(key, ((bool)value) ? 1 : 0);
-                            break;
-                        case var x when x == typeof(int):
-                            PlayerPrefs.SetInt(key, (int)value);
-                            break;
-                        case var x when x == typeof(float):
-                            PlayerPrefs.SetFloat(key, (float)value);
-                            break;
-                        case var x when x == typeof(string):
-                            PlayerPrefs.SetString(key, (string)value);
-                            break;
-                        case var x when x == typeof(Vector2):
-                            PlayerPrefs.SetString(key, JsonUtility.ToJson(value));
-                            break;
-                    }
-                    
-                    PlayerPrefs.Save();
-                    
-                    break;
-                case SettingType.SessionState:
-                    
-                    switch (typeof(T))
-                    {
-                        case var x when x == typeof(bool):
-                            SessionState.SetBool(key, (bool)value);
-                            break;
-                        case var x when x == typeof(int):
-                            SessionState.SetInt(key, (int)value);
-                            break;
-                        case var x when x == typeof(float):
-                            SessionState.SetFloat(key, (float)value);
-                            break;
-                        case var x when x == typeof(string):
-                            SessionState.SetString(key, (string)value);
-                            break;
-                        case var x when x == typeof(Vector2):
-                            SessionState.SetString(key, JsonUtility.ToJson(value));
-                            break;
-                    }
-                    
-                    break;
-            }
+            PerUserSettingsEditor.SetValue<T>(key, type, value);
         }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -496,7 +311,6 @@ namespace CarterGames.Assets.AudioManager.Editor
             ShowEditorOptions = false;
             ShowHelpBoxes = false;
             ShowAudioOptions = false;
-            VersionValidationAutoCheckOnLoad = true;
             LastLibraryIndexShown = -1;
             LibBtnScrollRectPos = Vector2.zero;
             LibScrollRectPos = Vector2.zero;

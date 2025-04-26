@@ -1,26 +1,27 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using CarterGames.Assets.Shared.Common;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
@@ -44,13 +45,13 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// The pool of audio sequences.
         /// </summary>
-        private static ObjectPool<AudioPlayerSequence> SequencePool { get; set; }
+        private static ObjectPool<AudioPlayer> PlayerObjectPool { get; set; }
         
         
         /// <summary>
         /// The pool of audio players.
         /// </summary>
-        private static ObjectPool<AudioPlayer> PlayerPool { get; set; }
+        private static ObjectPool<AudioSourceInstance> SourceInstanceObjectPool { get; set; }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
@@ -62,20 +63,25 @@ namespace CarterGames.Assets.AudioManager
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Initialize()
         {
-            if (SequencePool != null) return;
+            if (PlayerObjectPool != null) return;
+
+            if (!DoNotDestroyHandler.IsInitialized)
+            {
+                DoNotDestroyHandler.Initialize();
+            }
             
             // Initializes the pool collections...
-            var seqPrefab = AssetAccessor.GetAsset<SettingsAssetRuntime>().SequencePrefab;
-            var playerPrefab = AssetAccessor.GetAsset<SettingsAssetRuntime>().Prefab;
+            var playerPrefab = AssetAccessor.GetAsset<AmAssetSettings>().PlayerPrefab;
+            var instancePrefab = AssetAccessor.GetAsset<AmAssetSettings>().SourceInstancePrefab;
             
-            var initSize = AssetAccessor.GetAsset<SettingsAssetRuntime>().AudioPoolInitialSize;
+            var initSize = AssetAccessor.GetAsset<AmAssetSettings>().AudioPoolInitialSize;
 
-            SequencePool = new ObjectPool<AudioPlayerSequence>(seqPrefab, DoNotDestroyHandler.AudioParent, initSize, false)
+            PlayerObjectPool = new ObjectPool<AudioPlayer>(playerPrefab, DoNotDestroyHandler.PoolParentPlayers, initSize, false)
             {
                 ShouldExpand = true
             };
             
-            PlayerPool = new ObjectPool<AudioPlayer>(playerPrefab, DoNotDestroyHandler.AudioParent, initSize, false)
+            SourceInstanceObjectPool = new ObjectPool<AudioSourceInstance>(instancePrefab, DoNotDestroyHandler.PoolParentSourceInstances, initSize, false)
             {
                 ShouldExpand = true
             };
@@ -86,9 +92,11 @@ namespace CarterGames.Assets.AudioManager
         /// Assigns a new audio sequence to use from the pool when called.
         /// </summary>
         /// <returns>An AudioPlayerSequence instance.</returns>
-        public static AudioPlayerSequence AssignSequence()
+        public static AudioPlayer AssignPlayer()
         {
-            return SequencePool.Assign();
+            var activePlayer = PlayerObjectPool.Assign();
+            activePlayer.transform.SetParent(DoNotDestroyHandler.PoolParentActive);
+            return activePlayer;
         }
         
         
@@ -96,19 +104,21 @@ namespace CarterGames.Assets.AudioManager
         /// Assigns a new audio player to use from the pool when called.
         /// </summary>
         /// <returns>An AudioPlayer instance.</returns>
-        public static AudioPlayer AssignPlayer()
+        public static AudioSourceInstance AssignSource()
         {
-            return PlayerPool.Assign();
+            return SourceInstanceObjectPool.Assign();
         }
 
 
         /// <summary>
         /// Returns a audio sequence to the pool for re-use.
         /// </summary>
-        /// <param name="playerSequence">The element to return.</param>
-        public static void Return(AudioPlayerSequence playerSequence)
+        /// <param name="player">The element to return.</param>
+        public static void Return(AudioPlayer player)
         {
-            SequencePool.Return(playerSequence);
+            player.gameObject.SetActive(false);
+            PlayerObjectPool.Return(player);
+            player.transform.SetParent(DoNotDestroyHandler.PoolParentPlayers);
         }
         
         
@@ -116,10 +126,14 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Returns a audio player to the pool for re-use.
         /// </summary>
-        /// <param name="player">The element to return.</param>
-        public static void Return(AudioPlayer player)
+        /// <param name="instance">The element to return.</param>
+        public static void Return(AudioSourceInstance instance)
         {
-            PlayerPool.Return(player);
+            instance.ResetSourceInstance();
+            instance.transform.SetParent(DoNotDestroyHandler.PoolParentSourceInstances);
+            instance.gameObject.SetActive(false);
+            
+            SourceInstanceObjectPool.Return(instance);
         }
 
 
@@ -128,8 +142,8 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public static void Reset()
         {
-            SequencePool.Reset();
-            PlayerPool.Reset();
+            PlayerObjectPool.Reset();
+            SourceInstanceObjectPool.Reset();
         }
     }
 }

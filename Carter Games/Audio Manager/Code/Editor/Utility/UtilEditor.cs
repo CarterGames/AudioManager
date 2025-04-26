@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -23,7 +23,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CarterGames.Common.Serializiation;
+using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Assets.Shared.Common.Serializiation;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -41,13 +42,12 @@ namespace CarterGames.Assets.AudioManager.Editor
 
         // Paths
         /* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        public const string SettingsLocationPath = "Project/Carter Games/Audio Manager";
-        public static readonly string LibraryAssetPath = $"{FileEditorUtil.AssetBasePath}/Carter Games/Audio Manager/Data/Library.asset";
+        public const string SettingsLocationPath = "Carter Games/Assets/Audio Manager";
         
 
         // Default Names
         /* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        public const string AudioPrefabName = UtilRuntime.AudioPrefabName;
+        public const string AudioPrefabName = UtilRuntime.AudioPlayerPrefabName;
 
         
         // Filters
@@ -189,49 +189,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// Gets the carter games banner.
         /// </summary>
         public static Texture2D CarterGamesBanner => FileEditorUtil.GetOrAssignCache(ref carterGamesBannerCache, CarterGamesBannerFilter);
-
         
-        // Assets
-        /* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        /// <summary>
-        /// Gets/Sets the audio manager settings asset.
-        /// </summary>
-        public static AssetIndex AssetIndex => ScriptableRef.AssetIndex;
-
-
-        /// <summary>
-        /// Gets/Sets the audio manager settings asset.
-        /// </summary>
-        public static SettingsAssetRuntime RuntimeSettings => ScriptableRef.RuntimeSettings;
-
-
-        /// <summary>
-        /// Gets/Sets the save manager editor settings asset.
-        /// </summary>
-        public static SerializedObject SettingsObject => ScriptableRef.RuntimeSettingsObject;
-        
-
-        /// <summary>
-        /// Gets/Sets the audio manager library asset.
-        /// </summary>
-        public static AudioLibrary Library => ScriptableRef.Library;
-
-        //
-        public static SerializedObject LibraryObject => ScriptableRef.LibraryObject;
-
-
-        /// <summary>
-        /// Gets if there is a settings asset in the project.
-        /// </summary>
-        public static bool HasInitialized
-        {
-            get
-            {
-                AssetIndexHandler.UpdateIndex();
-                return ScriptableRef.HasAllAssets;
-            }
-        }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
@@ -270,7 +228,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// </summary>
         public static SerializableDictionary<string, AudioData> GetLibraryData()
         {
-            return Library.LibraryLookup;
+            return ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.LibraryLookup;
         }
         
         
@@ -280,10 +238,12 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <param name="value">The data to set to.</param>
         public static void SetLibraryData(Dictionary<AudioData, bool> value, bool clearData = false)
         {
+            var library = ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef;
+            var libraryObject = ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef;
+            
             if (clearData)
             {
-                LibraryObject.FindProperty("library").FindPropertyRelative("list").ClearArray();
-                LibraryObject.FindProperty("libraryReverseLookup").FindPropertyRelative("list").ClearArray();
+                libraryObject.Fp("library").Fpr("list").ClearArray();
             }
 
             var keysList = value.Keys.ToList();
@@ -292,22 +252,18 @@ namespace CarterGames.Assets.AudioManager.Editor
             for (var i = 0; i < value.Count; i++)
             {
                 if (!valuesList[i]) continue;
-                if (Library.LibraryLookup.ContainsKey(keysList[i].id)) continue;
+                if (library.LibraryLookup.ContainsKey(keysList[i].id)) continue;
                 
-                Library.LibraryLookup.Add(keysList[i].id, keysList[i]);
-                
-                if (Library.ReverseLibraryLookup.ContainsKey(keysList[i].key)) continue;
-                
-                Library.ReverseLibraryLookup.Add(keysList[i].key, keysList[i].id);
+                library.LibraryLookup.Add(keysList[i].id, keysList[i]);
             }
             
-            LibraryObject.ApplyModifiedProperties();
-            LibraryObject.Update();
+            libraryObject.ApplyModifiedProperties();
+            libraryObject.Update();
 
-            Library.OrderLibrary();
+            library.OrderLibrary();
 
-            LibraryObject.ApplyModifiedProperties();
-            LibraryObject.Update();
+            libraryObject.ApplyModifiedProperties();
+            libraryObject.Update();
         }
         
         
@@ -317,8 +273,8 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <param name="value">The value to set to.</param>
         public static void SetLibraryMixerGroups(AudioMixerGroup[] value)
         {
-            Library.SetMixerGroups(value);
-            EditorUtility.SetDirty(Library);
+            ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.SetMixerGroups(value);
+            EditorUtility.SetDirty(ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -476,6 +432,31 @@ namespace CarterGames.Assets.AudioManager.Editor
         public static float Width(this string text)
         {
             return GUI.skin.label.CalcSize(new GUIContent(text)).x;
+        }
+        
+        
+        /// <summary>
+        /// Copies data from one instance of an asset to another.
+        /// </summary>
+        /// <param name="read">The asset to read from.</param>
+        /// <param name="target">The asset to assign to.</param>
+        public static void TransferProperties(SerializedObject read, SerializedObject target)
+        {
+            var dest = target;
+            var propIterator = read.GetIterator();
+            
+            if (propIterator.NextVisible(true))
+            {
+                while (propIterator.NextVisible(true))
+                {
+                    var propElement = dest.FindProperty(propIterator.name);
+                    
+                    if (propElement == null || propElement.propertyType != propIterator.propertyType) continue;
+                    dest.CopyFromSerializedProperty(propIterator);
+                }
+            }
+            
+            dest.ApplyModifiedProperties();
         }
     }
 }

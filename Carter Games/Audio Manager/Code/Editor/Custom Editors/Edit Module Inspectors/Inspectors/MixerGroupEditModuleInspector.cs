@@ -1,27 +1,29 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
+using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -35,12 +37,6 @@ namespace CarterGames.Assets.AudioManager.Editor
     public sealed class MixerGroupEditModuleInspector : EditModuleInspectorBase
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Fields
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        private MixerSearchProvider mixerSearchProvider;
-        
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
@@ -53,6 +49,8 @@ namespace CarterGames.Assets.AudioManager.Editor
             { "enabled", "True" },
             { "mixerName", string.Empty },
         };
+        
+        public override Type EditModule => typeof(MixerEdit);
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
@@ -69,7 +67,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             EditorGUILayout.BeginVertical("HelpBox");
 
-            DrawDropDown(targetObject, index, "Mixer Group Edit");
+            DrawDropDown("Mixer Group Edit");
             
             GUILayout.Space(2.5f);
             
@@ -79,20 +77,18 @@ namespace CarterGames.Assets.AudioManager.Editor
                 return;
             }
 
-            if (bool.Parse(EditModuleInspectorHelper.GetValue(targetObject, index, "showModule")))
+            if (bool.Parse(GetValue( "showModule")))
             {
                 UtilEditor.DrawHorizontalGUILine();
                 
-                if (string.IsNullOrEmpty(EditModuleInspectorHelper.GetValue(targetObject, index, "mixerName")))
+                if (string.IsNullOrEmpty(GetValue("mixerName")))
                 {
                     if (GUILayout.Button("Select Mixer"))
                     {
-                        mixerSearchProvider ??= ScriptableObject.CreateInstance<MixerSearchProvider>();
-                        
-                        MixerSearchProvider.ToExclude.Clear();
+                        SearchProviderInstancing.SearchProviderMixers.ToExclude.Clear();
                 
-                        MixerSearchProvider.OnSearchTreeSelectionMade.AddAnonymous("mixerSearch", (s) => SelectMixer(targetObject, index, s));
-                        SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), mixerSearchProvider);
+                        SearchProviderInstancing.SearchProviderMixers.SelectionMade.AddAnonymous("mixerSearch", (s) => SelectMixer(targetObject, index, s));
+                        SearchProviderInstancing.SearchProviderMixers.Open();
                     }
                 }
                 else
@@ -102,20 +98,15 @@ namespace CarterGames.Assets.AudioManager.Editor
                     EditorGUI.BeginDisabledGroup(true);
                     
                     EditorGUILayout.ObjectField(
-                        UtilEditor.Library.GetMixer(EditModuleInspectorHelper.GetValue(targetObject, index, "mixerName")),
+                        ScriptableRef.GetAssetDef<AudioLibrary>().AssetRef.GetMixer(GetValue("mixerName")),
                         typeof(AudioMixerGroup), false);
                     
                     EditorGUI.EndDisabledGroup();
                     
                     if (GUILayout.Button("Change Mixer", GUILayout.Width(100)))
                     {
-                        mixerSearchProvider ??= ScriptableObject.CreateInstance<MixerSearchProvider>();
-                        
-                        MixerSearchProvider.ToExclude.Clear();
-                        MixerSearchProvider.ToExclude.Add(EditModuleInspectorHelper.GetValue(targetObject, index, "mixerName"));
-                
-                        MixerSearchProvider.OnSearchTreeSelectionMade.AddAnonymous("mixerSearch", (s) => SelectMixer(targetObject, index, s));
-                        SearchWindow.Open(new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition)), mixerSearchProvider);
+                        SearchProviderInstancing.SearchProviderMixers.SelectionMade.AddAnonymous("mixerSearch", (s) => SelectMixer(targetObject, index, s));
+                        SearchProviderInstancing.SearchProviderMixers.Open(GetValue("mixerName"));
                     }
                     
                     EditorGUILayout.EndHorizontal();
@@ -133,10 +124,10 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <param name="targetObject">The target object.</param>
         /// <param name="index">The index of the module in the object.</param>
         /// <param name="treeEntry">The entry selected from the search provider.</param>
-        private static void SelectMixer(SerializedObject targetObject, int index, SearchTreeEntry treeEntry)
+        private void SelectMixer(SerializedObject targetObject, int index, SearchTreeEntry treeEntry)
         {
-            MixerSearchProvider.OnSearchTreeSelectionMade.RemoveAnonymous("mixerSearch");
-            EditModuleInspectorHelper.SetValue(targetObject, index, "mixerName", treeEntry.userData.ToString());
+            SearchProviderInstancing.SearchProviderMixers.SelectionMade.RemoveAnonymous("mixerSearch");
+            SetValue("mixerName", treeEntry.userData.ToString());
             targetObject.ApplyModifiedProperties();
             targetObject.Update();
         }

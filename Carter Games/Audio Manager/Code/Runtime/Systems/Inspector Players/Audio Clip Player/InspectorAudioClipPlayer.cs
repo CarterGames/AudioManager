@@ -1,20 +1,20 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
- *
+ * Copyright (c) 2025 Carter Games
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
- *
+ * 
+ *    
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,7 +22,7 @@
  */
 
 using System.Collections.Generic;
-using CarterGames.Common.Serializiation;
+using CarterGames.Assets.Shared.Common.Serializiation;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -31,7 +31,7 @@ namespace CarterGames.Assets.AudioManager
     /// <summary>
     /// The inspector player for audio clips with the audio manager setup...
     /// </summary>
-    [AddComponentMenu("Carter Games/Audio Manager/Audio Clip Player")]
+    [AddComponentMenu("Carter Games/Audio Manager/Inspector Audio Clip Player")]
     public class InspectorAudioClipPlayer : MonoBehaviour
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -53,35 +53,21 @@ namespace CarterGames.Assets.AudioManager
         public UnityEvent onLooped;
         public UnityEvent onCompleted;
         
-        private AudioPlayerSequence sequence;
+        private AudioPlayer player;
         private bool isPlaying;
         
         private readonly Dictionary<string, IInspectorPlayerParse> inspectorParsers =
             new Dictionary<string, IInspectorPlayerParse>()
             {
-                { "CarterGames.Assets.AudioManager.VolumeEdit", new VolumeEditParse() },
-                { "CarterGames.Assets.AudioManager.PitchEdit", new PitchEditParse() },
-                { "CarterGames.Assets.AudioManager.MixerEdit", new MixerEditParse() },
-                { "CarterGames.Assets.AudioManager.DelayEdit", new DelayEditParse() },
-                { "CarterGames.Assets.AudioManager.GlobalVarianceEdit", new GlobalVarianceEditParse() },
-                { "CarterGames.Assets.AudioManager.DynamicStartTimeEdit", new DynamicStartTimeEditParse() },
-                { "CarterGames.Assets.AudioManager.LoopEdit", new LoopEditParse() },
+                { typeof(VolumeEdit).AssemblyQualifiedName, new VolumeEditParse() },
+                { typeof(PitchEdit).AssemblyQualifiedName, new PitchEditParse() },
+                { typeof(MixerEdit).AssemblyQualifiedName, new MixerEditParse() },
+                { typeof(DelayEdit).AssemblyQualifiedName, new DelayEditParse() },
+                { typeof(GlobalVarianceEdit).AssemblyQualifiedName, new GlobalVarianceEditParse() },
+                { typeof(DynamicStartTimeEdit).AssemblyQualifiedName, new DynamicStartTimeEditParse() },
+                { typeof(LoopEdit).AssemblyQualifiedName, new LoopEditParse() },
             };
-
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Properties
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        private AudioPlayerSequence Sequence
-        {
-            get
-            {
-                if (sequence != null) return sequence;
-                sequence = SetupSequence();
-                return sequence;
-            }
-        }
-
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Unity Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -100,9 +86,8 @@ namespace CarterGames.Assets.AudioManager
         /// Sets up the sequence to be used.
         /// </summary>
         /// <returns>The setup sequence.</returns>
-        private AudioPlayerSequence SetupSequence()
+        private AudioPlayer SetupSequence()
         {
-            AudioPlayerSequence sequence;
             var modules = new List<IEditModule>();
 
             foreach (var settings in editModuleSettings)
@@ -113,14 +98,14 @@ namespace CarterGames.Assets.AudioManager
             
             if (isGroup)
             { 
-                sequence = AudioManager.PrepareGroup(groupRequest, modules.ToArray());
+                player = AudioManager.PrepareGroup(groupRequest, modules.ToArray());
             }
             else
             {
-                sequence = AudioManager.Prepare(request, modules.ToArray());
+                player = AudioManager.Prepare(request, modules.ToArray());
             }
 
-            return sequence;
+            return player;
         }
 
 
@@ -129,13 +114,12 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         public void Play()
         {
-            if (isPlaying) return;
+            player = SetupSequence();
+            player.Play();
             
-            Sequence.Play();
-            
-            Sequence.Started.Add(OnSequenceStarted);
-            Sequence.Looped.Add(OnSequenceLooped);
-            Sequence.Completed.Add(OnSequenceCompleted);
+            player.Started.Add(OnSequenceStarted);
+            player.Looped.Add(OnSequenceLooped);
+            player.Completed.Add(OnSequenceCompleted);
 
             isPlaying = true;
         }
@@ -147,7 +131,7 @@ namespace CarterGames.Assets.AudioManager
         public void Pause()
         {
             if (!isPlaying) return;
-            Sequence.Pause();
+            player.Pause();
             isPlaying = false;
         }
         
@@ -158,7 +142,7 @@ namespace CarterGames.Assets.AudioManager
         public void Resume()
         {
             if (isPlaying) return;
-            Sequence.Resume();
+            player.Resume();
             isPlaying = true;
         }
         
@@ -169,7 +153,7 @@ namespace CarterGames.Assets.AudioManager
         public void Stop()
         {
             if (!isPlaying) return;
-            Sequence.Stop();
+            player.Stop();
             isPlaying = false;
         }
         
@@ -198,7 +182,7 @@ namespace CarterGames.Assets.AudioManager
         private void OnSequenceCompleted()
         {
             onCompleted?.Invoke();
-            Sequence.Completed.Remove(OnSequenceCompleted);
+            player = null;
             isPlaying = false;
         }
     }
