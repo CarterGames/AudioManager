@@ -138,7 +138,9 @@ namespace CarterGames.Assets.Shared.Common.Editor
             
             for (var i = 0; i < property.arraySize; i++)
             {
+#pragma warning disable 0253
                 if (property.GetIndex(i).objectReferenceValue == toFind) return i;
+#pragma warning restore
             }
             
             return -1;
@@ -161,7 +163,9 @@ namespace CarterGames.Assets.Shared.Common.Editor
             
             for (var i = 0; i < property.arraySize; i++)
             {
+#pragma warning disable 0253
                 if (property.GetIndex(i).objectReferenceValue == toFind) return true;
+#pragma warning restore
             }
             
             return false;

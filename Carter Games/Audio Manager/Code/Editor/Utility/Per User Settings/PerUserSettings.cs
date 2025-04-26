@@ -21,7 +21,6 @@
  * THE SOFTWARE.
  */
 
-using System;
 using CarterGames.Assets.Shared.Common.Editor;
 using UnityEditor;
 using UnityEngine;
