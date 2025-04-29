@@ -24,7 +24,16 @@ You can still acces the legacy 2.x version in the ```2.x``` branch of this repo.
 - Regularly updated and maintained with ❤️ 
 
 ## How To Install
-Either download and import the package from the releases section or the <a href="https://assetstore.unity.com/packages/tools/audio/audio-manager-cg-149123">Unity Asset Store</a> and use the package manager. Alternatively, download this repo and copy all files into your project.
+
+### Unity Package Manager (Git URL) [Recommended]
+<b>Release:</b>
+<br>
+<i>The most up-to-date version of the repo that is considered stable enough for public use.</i>
+```
+https://github.com/CarterGames/AudioManager.git
+```
+
+Otherwise, either download and import the package from the releases section or the <a href="https://assetstore.unity.com/packages/tools/audio/audio-manager-cg-149123">Unity Asset Store</a> and use the package manager. Alternatively, download this repo and copy all files into your project.
 
 ## Setup
 Unlike the ```2.x``` version of the asset. ```3.x``` doesn't have any user setup needed for it to actually function. Once you import the asset into your project, you'll be prompted to scan for audio, do the scan and you'll be all set for use. 
