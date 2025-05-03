@@ -1,3 +1,17 @@
+<<<<<<< Updated upstream
 ﻿fileFormatVersion: 2
 guid: ba1aa0b444604402bc9959be51c5286f
 timeCreated: 1742503735
+=======
+fileFormatVersion: 2
+guid: fe9e7140f7f114443a41cab556302349
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: cf26c7678fe4a54488261ff025f3ce25, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+>>>>>>> Stashed changes
