@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2024 Carter Games
+ * Copyright (c) 2025 Carter Games
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-namespace CarterGames.Assets.Shared.Common
+namespace CarterGames.Shared.AudioManager
 {
 	/// <summary>
 	/// A class for storing info about a class so it can be referenced from its assembly & type names.

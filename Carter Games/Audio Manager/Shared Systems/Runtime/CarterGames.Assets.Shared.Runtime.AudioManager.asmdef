@@ -1,6 +1,6 @@
 {
     "name": "CarterGames.Shared.AudioManager",
-    "rootNamespace": "CarterGames.Assets.Shared",
+    "rootNamespace": "CarterGames.Shared.AudioManager",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

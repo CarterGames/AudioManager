@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 
 namespace CarterGames.Assets.AudioManager
 {
@@ -44,7 +44,7 @@ namespace CarterGames.Assets.AudioManager
         public const string AudioSourcePrefabName = "+[AudioManager] - Source";
 
 
-        public static bool SettingCanPlayAudio => AssetAccessor.GetAsset<AmAssetSettings>().CanPlayAudio;
-        public static PlayState SettingAudioPlayState => AssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState;
+        public static bool SettingCanPlayAudio => AmAssetAccessor.GetAsset<AmAssetSettings>().CanPlayAudio;
+        public static PlayState SettingAudioPlayState => AmAssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState;
     }
 }

@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common.Serializiation;
+using CarterGames.Shared.AudioManager.Serializiation;
 
 namespace CarterGames.Assets.AudioManager
 {

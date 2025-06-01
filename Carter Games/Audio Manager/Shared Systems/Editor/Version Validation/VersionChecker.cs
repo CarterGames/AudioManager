@@ -21,11 +21,10 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// Handles checking for the latest version.

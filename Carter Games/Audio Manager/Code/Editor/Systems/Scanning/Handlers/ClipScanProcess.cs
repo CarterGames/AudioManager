@@ -23,7 +23,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -115,6 +115,9 @@ namespace CarterGames.Assets.AudioManager.Editor
 
                 lookup.GetIndex(index).Fpr("value").Fpr("defaultSettings").Fpr("volume").floatValue = 1f;
                 lookup.GetIndex(index).Fpr("value").Fpr("defaultSettings").Fpr("pitch").floatValue = 1f;
+
+                lookup.GetIndex(index).Fpr("value").Fpr("metaData").Fpr("category").stringValue = string.Empty;
+                lookup.GetIndex(index).Fpr("value").Fpr("metaData").Fpr("tags").ClearArray();
                 
                 ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef.ApplyModifiedProperties();
                 ScriptableRef.GetAssetDef<AudioLibrary>().ObjectRef.Update();

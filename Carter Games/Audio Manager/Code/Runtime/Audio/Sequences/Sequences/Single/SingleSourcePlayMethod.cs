@@ -44,18 +44,6 @@ namespace CarterGames.Assets.AudioManager
         }
         
         
-        public static SingleSourcePlayMethod InitializePlayMethod(AudioPlayer player, AudioData requestData)
-        {
-            var playMethodHandler = new SingleSourcePlayMethod(player);
-            
-            player.Source.InitializePlayer(player, requestData);
-            player.Source.Completed.Remove(player.PlayerComplete);
-            player.Source.Completed.Add(player.PlayerComplete);
-            
-            return playMethodHandler;
-        }
-        
-        
         public static SingleSourcePlayMethod InitializePlayMethod(AudioPlayer player, AudioData requestData, AudioClipSettings clipSettings)
         {
             var playMethodHandler = new SingleSourcePlayMethod(player);

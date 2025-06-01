@@ -22,12 +22,13 @@
  */
 
 using System;
+using UnityEngine;
 
-namespace CarterGames.Assets.Shared.PerProject
+namespace CarterGames.Shared.AudioManager
 {
-	/// <summary>
-	/// Used to define a scriptable object as a part of this asset, but should only be accessible in the editor.
-	/// </summary>
-	[Serializable]
-	public abstract class AudioManagerEditorOnlyDataAsset : AudioManagerDataAsset {}
+    /// <summary>
+    /// Used to define a scriptable object as a part of this asset...
+    /// </summary>
+    [Serializable]
+    public abstract class AmDataAsset : ScriptableObject { }
 }

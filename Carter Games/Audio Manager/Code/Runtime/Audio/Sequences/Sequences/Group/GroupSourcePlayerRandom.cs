@@ -1,17 +1,17 @@
 ﻿/*
  * Copyright (c) 2025 Carter Games
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- *    
+ *
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
@@ -62,7 +62,7 @@ namespace CarterGames.Assets.AudioManager
             // Random - play 1 clip - when looping play another random.
             var clip = groupData.Clips[Random.Range(0, groupData.Clips.Count - 1)];
 
-            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(clip, out var data)) return null;
+            if (!AmAssetAccessor.GetAsset<AudioLibrary>().TryGetClip(clip, out var data)) return null;
             
             player.Source.InitializePlayer(player, data, clipSettings);
             player.Source.Completed.Remove(player.PlayerComplete);
@@ -118,7 +118,7 @@ namespace CarterGames.Assets.AudioManager
         {
             var clip = groupData.Clips[Random.Range(0, groupData.Clips.Count - 1)];
 
-            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(clip, out var data)) return;
+            if (!AmAssetAccessor.GetAsset<AudioLibrary>().TryGetClip(clip, out var data)) return;
             player.Source.InitializePlayer(player, data);
         }
     }

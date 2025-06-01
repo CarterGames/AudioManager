@@ -26,7 +26,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = System.Object;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// A helper class to aid with editor scripting where the API is really wordy...
@@ -138,7 +138,9 @@ namespace CarterGames.Assets.Shared.Common.Editor
             
             for (var i = 0; i < property.arraySize; i++)
             {
+#pragma warning disable 0253
                 if (property.GetIndex(i).objectReferenceValue == toFind) return i;
+#pragma warning restore
             }
             
             return -1;
@@ -161,7 +163,9 @@ namespace CarterGames.Assets.Shared.Common.Editor
             
             for (var i = 0; i < property.arraySize; i++)
             {
+#pragma warning disable 0253
                 if (property.GetIndex(i).objectReferenceValue == toFind) return true;
+#pragma warning restore
             }
             
             return false;

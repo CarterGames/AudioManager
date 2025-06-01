@@ -25,8 +25,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CarterGames.Assets.AudioManager.Logging;
-using CarterGames.Assets.Shared.Common.Serializiation;
-using CarterGames.Assets.Shared.PerProject;
+using CarterGames.Shared.AudioManager;
+using CarterGames.Shared.AudioManager.Serializiation;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -36,7 +36,7 @@ namespace CarterGames.Assets.AudioManager
     /// Holds all the clips
     /// </summary>
     [Serializable]
-    public class AudioLibrary : AudioManagerDataAsset
+    public class AudioLibrary : AmDataAsset
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields

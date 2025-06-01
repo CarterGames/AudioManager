@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace CarterGames.Assets.Shared.PerProject.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// Contains details for the asset.
@@ -46,6 +46,6 @@ namespace CarterGames.Assets.Shared.PerProject.Editor
         /// <remarks>
         /// Asset owner is in the UK, so its Y/M/D format.
         /// </remarks>
-        public static string ReleaseDate => "2025/05/03";
+        public static string ReleaseDate => "2025/06/01";
     }
 }

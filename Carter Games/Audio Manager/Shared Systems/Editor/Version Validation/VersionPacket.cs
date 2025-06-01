@@ -23,10 +23,9 @@
 
 using System;
 using System.Linq;
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEngine;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// A data class to hold the data downloaded from the server when requested.

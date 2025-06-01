@@ -21,77 +21,32 @@
  * THE SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using CarterGames.Assets.Shared.PerProject;
+using CarterGames.Shared.AudioManager.Serializiation;
 using UnityEngine;
 
-namespace CarterGames.Assets.Shared.Common
+namespace CarterGames.Shared.AudioManager
 {
     /// <summary>
-    /// Handles accessing the scriptable object data assets for this asset.
+    /// Handles a data store of all the scriptable objects for the asset that are used at runtime.
     /// </summary>
-    public static class AssetAccessor
+    [Serializable]
+    public sealed class AmDataAssetIndex : AmDataAsset
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-     
-        private const string IndexPath = "[Audio Manager] Asset Index";
         
-        // A cache of all the assets found...
-        private static DataAssetIndex indexCache;
+        [SerializeField] private SerializableDictionary<string, List<AmDataAsset>> assets;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
         /// <summary>
-        /// Gets all the assets from the build versions asset...
+        /// A lookup of all the assets in the project that can be used at runtime.
         /// </summary>
-        private static DataAssetIndex Index
-        {
-            get
-            {
-                if (indexCache != null) return indexCache;
-                indexCache = (DataAssetIndex) Resources.Load(IndexPath, typeof(DataAssetIndex));
-                return indexCache;
-            }
-        }
-
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Methods
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-
-        /// <summary>
-        /// Gets the Save Manager Asset requested.
-        /// </summary>
-        /// <typeparam name="T">The save manager asset to get.</typeparam>
-        /// <returns>The asset if it exists.</returns>
-        public static T GetAsset<T>() where T : AudioManagerDataAsset
-        {
-            if (Index.Lookup.ContainsKey(typeof(T).ToString()))
-            {
-                return (T)Index.Lookup[typeof(T).ToString()][0];
-            }
-
-            return null;
-        }
-        
-        
-        /// <summary>
-        /// Gets the Save Manager Asset requested.
-        /// </summary>
-        /// <typeparam name="T">The save manager asset to get.</typeparam>
-        /// <returns>The asset if it exists.</returns>
-        public static List<T> GetAssets<T>() where T : AudioManagerDataAsset
-        {
-            if (Index.Lookup.ContainsKey(typeof(T).ToString()))
-            {
-                return Index.Lookup[typeof(T).ToString()].Cast<T>().ToList();
-            }
-
-            return null;
-        }
+        public SerializableDictionary<string, List<AmDataAsset>> Lookup => assets;
     }
 }

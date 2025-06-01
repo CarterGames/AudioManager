@@ -1,8 +1,4 @@
 fileFormatVersion: 2
-<<<<<<< Updated upstream
-guid: 8db72556977a4b6891c4866057b12cdb
-timeCreated: 1741204170
-=======
 guid: ef4b626dd49f0724a9fa9c549b99c51d
 MonoImporter:
   externalObjects: {}
@@ -13,4 +9,3 @@ MonoImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
->>>>>>> Stashed changes

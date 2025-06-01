@@ -22,8 +22,8 @@
  */
 
 using System.Collections.Generic;
-using CarterGames.Assets.Shared.Common;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -32,7 +32,7 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// <summary>
     /// Handles the custom inspector for the Audio Manager asset index.
     /// </summary>
-    [CustomEditor(typeof(DataAssetIndex))]
+    [CustomEditor(typeof(AmDataAssetIndex))]
     public sealed class AudioManagerAssetIndexEditor : UnityEditor.Editor
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -63,7 +63,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             GUILayout.Space(12.5f);
             
-            UtilEditor.DrawSoScriptSection((DataAssetIndex) target);
+            UtilEditor.DrawSoScriptSection((AmDataAssetIndex) target);
             GUILayout.Space(12.5f);
 
             DrawRequireReferencesSection();

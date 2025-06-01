@@ -23,7 +23,7 @@
 
 using System.Collections;
 using System.Linq;
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
@@ -74,7 +74,7 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// Gets the parameters for the player.
         /// </summary>
-        public EditParameters EditParams { get; private set; } = new EditParameters();
+        [field: SerializeField] public EditParameters EditParams { get; private set; } = new EditParameters();
 
 
         /// <summary>
@@ -130,13 +130,13 @@ namespace CarterGames.Assets.AudioManager
         
         private void OnEnable()
         {
-            AssetAccessor.GetAsset<AmAssetSettings>().AudioStateChanged.Add(OnClipStateChanged);
+            AmAssetAccessor.GetAsset<AmAssetSettings>().AudioStateChanged.Add(OnClipStateChanged);
         }
 
 
         private void OnDestroy()
         {
-            AssetAccessor.GetAsset<AmAssetSettings>().AudioStateChanged.Remove(OnClipStateChanged);
+            AmAssetAccessor.GetAsset<AmAssetSettings>().AudioStateChanged.Remove(OnClipStateChanged);
         }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -148,7 +148,7 @@ namespace CarterGames.Assets.AudioManager
             targetPlayer = player;
             data = audioData;
             Source.clip = audioData.value;
-            Source.mute = AssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState == PlayState.PlayMuted;
+            Source.mute = AmAssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState == PlayState.PlayMuted;
 
             Source.volume = audioData.defaultSettings.Volume;
             Source.pitch = audioData.defaultSettings.Pitch;
@@ -161,7 +161,7 @@ namespace CarterGames.Assets.AudioManager
             
             if (Source.outputAudioMixerGroup == null)
             {
-                Source.outputAudioMixerGroup = AssetAccessor.GetAsset<AmAssetSettings>().ClipAudioMixer;
+                Source.outputAudioMixerGroup = AmAssetAccessor.GetAsset<AmAssetSettings>().ClipAudioMixer;
             }
             
             IsInitialized = true;
@@ -191,10 +191,10 @@ namespace CarterGames.Assets.AudioManager
         private void PrepareSourceInstance()
         {
             if (!IsInitialized) return;
-            if (AssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState == PlayState.Disabled) return;
+            if (AmAssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState == PlayState.Disabled) return;
             
             if (IsPrepared) return;
-                
+            
             if (EditParams.TryGetValue("dynamicTime", out bool useDynamicTime))
             {
                 if (useDynamicTime)
@@ -205,10 +205,10 @@ namespace CarterGames.Assets.AudioManager
             
             if (Source.outputAudioMixerGroup == null)
             {
-                Source.outputAudioMixerGroup = AssetAccessor.GetAsset<AmAssetSettings>().ClipAudioMixer;
+                Source.outputAudioMixerGroup = AmAssetAccessor.GetAsset<AmAssetSettings>().ClipAudioMixer;
             }
             
-            AssetAccessor.GetAsset<AmAssetSettings>().AudioStateChanged.Add(OnClipStateChanged);
+            AmAssetAccessor.GetAsset<AmAssetSettings>().AudioStateChanged.Add(OnClipStateChanged);
             RefreshGlobalVariance();
             IsPrepared = true;
             State = AudioSourceState.Ready;
@@ -300,13 +300,13 @@ namespace CarterGames.Assets.AudioManager
                 if (!useVariance) return;
             }
 
-            if (!AssetAccessor.GetAsset<AmAssetSettings>().UseGlobalVariance) return;
+            if (!AmAssetAccessor.GetAsset<AmAssetSettings>().UseGlobalVariance) return;
 
             var volVariance = new Variance(Source.volume,
-                AssetAccessor.GetAsset<AmAssetSettings>().VariantVolume);
+                AmAssetAccessor.GetAsset<AmAssetSettings>().VariantVolume);
             
             var pitchVariance = new Variance(Source.pitch,
-                AssetAccessor.GetAsset<AmAssetSettings>().VariantPitch);
+                AmAssetAccessor.GetAsset<AmAssetSettings>().VariantPitch);
 
             Source.volume = volVariance.GetVariance();
             Source.pitch = pitchVariance.GetVariance();
@@ -340,7 +340,7 @@ namespace CarterGames.Assets.AudioManager
         /// </summary>
         private void OnClipStateChanged()
         {
-            Source.mute = AssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState == PlayState.PlayMuted;
+            Source.mute = AmAssetAccessor.GetAsset<AmAssetSettings>().PlayAudioState == PlayState.PlayMuted;
         }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────

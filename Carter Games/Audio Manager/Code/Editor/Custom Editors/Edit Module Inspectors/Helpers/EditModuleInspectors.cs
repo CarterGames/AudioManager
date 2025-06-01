@@ -23,7 +23,7 @@
 
 using System;
 using System.Collections.Generic;
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {

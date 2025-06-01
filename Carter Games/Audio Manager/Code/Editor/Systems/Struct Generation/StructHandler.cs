@@ -23,10 +23,8 @@
 
 using System.IO;
 using System.Text.RegularExpressions;
-using CarterGames.Assets.Shared.Common.Editor;
-using CarterGames.Assets.Shared.PerProject.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
-using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {

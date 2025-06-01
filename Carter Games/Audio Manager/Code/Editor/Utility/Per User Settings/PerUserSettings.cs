@@ -21,8 +21,7 @@
  * THE SOFTWARE.
  */
 
-using System;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -73,7 +72,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         /// <summary>
         /// The unique if for the assets settings to be per project...
         /// </summary>
-        private static string UniqueId => CommonPerUserSettings.UniqueId;
+        private static string UniqueId => SharedPerUserSettings.UniqueId;
         
         
         /// <summary>

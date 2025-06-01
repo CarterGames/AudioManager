@@ -21,10 +21,9 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEditor;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// Handles the auto update checker for the asset.
@@ -67,7 +66,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
             EditorApplication.delayCall -= OnEditorLoad;
             SessionState.SetBool(AutoVersionCheckSessionInitKey, true);
             
-            if (!CommonPerUserSettings.VersionValidationAutoCheckOnLoad) return;
+            if (!SharedPerUserSettings.VersionValidationAutoCheckOnLoad) return;
             AutoVersionCheckInit();
         }
         

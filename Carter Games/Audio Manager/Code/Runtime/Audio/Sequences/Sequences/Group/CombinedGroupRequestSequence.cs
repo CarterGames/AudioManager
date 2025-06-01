@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 
 namespace CarterGames.Assets.AudioManager
 {
@@ -78,7 +78,7 @@ namespace CarterGames.Assets.AudioManager
 
             for (var i = 0; i < player.AllSources.Count; i++)
             {
-                if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(groupData.Clips[i], out var data)) continue;
+                if (!AmAssetAccessor.GetAsset<AudioLibrary>().TryGetClip(groupData.Clips[i], out var data)) continue;
                 player.AllSources[i].InitializePlayer(player, data, clipSettings);
                 
                 player.AllSources[i].Completed.Remove(player.PlayerComplete);

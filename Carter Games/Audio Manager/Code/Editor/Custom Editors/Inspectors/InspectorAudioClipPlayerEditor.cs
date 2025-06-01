@@ -23,7 +23,7 @@
 
 using System;
 using System.Collections.Generic;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -33,7 +33,7 @@ namespace CarterGames.Assets.AudioManager.Editor
     /// <summary>
     /// Handles the custom editor for the inspector audio clip player.
     /// </summary>
-    [CustomEditor(typeof(InspectorAudioClipPlayer))]
+    [CustomEditor(typeof(InspectorAudioClipPlayer), true)]
     public sealed class InspectorAudioClipPlayerEditor : UnityEditor.Editor
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -142,13 +142,9 @@ namespace CarterGames.Assets.AudioManager.Editor
             }
             
             EditorGUI.EndDisabledGroup();
-            
-            if (!PerUserSettings.DeveloperDebugMode) return;
-            
-            EditorGUILayout.LabelField("DEVELOPER DEBUG", EditorStyles.boldLabel);
-            UtilEditor.DrawHorizontalGUILine();
-            
-            base.OnInspectorGUI();
+
+            DrawPropertiesExcluding(serializedObject, "m_Script", "playInstantly", "isGroup", "request", "groupRequest",
+                "editModuleSettings", "showEvents", "onStarted", "onLooped", "onCompleted");
         }
         
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────

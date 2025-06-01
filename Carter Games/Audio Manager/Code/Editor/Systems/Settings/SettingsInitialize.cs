@@ -1,17 +1,17 @@
 ﻿/*
  * Copyright (c) 2025 Carter Games
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- *    
+ *
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -65,13 +65,13 @@ namespace CarterGames.Assets.AudioManager.Editor
             
             if (SettingsObj.Fp("playerPrefab").objectReferenceValue == null)
             {
-                SettingsObj.Fp("playerPrefab").objectReferenceValue = Resources.Load(UtilRuntime.DefaultAudioSourcePrefabResourcesPath);
+                SettingsObj.Fp("playerPrefab").objectReferenceValue = Resources.Load(UtilRuntime.DefaultAudioPlayerPrefabResourcesPath);
                 changed = true;
             }
             
             if (SettingsObj.Fp("sourceInstancePrefab").objectReferenceValue == null)
             {
-                SettingsObj.Fp("sourceInstancePrefab").objectReferenceValue = Resources.Load(UtilRuntime.DefaultAudioPlayerPrefabResourcesPath);
+                SettingsObj.Fp("sourceInstancePrefab").objectReferenceValue = Resources.Load(UtilRuntime.DefaultAudioSourcePrefabResourcesPath);
                 changed = true;
             }
 
