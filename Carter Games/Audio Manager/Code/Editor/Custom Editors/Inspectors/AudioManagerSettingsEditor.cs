@@ -22,7 +22,7 @@
  */
 
 using CarterGames.Assets.AudioManager.Logging;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 using UnityEngine;
 

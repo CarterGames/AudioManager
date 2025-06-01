@@ -23,8 +23,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CarterGames.Assets.Shared.Common.Editor;
-using CarterGames.Assets.Shared.Common.Serializiation;
+using CarterGames.Shared.AudioManager.Editor;
+using CarterGames.Shared.AudioManager.Serializiation;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Audio;

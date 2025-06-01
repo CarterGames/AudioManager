@@ -24,7 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager.Editor

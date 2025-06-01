@@ -22,12 +22,11 @@
  */
 
 using System.Collections.Generic;
-using CarterGames.Assets.Shared.PerProject;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// Handles the setup of the asset index for runtime references to scriptable objects used for the asset.
@@ -38,7 +37,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-        private static readonly string AssetFilter = $"t:{nameof(AudioManagerDataAsset)}";
+        private static readonly string AssetFilter = $"t:{nameof(AmDataAsset)}";
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   IAssetEditorInitialize Implementation
@@ -112,7 +111,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         [MenuItem("Tools/Carter Games/Audio Manager/Update Asset Index", priority = 17)]
         public static void UpdateIndex()
         {
-            var foundAssets = new List<AudioManagerDataAsset>();
+            var foundAssets = new List<AmDataAsset>();
             var asset = AssetDatabase.FindAssets(AssetFilter, null);
             
             if (asset == null || asset.Length <= 0) return;
@@ -120,16 +119,16 @@ namespace CarterGames.Assets.Shared.Common.Editor
             foreach (var assetInstance in asset)
             {
                 var assetPath = AssetDatabase.GUIDToAssetPath(assetInstance);
-                var assetObj = (AudioManagerDataAsset) AssetDatabase.LoadAssetAtPath(assetPath, typeof(AudioManagerDataAsset));
+                var assetObj = (AmDataAsset) AssetDatabase.LoadAssetAtPath(assetPath, typeof(AmDataAsset));
                 
                 // Doesn't include editor only or the index itself.
                 if (assetObj == null) continue;
-                if (assetObj is DataAssetIndex) continue;
-                if (assetObj is AudioManagerEditorOnlyDataAsset) continue;
-                foundAssets.Add((AudioManagerDataAsset) AssetDatabase.LoadAssetAtPath(assetPath, typeof(AudioManagerDataAsset)));
+                if (assetObj is AmDataAssetIndex) continue;
+                if (assetObj is AmEditorOnlyDataAsset) continue;
+                foundAssets.Add((AmDataAsset) AssetDatabase.LoadAssetAtPath(assetPath, typeof(AmDataAsset)));
             }
 
-            var indexProp = ScriptableRef.GetAssetDef<DataAssetIndex>().ObjectRef;
+            var indexProp = ScriptableRef.GetAssetDef<AmDataAssetIndex>().ObjectRef;
             
             RemoveNullReferences(indexProp);
             UpdateIndexReferences(foundAssets ,indexProp);
@@ -156,7 +155,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         }
 
 
-        private static void UpdateIndexReferences(IReadOnlyList<AudioManagerDataAsset> foundAssets, SerializedObject indexProp)
+        private static void UpdateIndexReferences(IReadOnlyList<AmDataAsset> foundAssets, SerializedObject indexProp)
         {
             indexProp.Fp("assets").Fpr("list").ClearArray();
             

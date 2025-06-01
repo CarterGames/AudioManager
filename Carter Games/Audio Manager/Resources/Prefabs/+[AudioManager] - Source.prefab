@@ -14,7 +14,7 @@ GameObject:
   m_Layer: 0
   m_Name: +(Audio Manager) Audio Player Prefab
   m_TagString: Untagged
-  m_Icon: {fileID: 2800000, guid: 4177ed6be0a83124bbf6cb7fbbc00169, type: 3}
+  m_Icon: {fileID: 2800000, guid: 5858d573cdec55f429a30e0f291caec8, type: 3}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2444215560086890528}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 303929fac6584061b63b37b1baeedd3c, type: 3}
+  m_Script: {fileID: 11500000, guid: 2bd6d652e52dcee468132434a42afa17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!82 &2444215560086890530

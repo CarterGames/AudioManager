@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 
 namespace CarterGames.Assets.AudioManager.Editor

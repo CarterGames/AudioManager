@@ -24,7 +24,7 @@
 using System;
 using UnityEngine;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     // Warning disable for overriding Equals() but not the hashcode method.
 #pragma warning disable 0659

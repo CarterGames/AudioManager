@@ -22,7 +22,7 @@
  */
 
 using System.Collections.Generic;
-using CarterGames.Assets.Shared.Common.Serializiation;
+using CarterGames.Shared.AudioManager.Serializiation;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -53,7 +53,7 @@ namespace CarterGames.Assets.AudioManager
         public UnityEvent onLooped;
         public UnityEvent onCompleted;
         
-        private AudioPlayer player;
+        protected AudioPlayer player;
         private bool isPlaying;
         
         private readonly Dictionary<string, IInspectorPlayerParse> inspectorParsers =

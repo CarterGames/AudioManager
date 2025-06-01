@@ -22,10 +22,9 @@
  */
 
 using System.Threading.Tasks;
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEditor;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     public class AssetFileChangeHandler : AssetPostprocessor
     {

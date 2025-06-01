@@ -21,8 +21,8 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager;
+using CarterGames.Shared.AudioManager.Editor;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {

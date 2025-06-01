@@ -24,11 +24,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CarterGames.Assets.Shared.PerProject;
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEditor;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// Handles references to scriptable objects in the asset that need generating without user input etc.
@@ -47,7 +45,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         public static readonly string FullPathData = $"{Root}{PathData}";
         
         
-        private static Dictionary<Type, IScriptableAssetDef<AudioManagerDataAsset>> cacheLookup;
+        private static Dictionary<Type, IScriptableAssetDef<AmDataAsset>> cacheLookup;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
@@ -56,7 +54,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <summary>
         /// Handles a lookup of all the assets in the project.
         /// </summary>
-        private static Dictionary<Type, IScriptableAssetDef<AudioManagerDataAsset>> AssetLookup
+        private static Dictionary<Type, IScriptableAssetDef<AmDataAsset>> AssetLookup
         {
             get
             {
@@ -65,9 +63,9 @@ namespace CarterGames.Assets.Shared.Common.Editor
                     if (cacheLookup.Count > 0) return cacheLookup;
                 }
                 
-                cacheLookup = new Dictionary<Type, IScriptableAssetDef<AudioManagerDataAsset>>();
+                cacheLookup = new Dictionary<Type, IScriptableAssetDef<AmDataAsset>>();
 
-                foreach (var elly in AssemblyHelper.GetClassesOfType<IScriptableAssetDef<AudioManagerDataAsset>>())
+                foreach (var elly in AssemblyHelper.GetClassesOfType<IScriptableAssetDef<AmDataAsset>>())
                 {
                     cacheLookup.Add(elly.AssetType, elly);
                 }
@@ -97,7 +95,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// </summary>
         /// <typeparam name="T">The type of the scriptable asset.</typeparam>
         /// <returns>The asset definition found.</returns>
-        public static IScriptableAssetDef<T> GetAssetDef<T>() where T : AudioManagerDataAsset
+        public static IScriptableAssetDef<T> GetAssetDef<T>() where T : AmDataAsset
         {
             if (AssetLookup.ContainsKey(typeof(T)))
             {
@@ -114,7 +112,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <param name="asset">The asset found.</param>
         /// <typeparam name="T">The type of the scriptable asset.</typeparam>
         /// <returns>If it was successful or not.</returns>
-        public static bool TryGetAssetDef<T>(out IScriptableAssetDef<T> asset) where T : AudioManagerDataAsset
+        public static bool TryGetAssetDef<T>(out IScriptableAssetDef<T> asset) where T : AmDataAsset
         {
             asset = GetAssetDef<T>();
             return asset != null;
@@ -127,7 +125,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <param name="def">The definition to check</param>
         /// <typeparam name="T">The type of the scriptable asset.</typeparam>
         /// <returns>If the asset exists.</returns>
-        private static bool HasAsset<T>(IScriptableAssetDef<T> def) where T : AudioManagerDataAsset
+        private static bool HasAsset<T>(IScriptableAssetDef<T> def) where T : AmDataAsset
         {
             return AssetDatabaseHelper.FileIsInProject<T>(def.DataAssetPath);
         }
@@ -139,7 +137,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <param name="def">The definition to use.</param>
         /// <param name="cache">The cache for the definition.</param>
         /// <typeparam name="T">The type of the scriptable asset.</typeparam>
-        public static void TryCreateAsset<T>(IScriptableAssetDef<T> def, ref T cache) where T : AudioManagerDataAsset
+        public static void TryCreateAsset<T>(IScriptableAssetDef<T> def, ref T cache) where T : AmDataAsset
         {
             if (cache != null) return;
             GetOrCreateAsset(def, ref cache);
@@ -153,7 +151,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <param name="cache">The cache for the definition.</param>
         /// <typeparam name="T">The type of the scriptable asset.</typeparam>
         /// <returns>The asset reference.</returns>
-        public static T GetOrCreateAsset<T>(IScriptableAssetDef<T> def, ref T cache) where T : AudioManagerDataAsset
+        public static T GetOrCreateAsset<T>(IScriptableAssetDef<T> def, ref T cache) where T : AmDataAsset
         {
             return FileEditorUtil.CreateSoGetOrAssignAssetCache(
                 ref cache, 
@@ -170,7 +168,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <param name="objCache">The cache for the definition.</param>
         /// <typeparam name="T">The type of the scriptable asset.</typeparam>
         /// <returns>The object reference</returns>
-        public static SerializedObject GetOrCreateAssetObject<T>(IScriptableAssetDef<T> def, ref SerializedObject objCache) where T : AudioManagerDataAsset
+        public static SerializedObject GetOrCreateAssetObject<T>(IScriptableAssetDef<T> def, ref SerializedObject objCache) where T : AmDataAsset
         {
             return FileEditorUtil.CreateGetOrAssignSerializedObjectCache(ref objCache, def.AssetRef);
         }

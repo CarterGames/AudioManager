@@ -24,7 +24,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CarterGames.Assets.Shared.Common
+namespace CarterGames.Shared.AudioManager
 {
     /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
     |   No Parameters Evt

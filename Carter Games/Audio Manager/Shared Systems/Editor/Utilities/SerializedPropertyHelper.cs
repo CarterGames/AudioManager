@@ -26,7 +26,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = System.Object;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// A helper class to aid with editor scripting where the API is really wordy...

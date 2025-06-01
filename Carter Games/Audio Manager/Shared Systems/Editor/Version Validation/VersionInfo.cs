@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace CarterGames.Assets.Shared.PerProject.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// The info used in the version validation system.

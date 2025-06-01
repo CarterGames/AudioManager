@@ -22,28 +22,27 @@
  */
 
 using System;
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEditor;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
 	/// <summary>
 	/// Handles the creation and referencing of the asset index file.
 	/// </summary>
-	public sealed class ScriptableAssetDefAssetIndex : IScriptableAssetDef<DataAssetIndex>
+	public sealed class ScriptableAssetDefAssetIndex : IScriptableAssetDef<AmDataAssetIndex>
 	{
 		// IScriptableAssetDef Implementation
 		/* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 		
-		private static DataAssetIndex cache;
+		private static AmDataAssetIndex cache;
 		private static SerializedObject objCache;
 
-		public Type AssetType => typeof(DataAssetIndex);
+		public Type AssetType => typeof(AmDataAssetIndex);
 		public string DataAssetFileName => $"[{AssetVersionData.AssetName}] Asset Index.asset";
-		public string DataAssetFilter => $"t:{typeof(DataAssetIndex).FullName} name={DataAssetFileName}";
+		public string DataAssetFilter => $"t:{typeof(AmDataAssetIndex).FullName} name={DataAssetFileName}";
 		public string DataAssetPath => $"{ScriptableRef.FullPathResources}{DataAssetFileName}";
 
-		public DataAssetIndex AssetRef => ScriptableRef.GetOrCreateAsset(this, ref cache);
+		public AmDataAssetIndex AssetRef => ScriptableRef.GetOrCreateAsset(this, ref cache);
 		public SerializedObject ObjectRef => ScriptableRef.GetOrCreateAssetObject(this, ref objCache);
 		
 		public void TryCreate()
@@ -56,14 +55,14 @@ namespace CarterGames.Assets.Shared.Common.Editor
 		// ILegacyAssetPort Implementation
 		/* ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 		
-		public bool CanPort => AssetDatabaseHelper.TypeExistsElsewhere<DataAssetIndex>(DataAssetPath);
+		public bool CanPort => AssetDatabaseHelper.TypeExistsElsewhere<AmDataAssetIndex>(DataAssetPath);
 		
 
 		public void PortAsset()
 		{
 			TryCreate();
 
-			var assets = AssetDatabaseHelper.GetAssetPathNotAtPath<DataAssetIndex>(DataAssetPath);
+			var assets = AssetDatabaseHelper.GetAssetPathNotAtPath<AmDataAssetIndex>(DataAssetPath);
 
 			if (assets != null)
 			{

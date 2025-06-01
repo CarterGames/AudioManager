@@ -25,8 +25,8 @@ using System;
 using System.IO;
 using System.Reflection;
 using CarterGames.Assets.AudioManager.Logging;
-using CarterGames.Assets.Shared.Common;
-using CarterGames.Assets.Shared.Common.Serializiation;
+using CarterGames.Shared.AudioManager;
+using CarterGames.Shared.AudioManager.Serializiation;
 
 namespace CarterGames.Assets.AudioManager.Editor
 {
@@ -53,7 +53,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             {
                 StructHandler.WriteHeader(file, ClassName);
 
-                var data = (SerializableDictionary<string, MixerData>) GetMixerGroups(AssetAccessor.GetAsset<AudioLibrary>()).GetValue(AssetAccessor.GetAsset<AudioLibrary>());
+                var data = (SerializableDictionary<string, MixerData>) GetMixerGroups(AmAssetAccessor.GetAsset<AudioLibrary>()).GetValue(AmAssetAccessor.GetAsset<AudioLibrary>());
 
                 if (data == null)
                 {

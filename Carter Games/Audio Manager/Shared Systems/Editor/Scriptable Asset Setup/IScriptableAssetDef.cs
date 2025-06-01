@@ -22,16 +22,15 @@
  */
 
 using System;
-using CarterGames.Assets.Shared.PerProject;
 using UnityEditor;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
 	/// <summary>
 	/// Implement to define a scriptable asset in the asset.
 	/// </summary>
 	/// <typeparam name="T">The type of the asset itself.</typeparam>
-	public interface IScriptableAssetDef<out T> where T : AudioManagerDataAsset
+	public interface IScriptableAssetDef<out T> where T : AmDataAsset
 	{
 		Type AssetType { get; }
 		string DataAssetFileName { get; }

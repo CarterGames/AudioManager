@@ -22,7 +22,7 @@
  */
 
 using System.Collections.Generic;
-using CarterGames.Assets.Shared.Common.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -159,7 +159,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                 }
                 
                 var toDisplay = new GUIContent(LibObj
-                    .Fp("library").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue);
+                    .Fp("mixers").Fpr("list").GetIndex(i).Fpr("value").Fpr("key").stringValue);
 
                 if (toDisplay.text.Length > 25)
                 {

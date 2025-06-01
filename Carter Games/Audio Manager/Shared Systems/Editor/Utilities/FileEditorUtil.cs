@@ -25,13 +25,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CarterGames.Assets.Shared.PerProject;
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// Handles finding assets in the project in editor space and creating/referencing/caching them for use.
@@ -225,7 +223,7 @@ namespace CarterGames.Assets.Shared.Common.Editor
         /// <param name="pathContains">Any string that should be in the path to make sure its the right asset.</param>
         /// <typeparam name="T">The type to check for.</typeparam>
         /// <returns>The found or created asset.</returns>
-        public static T CreateSoGetOrAssignAssetCache<T>(ref T cache, IScriptableAssetDef<T> definition, params string[] pathContains) where T : AudioManagerDataAsset
+        public static T CreateSoGetOrAssignAssetCache<T>(ref T cache, IScriptableAssetDef<T> definition, params string[] pathContains) where T : AmDataAsset
         {
             if (cache != null) return cache;
 

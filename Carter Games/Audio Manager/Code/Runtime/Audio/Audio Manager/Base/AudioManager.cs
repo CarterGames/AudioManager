@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 
 namespace CarterGames.Assets.AudioManager
 {
@@ -33,13 +33,13 @@ namespace CarterGames.Assets.AudioManager
         /// <summary>
         /// An internal ref to the audio library for better API.
         /// </summary>
-        private static AudioLibrary Library => AssetAccessor.GetAsset<AudioLibrary>();
+        private static AudioLibrary Library => AmAssetAccessor.GetAsset<AudioLibrary>();
         
         
         /// <summary>
         /// An internal ref to the audio settings for better API.
         /// </summary>
-        private static AmAssetSettings Settings => AssetAccessor.GetAsset<AmAssetSettings>();
+        private static AmAssetSettings Settings => AmAssetAccessor.GetAsset<AmAssetSettings>();
         
         
         /// <summary>

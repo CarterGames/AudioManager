@@ -22,12 +22,9 @@
  */
 
 using System.Collections.Generic;
-using System.Linq;
 using CarterGames.Assets.AudioManager.Logging;
-using CarterGames.Assets.Shared.Common.Editor;
-using CarterGames.Assets.Shared.PerProject.Editor;
+using CarterGames.Shared.AudioManager.Editor;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager.Editor
@@ -345,9 +342,9 @@ namespace CarterGames.Assets.AudioManager.Editor
                 EditorGUI.indentLevel++;
                 EditorGUILayout.BeginVertical("Box");
 
-                CommonPerUserSettings.VersionValidationAutoCheckOnLoad = EditorGUILayout.Toggle(new GUIContent("Update Check On Load",
+                SharedPerUserSettings.VersionValidationAutoCheckOnLoad = EditorGUILayout.Toggle(new GUIContent("Update Check On Load",
                         "Checks for any updates to the asset from the GitHub page when you load the project."),
-                    CommonPerUserSettings.VersionValidationAutoCheckOnLoad);
+                    SharedPerUserSettings.VersionValidationAutoCheckOnLoad);
                 
                 PerUserSettings.ShowHelpBoxes = EditorGUILayout.Toggle(new GUIContent("Help Boxes",
                         "Show prompts under some buttons to help aid in understanding what does what?"),

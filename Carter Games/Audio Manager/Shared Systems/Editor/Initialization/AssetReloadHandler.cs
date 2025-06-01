@@ -22,11 +22,10 @@
  */
 
 using System.Threading.Tasks;
-using CarterGames.Assets.Shared.PerProject.Editor;
 using UnityEditor;
 using UnityEditor.Callbacks;
 
-namespace CarterGames.Assets.Shared.Common.Editor
+namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
     /// Handles any reload listeners in the project for the asset.

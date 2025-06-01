@@ -21,8 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common;
-using CarterGames.Assets.Shared.PerProject;
+using CarterGames.Shared.AudioManager;
 using UnityEngine;
 using UnityEngine.Audio;
 using Random = UnityEngine.Random;
@@ -32,7 +31,7 @@ namespace CarterGames.Assets.AudioManager
     /// <summary>
     /// The settings object for runtime usage.
     /// </summary>
-    public sealed class AmAssetSettings : AudioManagerDataAsset
+    public sealed class AmAssetSettings : AmDataAsset
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
@@ -186,7 +185,7 @@ namespace CarterGames.Assets.AudioManager
             
             if (sourceInstancePrefab == null)
             {
-                sourceInstancePrefab = (GameObject)Resources.Load(UtilRuntime.AudioSourcePrefabName);
+                sourceInstancePrefab = (GameObject) Resources.Load(UtilRuntime.DefaultAudioSourcePrefabResourcesPath);
             }
         }
         
@@ -197,7 +196,7 @@ namespace CarterGames.Assets.AudioManager
         public void ResetSettings()
         {
             playerPrefab = (GameObject) Resources.Load(UtilRuntime.DefaultAudioPlayerPrefabResourcesPath);
-            sourceInstancePrefab = (GameObject) Resources.Load(UtilRuntime.AudioSourcePrefabName);
+            sourceInstancePrefab = (GameObject) Resources.Load(UtilRuntime.DefaultAudioSourcePrefabResourcesPath);
             
             clipAudioMixer = default;
             playAudioState = PlayState.Play;

@@ -24,7 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
@@ -174,7 +174,7 @@ namespace CarterGames.Assets.AudioManager
                 standardSource
             };
             
-            if (!AssetAccessor.GetAsset<AudioLibrary>().TryGetClip(request, out var data)) return;
+            if (!AmAssetAccessor.GetAsset<AudioLibrary>().TryGetClip(request, out var data)) return;
 
             RecycleOnComplete = true;
             playMethod = SingleSourcePlayMethod.InitializePlayMethod(this, data, requestSettings);
@@ -190,7 +190,7 @@ namespace CarterGames.Assets.AudioManager
         {
             if (IsInitialized) return;
 
-            var data = AssetAccessor.GetAsset<AudioLibrary>().GetGroup(request);
+            var data = AmAssetAccessor.GetAsset<AudioLibrary>().GetGroup(request);
 
             if (data == null) return;
 

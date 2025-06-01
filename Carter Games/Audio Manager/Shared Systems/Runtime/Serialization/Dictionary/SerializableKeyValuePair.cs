@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CarterGames.Assets.Shared.Common.Serializiation
+namespace CarterGames.Shared.AudioManager.Serializiation
 {
     /// <summary>
     /// Defines a data structure for a key pair value that is serializable.

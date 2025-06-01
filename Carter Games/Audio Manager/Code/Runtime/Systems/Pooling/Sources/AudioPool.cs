@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-using CarterGames.Assets.Shared.Common;
+using CarterGames.Shared.AudioManager;
 using UnityEngine;
 
 namespace CarterGames.Assets.AudioManager
@@ -71,10 +71,10 @@ namespace CarterGames.Assets.AudioManager
             }
             
             // Initializes the pool collections...
-            var playerPrefab = AssetAccessor.GetAsset<AmAssetSettings>().PlayerPrefab;
-            var instancePrefab = AssetAccessor.GetAsset<AmAssetSettings>().SourceInstancePrefab;
+            var playerPrefab = AmAssetAccessor.GetAsset<AmAssetSettings>().PlayerPrefab;
+            var instancePrefab = AmAssetAccessor.GetAsset<AmAssetSettings>().SourceInstancePrefab;
             
-            var initSize = AssetAccessor.GetAsset<AmAssetSettings>().AudioPoolInitialSize;
+            var initSize = AmAssetAccessor.GetAsset<AmAssetSettings>().AudioPoolInitialSize;
 
             PlayerObjectPool = new ObjectPool<AudioPlayer>(playerPrefab, DoNotDestroyHandler.PoolParentPlayers, initSize, false)
             {
