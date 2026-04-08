@@ -47,11 +47,11 @@ namespace CarterGames.Assets.AudioManager.Editor
         private static bool isInitialized;
 
         private readonly string[] tabNames = new string[3] { "Library", "Groups", "Mixers" };
-        
+
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
+
         /// <summary>
         /// The toolbar position for the window for this user.
         /// </summary>
@@ -61,7 +61,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             set => PerUserSettings.EditorTabPosition = value;
         }
 
-        
+
         /// <summary>
         /// The shown tab to the user at the moment.
         /// </summary>
@@ -92,24 +92,24 @@ namespace CarterGames.Assets.AudioManager.Editor
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Override Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
+
         /// <summary>
         /// The window GUI.
         /// </summary>
         private void OnGUI()
         {
             WindowInit();
-            
+
             Undo.undoRedoPerformed -= ForceUpdate;
             Undo.undoRedoPerformed += ForceUpdate;
-            
+
             DrawTabButtons();
         }
-        
+
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Methods
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
+
         /// <summary>
         /// Shows the window on a specific tab.
         /// </summary>
@@ -120,7 +120,7 @@ namespace CarterGames.Assets.AudioManager.Editor
             PerUserSettings.EditorTabPosition = tab;
             GetWindow<LibraryEditorWindow>().Repaint();
         }
-        
+
 
         /// <summary>
         /// Initializes the window when called.
@@ -129,11 +129,11 @@ namespace CarterGames.Assets.AudioManager.Editor
         {
             if (isInitialized) return;
             isInitialized = true;
-            
+
             libraryTab = new LibraryEditorLibraryTab();
             groupsTab = new LibraryEditorGroupsTab();
             mixerTab = new LibraryEditorMixerTab();
-            
+
             ShownTab = TabPos switch
             {
                 0 => libraryTab,
@@ -141,17 +141,21 @@ namespace CarterGames.Assets.AudioManager.Editor
                 2 => mixerTab,
                 _ => ShownTab
             };
-            
+
             // if (UtilEditor.Library.LibraryTotal <= 0)
             // {
             //     AudioScanner.ScanForAudio(false);
             // }
-            
+
             libraryTab.Initialize();
             groupsTab.Initialize();
             mixerTab.Initialize();
         }
 
+        private void OnDisable()
+        {
+            EditorAudioClipPlayer.StopAll();
+        }
 
         /// <summary>
         /// Draws the tab buttons on the window.
@@ -161,9 +165,9 @@ namespace CarterGames.Assets.AudioManager.Editor
             EditorGUILayout.Space();
 
             EditorGUI.BeginChangeCheck();
-            
+
             TabPos = GUILayout.Toolbar(TabPos, tabNames, GUILayout.Height(22.5f));
-            
+
             if (EditorGUI.EndChangeCheck())
             {
                 ShownTab = TabPos switch
@@ -174,7 +178,7 @@ namespace CarterGames.Assets.AudioManager.Editor
                     _ => ShownTab
                 };
             }
-            
+
             GUILayout.Space(7.5f);
 
             switch (TabPos)
@@ -198,7 +202,7 @@ namespace CarterGames.Assets.AudioManager.Editor
         public static void ForceUpdate()
         {
             if (!HasOpenInstances<LibraryEditorWindow>()) return;
-            
+
             window ??= GetWindow<LibraryEditorWindow>();
             window.Repaint();
         }
