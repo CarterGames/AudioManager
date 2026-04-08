@@ -140,4 +140,4 @@ You can access a online of the documentation here: <a href="https://carter.games
 <br><br>
 
 ## Licence
-GNU V3
+MIT
