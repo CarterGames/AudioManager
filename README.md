@@ -1,4 +1,4 @@
-![SaveManager_Logo_160_Sq](https://github.com/user-attachments/assets/d7536ecd-0e1a-4fd1-8dd0-d311494e611c)
+![AM Logo 160](https://github.com/user-attachments/assets/b587215c-2cae-4b16-bd9a-9e52ede3dd5e)
 
 # Audio Manager
 
@@ -128,30 +128,6 @@ private void OnEnable()
 }
 ```
 <br/>
-
-
-## Basic API
-All classes for the asset at runtime are under the following:
-<br/><br/>
-### Assembly
-
-```CarterGames.AudioManager.Runtime ```
-
-```CarterGames.Shared.AudioManager ``` 
-(Optional, may be needed for some API)
-
-### Base Namespace
-
-```CarterGames.Assets.AudioManager ```
-
-Below is a short rundown of the most common API you'd be using.
-<br/><br/>
-
-### AudioManager.Play() [Method]
-```public static bool IsBusy { get; } ```
-<br>
-Gets if the save manager is currently running a save or load operation.
-<br/><br/>
 
 
 
