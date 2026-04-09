@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2025 Carter Games
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,85 +21,45 @@
  * THE SOFTWARE.
  */
 
+using System;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace CarterGames.Shared.AudioManager.Editor
 {
     /// <summary>
-    /// Handles checking for the latest version.
+    /// A copy of the Json data for any error the server sends.
     /// </summary>
-    public static class VersionChecker
+    [Serializable]
+    public class VersionPacketError
     {
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
         |   Fields
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
-        /// <summary>
-        /// The download URL for the latest version.
-        /// </summary>
-        public static string DownloadURL => VersionInfo.DownloadBaseUrl + Versions.Data.Version;
-        
-
-        /// <summary>
-        /// Gets if the latest version is this version.
-        /// </summary>
-        public static bool IsLatestVersion => Versions.Data.VersionNumber.Equals(new VersionNumber(VersionInfo.ProjectVersionNumber));
-        
-        
-        /// <summary>
-        /// Gets if the version here is higher that the latest version.
-        /// </summary>
-        public static bool IsNewerVersion => Versions.Data.VersionNumber < new VersionNumber(VersionInfo.ProjectVersionNumber);
-        
-        
-        /// <summary>
-        /// Gets the version data downloaded.
-        /// </summary>
-        public static VersionPacket Versions { get; private set; }
-
-        
-        /// <summary>
-        /// The latest version string.
-        /// </summary>
-        public static string LatestVersionNumberString => Versions.Data.Version;
+        [SerializeField] private string error;
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Events
+        |   Properties
         ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
         
         /// <summary>
-        /// Raises when the data has been downloaded.
+        /// The release date for the entry.
         /// </summary>
-        public static Evt ResponseReceived { get; private set; } = new Evt();
-        
-        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        |   Methods
-        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
-        
-        /// <summary>
-        /// Gets the latest version data when called.
-        /// </summary>
-        public static void GetLatestVersions()
+        public string Error
         {
-            RequestLatestVersionData();
+            get => error;
+            set => error = value;
         }
+        
+        /* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        |   Constructors
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-
-        /// <summary>
-        /// Makes the web request & handles the response.
-        /// </summary>
-        private static void RequestLatestVersionData()
+        public static VersionPacketError Custom(string msg)
         {
-            var request = UnityWebRequest.Get(VersionInfo.ValidationUrl);
-            var async = request.SendWebRequest();
-
-            async.completed += (a) =>
+            return new VersionPacketError()
             {
-                if (request.result != UnityWebRequest.Result.Success) return;
-
-                Versions = JsonUtility.FromJson<VersionPacket>(request.downloadHandler.text);
-                ResponseReceived.Raise();
+                error = msg
             };
         }
     }

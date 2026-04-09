@@ -31,13 +31,7 @@ namespace CarterGames.Shared.AudioManager.Editor
         /// <summary>
         /// The version number of the asset.
         /// </summary>
-        public static string AssetName => "Audio Manager";
-        
-        
-        /// <summary>
-        /// The version number of the asset.
-        /// </summary>
-        public static string VersionNumber => "3.1.1";
+        public static string VersionNumber => "3.1.2";
         
         
         /// <summary>
@@ -46,6 +40,6 @@ namespace CarterGames.Shared.AudioManager.Editor
         /// <remarks>
         /// Asset owner is in the UK, so its Y/M/D format.
         /// </remarks>
-        public static string ReleaseDate => "2025/06/01";
+        public static string ReleaseDate => "2026/04/??";
     }
 }
