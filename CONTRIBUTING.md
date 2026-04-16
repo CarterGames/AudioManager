@@ -1,21 +1,37 @@
-# How to contribute to this project
-Interested in contributing? This guide will go through how to do just that.
+# Contribute to the Audio Manager
 
-## Reporting bugs
-Bug reports are super useful. While I strive to avoid any major issues with my projects, bugs will always slip through the cracks. To make sure the bug can be delt with quickly, please provide as much information on the issue as you can in your report. You can report bugs in 2 ways:
-- Adding an issue to this repo
-- Submitting a bug report on my website: https://carter.games/report/
+The following is a set of guidelines for contributing to this asset. The guidelines written here need to be followed for your contribution to be accepted with ease.
 
-I do aim to fix bugs as soon I get reports, but if I cannot replicate the issue or see the issues as a design choice it may be ignored. If you see another public issue on the repo about your issue do not make another issue. Just comment on that issue instead. 
+## How to contribute?
+
+### Reporting issues
+
+If you've found an issue with the asset, please do report it through one of the following channels. If you have a GitHub account its recommend to report an issue. But other methods are available if you don't:
+
+- GitHub issue, using the bug template. Please check the issue you are reporting is not already listed and follow the template provided to report the issue. (https://github.com/CarterGames/AudioManager/issues).
+- Bug report form (https://carter.games/report/).
+- Email (hello@carter.games)
+
+### Suggesting a feature
+
+If you have ideas for new features. Do feel free to let me know.
+
+- GitHub issue, using the feature template. (https://github.com/CarterGames/AudioManager/issues).
+- Email (hello@carter.games)
 
 
-## Pull requests
-Your code will have to be reviewed before being applied to the project.
+### Code changes
+This is the more compilcated contribution as you need to follow bigger guides and understanding how the asset functions behind the scenes. While I'm open to code changes, they may take longer to be accepted.
 
-If you have changes you want to merge in there are several things to do to make sure your changes pass.
+To make a code change you MUST follow the following guidelines:
+- Follow the Carter Games specific Unity C# style guide for your code. Which can be found here: https://carter.games/unity-c-style-guide/
+- Follow the Carter Games commit message guide for your commits which can be found here: https://carter.games/commit-emoji-guide/
+- Honour the Carter Games commitment to no AI usage. Any AI generated code will be rejected regardless of how useful it may be to the project. If you've used AI for other projects you may find your contributions denied even if you didn't use AI for your contribution. See the Carter Games stance on AI here: https://carter.games/ai-policy/
+- Provide documentation on your new changes or notes on what needs updating in the documentation to support your changes. 
 
-- Make sure your changes go off the latest release branch, not main! Pull requests to main will be rejected instantly for safety.
-- Make sure each commit is concise and explains well what it is changing, with reasoning if needed.
-- Make sure your code follows the Carter Games convention: https://carter.games/unity-c-style-guide/.
-- Make sure your changes are compatible with the previous version of the asset without breaking anything for the user.
-- If adding a new feature, explain in detail what it does and its use case (new features will take longer to review, naturally).
+To make changes, please do the following:
+- Fork the repository.
+- Make your changes in your fork.
+- Create a PR merging your changes into the **contribution** branch (https://github.com/CarterGames/AudioManager/tree/contribution). Your PR should explain what it adds to the project.
+- Your code will be reviewed and if all good will be merged into the **contribution** branch.
+- Your contribution will be merged into a future release when deemed necessary by Carter Games members. Theres a lot to a release to make it happen, so it isn't as simple as just merging to main xD
